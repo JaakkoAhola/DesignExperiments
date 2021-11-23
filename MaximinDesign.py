@@ -18,13 +18,21 @@ from Data import Data
 from geneticalgorithm import geneticalgorithm as ga
 from BinarySpacePartition import BinarySpacePartition
 
+def generalised_distance(x_array, y_array, s=2):
+    p = x_array.shape[0]
+
+    dist = numpy.power( numpy.sum( numpy.power(numpy.abs(x_array - y_array),s) ) / p, 1/s )
+
+    return dist
+
+
 def logarithmic_euclidian_distance(x,y):
     x_log = numpy.log(x)
     y_log = numpy.log(y)
 
     return distance.euclidean(x_log, y_log)
 
-def matrix_minimum_distance(mm, dist_func=logarithmic_euclidian_distance):
+def matrix_minimum_distance(mm, dist_func=generalised_distance):
     minimum = numpy.nan
 
     for row in range(mm.shape[0]):

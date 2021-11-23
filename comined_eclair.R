@@ -1,6 +1,8 @@
 #!/usr/bin/env Rscript
-source("/home/aholaj/Nextcloud/000_WORK/000_Codex/CoMinED/scripts/lib.R")
-source("/home/aholaj/Nextcloud/000_WORK/000_Codex/lhs/lib_meteo.R")
+koodihakemisto <- Sys.getenv("KOODIT")
+datahakemisto <- Sys.getenv("DATAT")
+source(paste(koodihakemisto, "/CoMinED/scripts/lib.R", sep=""))
+source(paste(koodihakemisto, "/DesignExperiments/lib_meteo.R", sep=""))
 require("rngWELL")
 require("lattice")
 require("grid")
@@ -20,36 +22,38 @@ if (length(args)==0) {
 moodi <- switch(moodi_nro, "test", "SBnight", "SBday", "SBnight")
 print(paste("moodi:", moodi))
 
+full_collection <- paste(datahakemisto, "/ECLAIR/eclair_dataset_2001_designvariables.csv", sep="")
+
 if (moodi == "test"){
-  filename <- "/home/aholaj/Data/ECLAIR/sample20000.csv"
+  filename <- paste(datahakemisto, "/ECLAIR/sample20000.csv", sep="")
   design_points <- 100
   sobol_points <- 200
   design_variables <- c("q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc")
   comined_params_Q <- 5
   
 } else if (moodi == "SBnight"){
-  filename <- "/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv"
+  filename <- full_collection
   design_points <- 500
   sobol_points <- 1e4
   design_variables <- c("q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc")
   comined_params_Q <- 19
   
 } else if (moodi == "SBday"){
-  filename <- "/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv"
+  filename <- full_collection
   design_points <- 500
   sobol_points <- 1e4
   design_variables <- c("q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "cos_mu")
   comined_params_Q <- 19
   
 } else if (moodi == "SALSAnight"){
-  filename <- "/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv"
+  filename <- full_collection
   design_points <- 135
   sobol_points <- 1e4
   design_variables <- c("q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff")
   comined_params_Q <- 23
   
 } else if (moodi == "SALSAday"){
-  filename <- "/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv"
+  filename <- full_collection
   design_points <- 150
   sobol_points <- 1e4
   design_variables <- c("q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff", "cos_mu")
@@ -62,25 +66,30 @@ all_keys <- c("q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "ks", "as",
 source_data_file_name <- filename
 source_data <- read.csv(source_data_file_name)
 
-create_lookup_tables <- TRUE
+
 
 look_up_table_hash <- hash()
 
 use_max_pro <- FALSE
 
-if (create_lookup_tables){
-  for (key in all_keys){
-    if (key == "cos_mu"){
-      filt_data <- source_data[ source_data$cos_mu > .Machine$double.eps, ]
-    } else{
-      filt_data <- source_data 
-    }
-    look_up_table <- sort(filt_data[, key])
-    look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
-    write.csv(look_up_table, file=look_up_table_filename, row.names = FALSE)
-          # write.csv(sorted_subset)
+
+for (key in all_keys){
+  look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
+  if (file.exists(look_up_table_filename)){
+    next
   }
+  print("Creating look-up tables")
+  if (key == "cos_mu"){
+    filt_data <- source_data[ source_data$cos_mu > .Machine$double.eps, ]
+  } else{
+    filt_data <- source_data 
+  }
+  look_up_table <- sort(filt_data[, key])
+  look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
+  write.csv(look_up_table, file=look_up_table_filename, row.names = FALSE)
+        # write.csv(sorted_subset)
 }
+
 
 for (key in design_variables){
     look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
@@ -190,11 +199,20 @@ if (TRUE){
 }
 
 
+get_file_name_create_folder <- function(design, design_points){
+  
+  design_filename <- paste(datahakemisto, "/ECLAIR/design_stats/", moodi, "/", design, "_", as.character(design_points), ".csv", sep="")
+  dir.create(dirname(design_filename))
+  return (design_filename)
+}
+
 tau <- c(0,exp(c(1:7)),1e6)
 
 
-getPoints <- function(design_points){
 
+
+getPoints <- function(design_points){
+  print(paste("DESIGN POINTS", design_points))
   if (TRUE){
     # Constrained Minimum Energy Design
     print("Constrained Minimum Energy Design")
@@ -211,7 +229,7 @@ getPoints <- function(design_points){
                 "time: ", inter_time[1]))
     
     scaled_up_comined_feasible <- matrix_look_up_table(comined.feasible)
-    print(head(scaled_up_comined_feasible))
+    write.csv(scaled_up_comined_feasible, file=get_file_name_create_folder("comined", design_points))
     print(" ")
     
     # CoMinED maximin design by one-point-at-a-time greedy algorithm
@@ -261,7 +279,10 @@ getPoints <- function(design_points){
                 "number of total samples", nrow(scmc.samp$samp.all),
                 "autoscaling:", use_scaling,
                 "time: ", inter_time[1]))
+    scaled_up_scmc_feasible <- matrix_look_up_table(scmc.feasible)
+    write.csv(scaled_up_scmc_feasible, file=get_file_name_create_folder("scmc", design_points))
     print(" ")
+    
     
     # SCMC Maximin design
     print("SCMC maximin design by one-point-at-a-time greedy algorithm")
@@ -299,11 +320,13 @@ getPoints <- function(design_points){
                 "total samples", nrow(lhs),
                 "time: ", inter_time[1]))
     print(" ")
+    scaled_up_lhs.in_feasible <- matrix_look_up_table(lhs.in)
+    write.csv(lhs.in, file=get_file_name_create_folder("lhs", design_points))
   }
 }
 
 if (moodi_nro > 1){
-  for (p in seq(10,500,10)){
+  for (p in seq(100,110,10)){
     getPoints(p)
   }
 } else{
