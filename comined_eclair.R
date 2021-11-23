@@ -1,6 +1,9 @@
 #!/usr/bin/env Rscript
 koodihakemisto <- Sys.getenv("KOODIT")
 datahakemisto <- Sys.getenv("DATAT")
+if (dir.exist("/fmi/projappl/project_2001927/project_rpackages_3.6.3")){
+  .libPaths(c("/fmi/projappl/project_2001927/project_rpackages_3.6.3", .libPaths()))
+}
 source(paste(koodihakemisto, "/CoMinED/scripts/lib.R", sep=""))
 source(paste(koodihakemisto, "/DesignExperiments/lib_meteo.R", sep=""))
 source(paste(koodihakemisto, "/DesignExperiments/puhti_env.R", sep=""))
