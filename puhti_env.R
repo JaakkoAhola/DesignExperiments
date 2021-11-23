@@ -1,5 +1,5 @@
 # Add this to your R code:
-if dir.exist("/fmi/projappl/project_2001927/project_rpackages_3.6.3"){
+if (dir.exist("/fmi/projappl/project_2001927/project_rpackages_3.6.3")){
     .libPaths(c("/fmi/projappl/project_2001927/project_rpackages_3.6.3", .libPaths()))
     libpath <- .libPaths()[1]
 
