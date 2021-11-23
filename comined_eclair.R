@@ -6,7 +6,6 @@ if (dir.exists("/fmi/projappl/project_2001927/project_rpackages_3.6.3")){
 }
 source(paste(koodihakemisto, "/CoMinED/scripts/lib.R", sep=""))
 source(paste(koodihakemisto, "/DesignExperiments/lib_meteo.R", sep=""))
-source(paste(koodihakemisto, "/DesignExperiments/puhti_env.R", sep=""))
 require("rngWELL")
 require("lattice")
 require("grid")
@@ -23,7 +22,7 @@ if (length(args)==0) {
   moodi_nro <- as.integer(args[1])
 }
 
-moodi <- switch(moodi_nro, "test", "SBnight", "SBday", "SBnight")
+moodi <- switch(moodi_nro, "test", "SBnight", "SBday", "SALSAnight", "SALSAday")
 print(paste("moodi:", moodi))
 
 full_collection <- paste(datahakemisto, "/ECLAIR/eclair_dataset_2001_designvariables.csv", sep="")
@@ -188,7 +187,7 @@ constraint <- function(x){
 
 
 ### sobol
-if (TRUE){
+if (FALSE){
   print("Getting Sobol points")
   ptm <- proc.time()
   samp <- sobol(sobol_points, design_dimension)
@@ -324,13 +323,15 @@ getPoints <- function(design_points){
                 "total samples", nrow(lhs),
                 "time: ", inter_time[1]))
     print(" ")
-    scaled_up_lhs.in_feasible <- matrix_look_up_table(lhs.in)
-    write.csv(lhs.in, file=get_file_name_create_folder("lhs", design_points))
+    if (nrow(lhs.in) > 0){
+	    scaled_up_lhs.in_feasible <- matrix_look_up_table(lhs.in)
+	    write.csv(lhs.in, file=get_file_name_create_folder("lhs", design_points))
+    }
   }
 }
 
 if (moodi_nro > 1){
-  for (p in seq(100,110,10)){
+  for (p in seq(100,500,100)){
     getPoints(p)
   }
 } else{
