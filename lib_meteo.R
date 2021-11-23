@@ -44,7 +44,7 @@ calc_sat_mixr <- function(p,temperature){
 
 calc_lwp <- function(p_surf, theta, pblh, rt){
   # Calculate liquid water path (kg/m^2) when boundary layer liquid water potential temperature (theta [K]) and total
-  # water mixing ratio (rt [kg/kg]) are constants from surface (p_surf, Pa) up to boundary layer top (pblh, Pa or km).
+  # water mixing ratio (rt [kg/kg]) are constants from surface (p_surf, Pa) up to boundary layer top (pblh, Pa).
   # In addition to the liquid water path, function returns cloud base and top heights (m) and the maximum (or cloud top)
   # liquid water mixing ratio (kg/kg).
   #
@@ -58,15 +58,10 @@ calc_lwp <- function(p_surf, theta, pblh, rt){
   p00 <- 1.0e+05
   alvl  <-  2.5e+06 #  ! latent heat of vaporization
   #
-  # It is assumed that a pblh value smaller than 10 is in kilometers and a value larger than that is Pa
-  if (pblh<10.0){
-    z_top <- pblh*1000. # from km to m (above surface)
-    p_top <- 0.
-  }
-  else{
-    z_top <- 10e3
-    p_top <- p_surf-pblh # Pa (above surface)
-  }
+  # It is assumed that a pblh value is Pa
+  z_top <- 10e3
+  p_top <- p_surf-pblh # Pa (above surface)
+
   #
   # Outputs
   lwp <- 0.    # Liquid water path (g/m^2)
@@ -132,11 +127,15 @@ calc_lwp <- function(p_surf, theta, pblh, rt){
   return (c(lwp, zb, zc, clw_max))
 }
 
-solve_rw_lwp <- function (p_surf, theta, lwp, pblh, debug=False){
+solve_rw_lwp <- function (p_surf, theta, lwp, pblh, debug=FALSE){
   # Solve boundary layer total water mixing ratio (kg/kg) from liquid water potential temperature (theta [K]),
-  # liquid water path (lwp, kg/m^2) and boundary layer height (pblh, Pa or km) for an adiabatic cloud.
+  # liquid water path (lwp, kg/m^2) and boundary layer height (pblh, Pa) for an adiabatic cloud.
   # For example, solve_rw_lwp(101780.,293.,100e-3,20000.) would return 0.00723684088331 [kg/kg].
   #
+  if ( is.na(theta) | is.na(lwp) | is.na(pblh)){
+    print(paste("NA found", "theta", theta, "lwp", lwp, "pblh", pblh))
+    return (-999)
+  }
   # Constants
   R  <- 287.04    # Specific gas constant for dry air (R_specific=R/M), J/kg/K
   cp  <- 1005.0    # Specific heat for a constant pressure
@@ -196,11 +195,10 @@ solve_rw_lwp <- function (p_surf, theta, lwp, pblh, debug=False){
     clw_max <- calc_lwp_output[4]
     #
     if (abs(lwp-lwp_new) < tol | abs(rw_max-rw_min) < 0.001e-3){
-      return (rw_new)}
-    else if (lwp < lwp_new){
+      return (rw_new)
+    } else if (lwp < lwp_new){
       rw_max  <- rw_new
-    }
-    else{
+    } else{
       rw_min  <- rw_new
     }
     k <- k+1

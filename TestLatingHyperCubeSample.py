@@ -11,30 +11,32 @@ import time
 import os
 import pandas
 import numpy
-from latin_hypercube_sample import latin_hypercube_sample
+from SourceVsSampleVsDesign import SourceVsSampleVsDesign
 
 
-class test_latin_hypercube_sample(unittest.TestCase):
+class test_SourceVsSampleVsDesign(unittest.TestCase):
 
     def test_init(self):
-        test_latin = latin_hypercube_sample()
+        test_latin = SourceVsSampleVsDesign()
         self.assertTrue(hasattr(test_latin, "files"))
         self.assertTrue(hasattr(test_latin, "dataframes"))
+        self.assertTrue(hasattr(test_latin, "figure_folder"))
+        self.assertTrue(hasattr(test_latin, "figures"))
 
     @unittest.skip("a bit too time consuming")
     def test_read_big(self):
-        test_latin = latin_hypercube_sample()
+        test_latin = SourceVsSampleVsDesign()
         test_latin.read_big()
         self.assertTrue("big" in test_latin.dataframes)
 
     def test_read_sample(self):
-        test_latin = latin_hypercube_sample()
+        test_latin = SourceVsSampleVsDesign()
         test_latin.read_sample()
         self.assertTrue("sample" in test_latin.dataframes)
 
     @unittest.skip("a bit too time consuming")
     def test_create_sample(self):
-        test_latin = latin_hypercube_sample()
+        test_latin = SourceVsSampleVsDesign()
         samples = 1000
         test_latin.read_big()
         test_latin.create_sample(samples)
@@ -45,13 +47,13 @@ class test_latin_hypercube_sample(unittest.TestCase):
 
     def test_create_sample_uninitialised_big(self):
         with self.assertRaises(AssertionError):
-            test_latin = latin_hypercube_sample()
+            test_latin = SourceVsSampleVsDesign()
             test_latin.create_sample()
 
     @unittest.skip("a bit too time consuming")
     def test_write_sample(self):
         test_sample = "/tmp/test.csv"
-        test_latin = latin_hypercube_sample(files={"big": "/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv",
+        test_latin = SourceVsSampleVsDesign(files={"big": "/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv",
                                                    "sample": test_sample})
         test_latin.read_big()
         test_latin.create_sample(1)
@@ -61,11 +63,11 @@ class test_latin_hypercube_sample(unittest.TestCase):
 
     def test_write_sample_uninitialised_sample(self):
         with self.assertRaises(AssertionError):
-            test_latin = latin_hypercube_sample()
+            test_latin = SourceVsSampleVsDesign()
             test_latin.write_sample()
 
     def test_get_lhs_sample(self):
-        test_latin = latin_hypercube_sample()
+        test_latin = SourceVsSampleVsDesign()
         test_latin.get_lhs_sample(1, 1)
 
         self.assertTrue(isinstance(test_latin.lhs_sample, numpy.ndarray))
@@ -74,7 +76,7 @@ class test_latin_hypercube_sample(unittest.TestCase):
                          numpy.zeros([1, 1]).shape)
 
     def test_get_lhs_sample_as_dataframe(self):
-        test_latin = latin_hypercube_sample()
+        test_latin = SourceVsSampleVsDesign()
         self.assertTrue(callable(test_latin.get_lhs_sample_as_dataframe))
 
         test_latin.get_lhs_sample(1, 2)
@@ -85,6 +87,27 @@ class test_latin_hypercube_sample(unittest.TestCase):
         with self.assertRaises(AssertionError):
             test_latin.get_lhs_sample(1, 1)
             test_latin.get_lhs_sample_as_dataframe()
+
+    def test_finalise_figures(self):
+        test_latin = SourceVsSampleVsDesign()
+        self.assertTrue(callable(test_latin.finalise_figures))
+
+    def test_figure_lhs(self):
+        test_latin = SourceVsSampleVsDesign(figure_folder="/tmp/figures")
+
+        self.assertTrue(callable(test_latin.figure_lhs))
+
+        test_latin.get_lhs_sample()
+        test_latin.get_lhs_sample_as_dataframe()
+        test_latin.figure_lhs()
+        self.assertTrue("lhs" in test_latin.figures)
+
+        with self.assertRaises(AssertionError):
+            test_latin2 = SourceVsSampleVsDesign()
+            test_latin2.figure_lhs()
+
+    def test_lhs
+
 
 
 
