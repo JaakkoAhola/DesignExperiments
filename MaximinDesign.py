@@ -131,6 +131,12 @@ def main():
 
     debug = False
 
+    try:
+        indeksi = int(sys.argv[1])
+    except IndexError:
+        print("Not getting a cmd-line argument, switching to debug mode")
+        debug = True
+
     design_variables = {"SBnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc"],
                         "SBday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "cos_mu"],
                         "SALSAnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff"],
@@ -142,7 +148,7 @@ def main():
         design_points_vector = numpy.array([5])
     else:
         file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
-        keys_list = list(design_variables)
+        keys_list = [list(design_variables)[indeksi]]
         design_points_vector = numpy.arange(10,500,10)
 
 
