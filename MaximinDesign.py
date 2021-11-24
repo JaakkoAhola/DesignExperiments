@@ -63,7 +63,8 @@ class MaxiMinDesign:
         os.makedirs(self.outputfolder, exist_ok=True)
 
         self.design = None
-        self.solution = None
+        self.solution = {"function":numpy.nan,
+                         "variable":None}
 
     def get_dataframe(self):
         return self.dataframe
@@ -96,10 +97,13 @@ class MaxiMinDesign:
                  dimension=self.dataframe.shape[0],
                  variable_type='bool',
                  convergence_curve=False)
+        try:
+            model.run()
+            self.solution = model.output_dict
+        except AssertionError:
+            print("solution not found")
 
-        model.run()
 
-        self.solution = model.output_dict
 
         return self.solution
 
@@ -111,7 +115,7 @@ class MaxiMinDesign:
 
     def get_design(self):
 
-        if ((self.design is None) and (self.solution is not None)):
+        if ((self.design is None) and (self.solution["variable"] is not None)):
             selection = pandas.array(self.solution["variable"].astype("bool"))
 
             self.design = self.dataframe[selection]
@@ -119,7 +123,8 @@ class MaxiMinDesign:
         return self.design
 
     def write_design(self):
-        self.design.to_csv(self.outputfile)
+        if self.design is not None:
+            self.design.to_csv(self.outputfile)
 
 
 def main():
