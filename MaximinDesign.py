@@ -16,7 +16,6 @@ from scipy.spatial import distance
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
 from geneticalgorithm import geneticalgorithm as ga
-from BinarySpacePartition import BinarySpacePartition
 
 def generalised_distance(x_array, y_array, s=2):
     p = x_array.shape[0]
@@ -45,8 +44,26 @@ def matrix_minimum_distance(mm, dist_func=generalised_distance):
 
 class MaxiMinDesign:
 
-    def __init__(self, candidate_dataframe_filename):
-        self.dataframe = pandas.read_csv(candidate_dataframe_filename, index_col=0)
+    def __init__(self,
+                 design_variables=['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc'],
+                 design_points=500,
+                 sourcefile="/home/aholaj/Data/ECLAIR/sample20000.csv",
+                 outputfile="/home/aholaj/Data/ECLAIR/bsp_test_sb_night_500.csv"
+                 ):
+        self.design_variables = design_variables
+        self.design_points = design_points
+
+        self.dataframe = pandas.read_csv(sourcefile, index_col=0)[self.design_variables]
+
+        if ("cos_mu" in self.design_variables):
+            self.dataframe = self.dataframe[self.dataframe["cos_mu"] > Data.getEpsilon()]
+
+        self.outputfile = outputfile
+        self.outputfolder = os.path.dirname(self.outputfile)
+        os.makedirs(self.outputfolder, exist_ok=True)
+
+        self.design = None
+        self.solution = None
 
     def get_dataframe(self):
         return self.dataframe
@@ -62,12 +79,14 @@ class MaxiMinDesign:
         candidates = self.dataframe[ selection ]
         matrix = numpy.asarray(candidates)
 
-        minimum_distance = matrix_minimum_distance(matrix)
+        minimum_distance = 0.
 
         pen = 0.
 
         if numpy.sum(boolean_array) != self.design_points:
-            pen = 100 + 10 * numpy.sum(boolean_array)
+            pen = 500 + 10 * numpy.sum(boolean_array)
+        else:
+            minimum_distance = matrix_minimum_distance(matrix)
 
         return -minimum_distance + pen
 
@@ -90,84 +109,79 @@ class MaxiMinDesign:
     def get_objective_value(self):
         return self.solution["function"]
 
+    def get_design(self):
+
+        if ((self.design is None) and (self.solution is not None)):
+            selection = pandas.array(self.solution["variable"].astype("bool"))
+
+            self.design = self.dataframe[selection]
+
+        return self.design
+
+    def write_design(self):
+        self.design.to_csv(self.outputfile)
+
 
 def main():
 
-    ga_design = MaxiMinDesign("/home/aholaj/Data/ECLAIR/sample20000.csv")
-    bsp = BinarySpacePartition()
-
     debug = False
-
-
-    if debug:
-        orig_df = pandas.read_csv("/home/aholaj/Data/ECLAIR/sample20000.csv", index_col=0)
-    else:
-        orig_df = pandas.read_csv("/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv", index_col=0)
-
 
     design_variables = {"SBnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc"],
                         "SBday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "cos_mu"],
                         "SALSAnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff"],
                         "SALSAday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]}
 
-    for key in list(design_variables)[2:]:
+    if debug:
+        file = os.environ["DATAT"] + "/ECLAIR/sample20000.csv"
+        keys_list = list(design_variables)[:1]
+        design_points_vector = numpy.array([5])
+    else:
+        file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
+        keys_list = list(design_variables)
+        design_points_vector = numpy.arange(10,500,10)
 
 
-        df = orig_df
 
-        if "cos_mu" in design_variables[key]:
-            df = df[df["cos_mu"] > Data.getEpsilon()]
-
-        df_desing_variables = df[design_variables[key]]
-
-        ga_design.set_dataframe(df_desing_variables)
-
-        bsp.set_design_variables(design_variables[key])
-        bsp.set_collection(df_desing_variables)
-
+    for key in keys_list:
+        solutions_ga = numpy.zeros(numpy.shape(design_points_vector))
+        timing_vector_ga = numpy.zeros(numpy.shape(design_points_vector))
 
         if debug:
-
-            df = ga_design.get_dataframe()
-            subsample = df.sample(10, random_state=0)
-            ga_design.set_dataframe(subsample)
-
-            p_vector = numpy.array([5])
-
+            subfolder = "test"
         else:
-            p_vector = numpy.arange(10,500,10)
+            subfolder = key
 
-        solutions_ga = numpy.zeros(numpy.shape(p_vector))
-        timing_vector_ga = numpy.zeros(numpy.shape(p_vector))
 
-        solutions_bsp = numpy.zeros(numpy.shape(p_vector))
-        timing_vector_bsp = numpy.zeros(numpy.shape(p_vector))
+        for ind, design_points in enumerate(design_points_vector):
+            ga_design = MaxiMinDesign(design_variables=design_variables[key],
+                                   design_points=design_points,
+                                   sourcefile=file,
+                                   outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/ga/ga_" + str(design_points) + ".csv")
 
-        for ind, p in enumerate(p_vector):
-            ga_design.set_design_points(p)
+            if debug:
+                df = ga_design.get_dataframe()
+                subsample = df.sample(10, random_state=0)
+                ga_design.set_dataframe(subsample)
+
             start = time.time()
             ga_design.optimise()
             duration_ga = time.time() - start
             timing_vector_ga[ind] = duration_ga
             solutions_ga[ind] = -ga_design.get_objective_value()
 
-            bsp.set_number_of_samples_required(p)
-            start = time.time()
-            bsp.create_bs_partitions()
-            bsp.sample_partitions_to_design()
-            duration_bsp = time.time() - start
-            bsp_matrix = numpy.asarray(bsp.get_design())
-            solutions_bsp[ind] = matrix_minimum_distance(bsp_matrix)
-            timing_vector_bsp[ind] = duration_bsp
+            ga_design.get_design()
+            if ga_design.get_design().shape[0] != design_points:
+                print("ValueError not the desired amount of design_points")
+                continue
+            ga_design.write_design()
 
-
-        solutions_df = pandas.DataFrame({"design_points": p_vector,
+        solutions_df = pandas.DataFrame(data = {
                                          "maximin_ga": solutions_ga,
                                          "duration_ga": timing_vector_ga,
-                                         "maximin_bsp": solutions_bsp,
-                                         "duration_bsp": timing_vector_ga})
-
-        solutions_df.to_csv("/home/aholaj/Data/ECLAIR/design_stats/" + key + "_design_stats.csv")
+                                         },
+                                        index=design_points_vector)
+        solutions_df.index.name = "design_points"
+        solutions_df.to_csv(os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/ga_stats.csv")
 
 
 

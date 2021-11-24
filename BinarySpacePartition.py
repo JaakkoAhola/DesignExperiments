@@ -12,51 +12,46 @@ import time
 import random
 from copy import deepcopy
 from datetime import datetime
-
+import numpy
 import pandas
 
 sys.path.append(os.environ["LESMAINSCRIPTS"])
-from SourceVsSampleVsDesign import SourceVsSampleVsDesign
 from Data import Data
-
+import MaximinDesign
 
 class BinarySpacePartition:
 
     def __init__(self,
-                 design_variables = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc'],
-                 number_of_samples_required = 500,
-                 file = "/home/aholaj/Data/ECLAIR/sb_sb_night_500.csv"
+                 design_variables=['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc'],
+                 design_points=500,
+                 sourcefile="/home/aholaj/Data/ECLAIR/sample20000.csv",
+                 outputfile="/home/aholaj/Data/ECLAIR/bsp_test_sb_night_500.csv"
                  ):
 
         self.design_variables = design_variables
 
         self.collection = None
 
-        self.number_of_samples_required = number_of_samples_required
+        self.collection = pandas.read_csv(sourcefile, index_col=0)[self.design_variables]
 
+        if ("cos_mu" in self.design_variables):
+            self.collection = self.collection[self.collection["cos_mu"] > Data.getEpsilon()]
 
-        self._load_collection()
+        self.design_points = design_points
 
         self.partitions = []
 
         self.design = None
 
-        self.file = file
-
-
-    def _load_collection(self):
-        latin = SourceVsSampleVsDesign()
-        latin.get_sample()
-
-        self.collection = deepcopy(latin.get_sample()[self.design_variables])
-
-        return self.collection
+        self.outputfile = outputfile
+        self.outputfolder = os.path.dirname(self.outputfile)
+        os.makedirs(self.outputfolder, exist_ok=True)
 
     def set_collection(self, dataframe):
         self.collection = dataframe
 
-    def set_number_of_samples_required(self, design_points):
-        self.number_of_samples_required = design_points
+    def set_design_points(self, design_points):
+        self.design_points = design_points
 
     def set_design_variables(self, design_variables):
         self.design_variables = design_variables
@@ -80,7 +75,7 @@ class BinarySpacePartition:
                 iterate_partitions = True
                 while iterate_partitions:
 
-                    if len(self.partitions) < self.number_of_samples_required:
+                    if len(self.partitions) < self.design_points:
                         partition = self.partitions[part_ind]
 
                         if len(partition) == 1:
@@ -102,7 +97,7 @@ class BinarySpacePartition:
                     iterate_partitions = (make_partition and (part_ind < len(self.partitions)))
 
     def sample_partitions_to_design(self):
-        design_helper_list = [None]*self.number_of_samples_required
+        design_helper_list = [None]*self.design_points
         for part_ind, partition in enumerate(self.partitions):
             pass
             row = partition.sample()
@@ -115,16 +110,70 @@ class BinarySpacePartition:
         return self.design
 
     def write_design(self):
-        self.design.to_csv(self.file)
+        self.design.to_csv(self.outputfile)
 
 
 
 def main():
-    bsp = BinarySpacePartition(number_of_samples_required = 500)
-    bsp.create_bs_partitions()
+    testing = False
+    if testing:
+        bsp = BinarySpacePartition(design_points = 500,
+                                   outputfile="/home/aholaj/Data/ECLAIR/design_stats/test/bsp_test.csv")
+        bsp.create_bs_partitions()
 
-    bsp.sample_partitions_to_design()
-    bsp.write_design()
+        bsp.sample_partitions_to_design()
+        bsp.write_design()
+
+    debug = False
+
+    design_variables = {"SBnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc"],
+                        "SBday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "cos_mu"],
+                        "SALSAnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff"],
+                        "SALSAday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]}
+
+    if debug:
+        file = os.environ["DATAT"] + "/ECLAIR/sample20000.csv"
+        keys_list = list(design_variables)[:1]
+        design_points_vector = numpy.array([5])
+    else:
+        file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
+        keys_list = list(design_variables)
+        design_points_vector = numpy.arange(10,500,10)
+
+
+    for key in keys_list:
+        solutions_bsp = numpy.zeros(numpy.shape(design_points_vector))
+        timing_vector_bsp = numpy.zeros(numpy.shape(design_points_vector))
+
+        if debug:
+            subfolder = "test"
+        else:
+            subfolder = key
+
+        for ind, design_points in enumerate(design_points_vector):
+            bsp = BinarySpacePartition(design_variables=design_variables[key],
+                                   design_points=design_points,
+                                   sourcefile=file,
+                                   outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/bsp/bsp_" + str(design_points) + ".csv")
+
+            start = time.time()
+            bsp.create_bs_partitions()
+            bsp.sample_partitions_to_design()
+            duration_bsp = time.time() - start
+            bsp_matrix = numpy.asarray(bsp.get_design())
+            solutions_bsp[ind] = MaximinDesign.matrix_minimum_distance(bsp_matrix)
+            timing_vector_bsp[ind] = duration_bsp
+            bsp.write_design()
+
+        solutions_df = pandas.DataFrame(data={
+                                         "maximin_bsp": solutions_bsp,
+                                         "duration_bsp": timing_vector_bsp,
+                                         },
+                                        index= design_points_vector)
+        solutions_df.index.name = "design_points"
+
+        solutions_df.to_csv(os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/bsp_stats.csv")
+
 
 
 if __name__ == "__main__":
