@@ -366,7 +366,7 @@ getPoints <- function(design_points){
 }
 
 if (moodi_nro > 1){
-  for (p in seq(100,500,100)){
+  for (p in seq(10,500,10)){
     getPoints(p)
   }
 } else{
