@@ -89,8 +89,11 @@ for (key in all_keys){
   }
   look_up_table <- sort(filt_data[, key])
   look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
-  write.csv(look_up_table, file=look_up_table_filename, row.names = FALSE)
-        # write.csv(sorted_subset)
+  write.table(look_up_table,
+              file=look_up_table_filename,
+              col.names = c(key),
+              row.names = FALSE,
+              sep=",")
 }
 
 
@@ -232,7 +235,10 @@ getPoints <- function(design_points){
                 "time: ", inter_time[1]))
     
     scaled_up_comined_feasible <- matrix_look_up_table(comined.feasible)
-    write.csv(scaled_up_comined_feasible, file=get_file_name_create_folder("comined", design_points))
+    write.table(scaled_up_comined_feasible,
+                file=get_file_name_create_folder("comined", design_points),
+                col.names = design_variables,
+                sep=",")
     print(" ")
     
     # CoMinED maximin design by one-point-at-a-time greedy algorithm
@@ -283,7 +289,11 @@ getPoints <- function(design_points){
                 "autoscaling:", use_scaling,
                 "time: ", inter_time[1]))
     scaled_up_scmc_feasible <- matrix_look_up_table(scmc.feasible)
-    write.csv(scaled_up_scmc_feasible, file=get_file_name_create_folder("scmc", design_points))
+    write.table(scaled_up_scmc_feasible,
+              file=get_file_name_create_folder("scmc", design_points),
+              col.names = design_variables,
+              sep=",")
+    
     print(" ")
     
     
@@ -325,7 +335,10 @@ getPoints <- function(design_points){
     print(" ")
     if (nrow(lhs.in) > 0){
 	    scaled_up_lhs.in_feasible <- matrix_look_up_table(lhs.in)
-	    write.csv(lhs.in, file=get_file_name_create_folder("lhs", design_points))
+	    write.table(lhs.in,
+	              file=get_file_name_create_folder("lhs", design_points),
+	              col.names = design_variables,
+	              sep=",")
     }
   }
 }
