@@ -207,19 +207,21 @@ if (FALSE){
 
 get_file_name_create_folder <- function(design, design_points){
   
-  design_filename <- paste(datahakemisto, "/ECLAIR/design_stats/", moodi, "/", design, "_", as.character(design_points), ".csv", sep="")
+  design_filename <- paste(datahakemisto, "/ECLAIR/design_stats/", moodi, "/", design, "/", design, "_", as.character(design_points), ".csv", sep="")
   dir.create(dirname(design_filename))
   return (design_filename)
 }
 
 tau <- c(0,exp(c(1:7)),1e6)
 
+M_scmc <- 300
 
-
+run_comined <- TRUE
 
 getPoints <- function(design_points){
   print(paste("DESIGN POINTS", design_points))
-  if (TRUE){
+  
+  if (run_comined){
     # Constrained Minimum Energy Design
     print("Constrained Minimum Energy Design")
     ptm <- proc.time()
@@ -234,95 +236,110 @@ getPoints <- function(design_points){
                 "number of feasible samples", nrow(comined.feasible),
                 "time: ", inter_time[1]))
     
-    scaled_up_comined_feasible <- matrix_look_up_table(comined.feasible)
-    write.table(scaled_up_comined_feasible,
-                file=get_file_name_create_folder("comined", design_points),
-                col.names = design_variables,
-                sep=",")
     print(" ")
     
-    # CoMinED maximin design by one-point-at-a-time greedy algorithm
-    print("CoMinED maximin design by one-point-at-a-time greedy algorithm")
-    ptm <- proc.time()
-    comined.maximin <- maximin.seq(design_points, comined.feasible, return.obj = T)
-    inter_time <- proc.time() - ptm
-    
-    print(paste("CoMinED maximin measure", comined.maximin$obj,
-                "time: ", inter_time[1]))
-                
-    print(" ")
-    
-    # Upscaled CoMinED maximin design by one-point-at-a-time greedy algorithm
-    print("Upscaled CoMinED maximin design by one-point-at-a-time greedy algorithm")
-    ptm <- proc.time()
-    comined.maximin <- maximin.seq(design_points, scaled_up_comined_feasible, return.obj = T)
-    inter_time <- proc.time() - ptm
-    
-    print(paste("CoMinED maximin measure", comined.maximin$obj,
-                "time: ", inter_time[1]))
-    
-    print(" ")
-    
-    if (use_max_pro){
-    # CoMinED maxpro design by one-point-at-a-time greedy algorithm
-    print("CoMinED maxpro design by one-point-at-a-time greedy algorithm")
-    ptm <- proc.time()
-    comined.maxpro <- maxpro.seq(design_points, comined.feasible, return.obj = T)
-    inter_time <- proc.time() - ptm
-    print(paste("CoMinED maxpro measure", comined.maxpro$obj,
-                "time: ", inter_time[1]))
+    if (nrow(comined.feasible) > design_points){
+      # CoMinED maximin design by one-point-at-a-time greedy algorithm
+      print("CoMinED maximin design by one-point-at-a-time greedy algorithm")
+      ptm <- proc.time()
+      comined.maximin <- maximin.seq(design_points, comined.feasible, return.obj = T)
+      inter_time <- proc.time() - ptm
+      
+      print(paste("CoMinED maximin measure", comined.maximin$obj,
+                  "time: ", inter_time[1]))
+                  
+      comined_design <- comined.feasible[ comined.maximin$idx, ]
+      print(comined_design)
+      scaled_up_comined_design <- matrix_look_up_table(comined_design)
+      
+      write.table(scaled_up_comined_design,
+                  file=get_file_name_create_folder("comined", design_points),
+                  col.names = design_variables,
+                  sep=",")
+      
+      print(" ")
+      
+      if (use_max_pro){
+      # CoMinED maxpro design by one-point-at-a-time greedy algorithm
+      print("CoMinED maxpro design by one-point-at-a-time greedy algorithm")
+      ptm <- proc.time()
+      comined.maxpro <- maxpro.seq(design_points, comined.feasible, return.obj = T)
+      inter_time <- proc.time() - ptm
+      print(paste("CoMinED maxpro measure", comined.maxpro$obj,
+                  "time: ", inter_time[1]))
+      }
     }
   }  
   
-  M_scmc <- max(design_points*comined_params_Q, ceiling(comined.all / length(tau)))
+  if (run_comined){
+    M_scmc <- max(design_points*comined_params_Q, ceiling(comined.all / length(tau)))
+  }
   
   # SCMC candidate points
   if (TRUE){
-    ptm <- proc.time()
-    use_scaling <- T
-    
-    scmc.samp <- scmc(M_scmc, design_dimension, tau, constraint, auto.scale = use_scaling, return.all = T)
-    scmc.feasible <- scmc.samp$samp.feasible
-    inter_time <- proc.time() - ptm
-    print(paste("SCMC: number of feasible samples", nrow(scmc.samp$samp.feasible),
-                "number of total samples", nrow(scmc.samp$samp.all),
-                "autoscaling:", use_scaling,
-                "time: ", inter_time[1]))
-    scaled_up_scmc_feasible <- matrix_look_up_table(scmc.feasible)
-    write.table(scaled_up_scmc_feasible,
-              file=get_file_name_create_folder("scmc", design_points),
-              col.names = design_variables,
-              sep=",")
-    
-    print(" ")
-    
-    
-    # SCMC Maximin design
-    print("SCMC maximin design by one-point-at-a-time greedy algorithm")
-    ptm <- proc.time()
-    scmc.maximin <- maximin.seq(design_points, scmc.feasible, return.obj = T)
-    inter_time <- proc.time() - ptm
-    print(paste("Maximin measure from SCMC candidate points", scmc.maximin$obj,
-                "time: ", inter_time[1]))
-    print(" ")
-    
-    # SCMC MAXPRO
-    if (use_max_pro){
-      print("SCMC maxpro design by one-point-at-a-time greedy algorithm")
+    best_scmc_obj <- -1
+    scmc_design <- NULL
+    print("SCMC")
+    for (kk in seq(50)){
+      print(paste("scmc ", kk, ". run", sep=""))
       ptm <- proc.time()
-      scmc.maxpro <- maxpro.seq(design_points, scmc.feasible, return.obj = T)
+      use_scaling <- T
+      
+      scmc.samp <- scmc(M_scmc, design_dimension, tau, constraint, auto.scale = use_scaling, return.all = T)
+      scmc.feasible <- scmc.samp$samp.feasible
       inter_time <- proc.time() - ptm
-      print(paste("Maxpro measure from SCMC candidate points", scmc.maximin$obj,
+      print(paste("SCMC: number of feasible samples", nrow(scmc.samp$samp.feasible),
+                  "number of total samples", nrow(scmc.samp$samp.all),
+                  "autoscaling:", use_scaling,
                   "time: ", inter_time[1]))
+      
       print(" ")
+      
+      
+      if (nrow(scmc.feasible) > design_points){
+        # SCMC Maximin design
+        print("SCMC maximin design by one-point-at-a-time greedy algorithm")
+        ptm <- proc.time()
+        scmc.maximin <- maximin.seq(design_points, scmc.feasible, return.obj = T)
+        inter_time <- proc.time() - ptm
+        print(paste("Maximin measure from SCMC candidate points", scmc.maximin$obj,
+                    "time: ", inter_time[1]))
+        print(" ")
+        
+        if (scmc.maximin$obj > best_scmc_obj){
+          scmc_design <- scmc.feasible[scmc.maximin$idx,]
+        } 
+        
+        
+        # SCMC MAXPRO
+        if (use_max_pro){
+          print("SCMC maxpro design by one-point-at-a-time greedy algorithm")
+          ptm <- proc.time()
+          scmc.maxpro <- maxpro.seq(design_points, scmc.feasible, return.obj = T)
+          inter_time <- proc.time() - ptm
+          print(paste("Maxpro measure from SCMC candidate points", scmc.maximin$obj,
+                      "time: ", inter_time[1]))
+          print(" ")
+        }
+      }
+    
     }
+    
+    
+    print(scmc_design)
+    scaled_up_scmc_design <- matrix_look_up_table(scmc_design)
+    
+    write.table(scaled_up_scmc_design,
+                file=get_file_name_create_folder("scmc", design_points),
+                col.names = design_variables,
+                sep=",")
   }
   
   # LHS
   if (TRUE){
     print("LHS points")
     ptm <- proc.time()
-    set.seed(20211112)
+    # set.seed(20211112)
     lhs <- randomLHS(M_scmc, design_dimension)
     lhs.gval <- t(apply(lhs, 1, constraint))
     lhs.out.idx <- apply(lhs.gval, 1, function(x) return(any(x>0)))
@@ -335,10 +352,15 @@ getPoints <- function(design_points){
     print(" ")
     if (nrow(lhs.in) > 0){
 	    scaled_up_lhs.in_feasible <- matrix_look_up_table(lhs.in)
-	    write.table(lhs.in,
+	    
+	    lhs.maximin <- maximin.seq(design_points, lhs.in, return.obj = T)
+	    lhs_design <- lhs.in[lhs.maximin$idx,]
+	    scaled_up_lhs_design <- matrix_look_up_table(lhs_design)
+	    write.table(scaled_up_lhs_design,
 	              file=get_file_name_create_folder("lhs", design_points),
 	              col.names = design_variables,
 	              sep=",")
+	    
     }
   }
 }
@@ -348,7 +370,7 @@ if (moodi_nro > 1){
     getPoints(p)
   }
 } else{
-  getPoints(100)
+  getPoints(50)
 }
 
   # print(" ")
