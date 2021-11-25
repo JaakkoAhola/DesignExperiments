@@ -242,15 +242,14 @@ getPoints <- function(design_points){
       # CoMinED maximin design by one-point-at-a-time greedy algorithm
       print("CoMinED maximin design by one-point-at-a-time greedy algorithm")
       ptm <- proc.time()
-      comined.maximin <- maximin.seq(design_points, comined.feasible, return.obj = T)
+      scaled_up_comined.feasible <- matrix_look_up_table(comined.feasible)
+      comined.maximin <- maximin.seq(design_points, scaled_up_comined.feasible, return.obj = T)
       inter_time <- proc.time() - ptm
       
       print(paste("CoMinED maximin measure", comined.maximin$obj,
                   "time: ", inter_time[1]))
                   
-      comined_design <- comined.feasible[ comined.maximin$idx, ]
-      print(comined_design)
-      scaled_up_comined_design <- matrix_look_up_table(comined_design)
+      scaled_up_comined_design <- scaled_up_comined.feasible[comined.maximin$idx,]
       
       write.table(scaled_up_comined_design,
                   file=get_file_name_create_folder("comined", design_points),
@@ -300,14 +299,15 @@ getPoints <- function(design_points){
         # SCMC Maximin design
         print("SCMC maximin design by one-point-at-a-time greedy algorithm")
         ptm <- proc.time()
-        scmc.maximin <- maximin.seq(design_points, scmc.feasible, return.obj = T)
+        scaled_up_scmc.feasible <- matrix_look_up_table(scmc.feasible)
+        scmc.maximin <- maximin.seq(design_points, scaled_up_scmc.feasible, return.obj = T)
         inter_time <- proc.time() - ptm
         print(paste("Maximin measure from SCMC candidate points", scmc.maximin$obj,
                     "time: ", inter_time[1]))
         print(" ")
         
         if (scmc.maximin$obj > best_scmc_obj){
-          scmc_design <- scmc.feasible[scmc.maximin$idx,]
+          scaled_up_scmc_design <- scaled_up_scmc.feasible[scmc.maximin$idx,]
         } 
         
         
@@ -326,8 +326,6 @@ getPoints <- function(design_points){
     }
     
     
-    print(scmc_design)
-    scaled_up_scmc_design <- matrix_look_up_table(scmc_design)
     
     write.table(scaled_up_scmc_design,
                 file=get_file_name_create_folder("scmc", design_points),
@@ -353,9 +351,8 @@ getPoints <- function(design_points){
     if (nrow(lhs.in) > 0){
 	    scaled_up_lhs.in_feasible <- matrix_look_up_table(lhs.in)
 	    
-	    lhs.maximin <- maximin.seq(design_points, lhs.in, return.obj = T)
-	    lhs_design <- lhs.in[lhs.maximin$idx,]
-	    scaled_up_lhs_design <- matrix_look_up_table(lhs_design)
+	    lhs.maximin <- maximin.seq(design_points, scaled_up_lhs.in_feasible, return.obj = T)
+	    scaled_up_lhs_design <- scaled_up_lhs.in_feasible[lhs.maximin$idx,]
 	    write.table(scaled_up_lhs_design,
 	              file=get_file_name_create_folder("lhs", design_points),
 	              col.names = design_variables,
