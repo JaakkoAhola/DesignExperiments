@@ -208,7 +208,7 @@ if (FALSE){
 get_file_name_create_folder <- function(design, design_points){
   
   design_filename <- paste(datahakemisto, "/ECLAIR/design_stats/", moodi, "/", design, "/", design, "_", as.character(design_points), ".csv", sep="")
-  dir.create(dirname(design_filename))
+  dir.create(dirname(design_filename), recursive = TRUE)
   return (design_filename)
 }
 
