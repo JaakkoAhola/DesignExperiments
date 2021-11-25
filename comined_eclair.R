@@ -133,7 +133,7 @@ matrix_look_up_table <- function(ma){
   return (scaled_matrix)
 }
 
-if (FALSE){
+if (TRUE){
   print("test look-up table")
   vector_look_up_table(runif(length(design_variables), min = 0, max = 1))
   ma_sobol <- sobol(10, length(design_variables))
@@ -218,6 +218,8 @@ M_scmc <- 300
 
 run_comined <- TRUE
 
+
+
 getPoints <- function(design_points){
   print(paste("DESIGN POINTS", design_points))
   
@@ -244,13 +246,16 @@ getPoints <- function(design_points){
       ptm <- proc.time()
       scaled_up_comined.feasible <- matrix_look_up_table(comined.feasible)
       comined.maximin <- maximin.seq(design_points, scaled_up_comined.feasible, return.obj = T)
+      
+                  
+      scaled_up_comined_design <- scaled_up_comined.feasible[comined.maximin$idx,]
       inter_time <- proc.time() - ptm
       
       print(paste("CoMinED maximin measure", comined.maximin$obj,
                   "time: ", inter_time[1]))
-                  
-      scaled_up_comined_design <- scaled_up_comined.feasible[comined.maximin$idx,]
-      
+      comined_time[time_ind] <- inter_time[1]
+      comined_obj[time_ind] <- comined.maximin$obj
+       
       write.table(scaled_up_comined_design,
                   file=get_file_name_create_folder("comined", design_points),
                   col.names = design_variables,
@@ -279,11 +284,12 @@ getPoints <- function(design_points){
     best_scmc_obj <- -1
     scmc_design <- NULL
     print("SCMC")
-    for (kk in seq(50)){
+    ptm_all <- proc.time()
+    for (kk in scmc_reps){
       print(paste("scmc ", kk, ". run", sep=""))
-      ptm <- proc.time()
-      use_scaling <- T
       
+      use_scaling <- T
+      ptm <- proc.time()  
       scmc.samp <- scmc(M_scmc, design_dimension, tau, constraint, auto.scale = use_scaling, return.all = T)
       scmc.feasible <- scmc.samp$samp.feasible
       inter_time <- proc.time() - ptm
@@ -325,7 +331,9 @@ getPoints <- function(design_points){
     
     }
     
-    
+    inter_time <- proc.time() - ptm_all
+    scmc_time[time_ind] <- inter_time[1]
+    scmc_obj[time_ind] <- scmc.maximin$obj
     
     write.table(scaled_up_scmc_design,
                 file=get_file_name_create_folder("scmc", design_points),
@@ -348,6 +356,7 @@ getPoints <- function(design_points){
                 "total samples", nrow(lhs),
                 "time: ", inter_time[1]))
     print(" ")
+    lhs.best <- -1
     if (nrow(lhs.in) > 0){
 	    scaled_up_lhs.in_feasible <- matrix_look_up_table(lhs.in)
 	    
@@ -357,18 +366,42 @@ getPoints <- function(design_points){
 	              file=get_file_name_create_folder("lhs", design_points),
 	              col.names = design_variables,
 	              sep=",")
+	    lhs.best <- lhs.maximin$obj
 	    
     }
+    inter_time <- proc.time() - ptm
+    lhs_time[time_ind] <- inter_time[1]
+    lhs_obj[time_ind] <- lhs.best
   }
 }
 
 if (moodi_nro > 1){
-  for (p in seq(10,500,10)){
-    getPoints(p)
-  }
+  design_points_vector <- seq(10,500,10)
+  scmc_reps <- seq(50)
 } else{
-  getPoints(50)
+  design_points_vector <- c(10)
+  scmc_reps <- c(1)
 }
+
+comined_time <- rep(-1,length(design_points_vector))
+scmc_time <- rep(-1,length(design_points_vector))
+lhs_time <- rep(-1,length(design_points_vector))
+
+comined_obj <- rep(-1,length(design_points_vector))
+scmc_obj <- rep(-1,length(design_points_vector))
+lhs_obj <- rep(-1,length(design_points_vector))
+
+time_ind <- 1
+for (p in design_points_vector){
+  getPoints(p)
+  time_ind <- time_ind + 1 
+}
+
+stats_df <- data.frame(comined_time, scmc_time, lhs_time,
+                       comined_obj, scmc_obj, lhs_obj)
+write.table(stats_df,
+            file=paste(datahakemisto, "/ECLAIR/design_stats/", moodi, "/comined_scmc_lhs_stats.csv", sep=""),
+            sep=",")
 
   # print(" ")
   # # CoMinED
