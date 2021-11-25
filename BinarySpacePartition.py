@@ -150,26 +150,34 @@ def main():
     for key in keys_list:
         solutions_bsp = numpy.zeros(numpy.shape(design_points_vector))
         timing_vector_bsp = numpy.zeros(numpy.shape(design_points_vector))
-
+        best = -1
         if debug:
             subfolder = "test"
         else:
             subfolder = key
 
         for ind, design_points in enumerate(design_points_vector):
-            bsp = BinarySpacePartition(design_variables=design_variables[key],
+            start = time.time()
+            for k in range(50):
+                bsp = BinarySpacePartition(design_variables=design_variables[key],
                                    design_points=design_points,
                                    sourcefile=file,
                                    outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/bsp/bsp_" + str(design_points) + ".csv")
 
-            start = time.time()
-            bsp.create_bs_partitions()
-            bsp.sample_partitions_to_design()
+                bsp.create_bs_partitions()
+                bsp.sample_partitions_to_design()
+                bsp_matrix = numpy.asarray(bsp.get_design())
+
+                solution = MaximinDesign.matrix_minimum_distance(bsp_matrix)
+
+                if solution > best:
+                    best = solution
+                    bsp.write_design()
             duration_bsp = time.time() - start
-            bsp_matrix = numpy.asarray(bsp.get_design())
-            solutions_bsp[ind] = MaximinDesign.matrix_minimum_distance(bsp_matrix)
+
+            solutions_bsp[ind] = best
             timing_vector_bsp[ind] = duration_bsp
-            bsp.write_design()
+
 
         solutions_df = pandas.DataFrame(data={
                                          "maximin_bsp": solutions_bsp,
