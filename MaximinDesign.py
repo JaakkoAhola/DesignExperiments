@@ -96,7 +96,15 @@ class MaxiMinDesign:
         model=ga(function=self.cost,
                  dimension=self.dataframe.shape[0],
                  variable_type='bool',
-                 convergence_curve=False)
+                 convergence_curve=False,
+                 algorithm_parameters={'max_num_iteration': 10000,
+                                  'population_size': 100,
+                                  'mutation_probability': 0.1,
+                                  'elit_ratio': 0.01,
+                                  'crossover_probability': 0.5,
+                                  'parents_portion': 0.3,
+                                  'crossover_type': 'uniform',
+                                  'max_iteration_without_improv': None})
         try:
             model.run()
             self.solution = model.output_dict
