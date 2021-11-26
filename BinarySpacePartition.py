@@ -58,7 +58,7 @@ class BinarySpacePartition:
 
     def shuffleList(self, array):
         shuffledArray = deepcopy(array)
-        random.seed(787)
+        
         random.shuffle(shuffledArray)
 
         return shuffledArray
