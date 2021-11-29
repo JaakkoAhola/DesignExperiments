@@ -150,13 +150,14 @@ def main():
     for key in keys_list:
         solutions_bsp = numpy.zeros(numpy.shape(design_points_vector))
         timing_vector_bsp = numpy.zeros(numpy.shape(design_points_vector))
-        best = -1
+
         if debug:
             subfolder = "test"
         else:
             subfolder = key
 
         for ind, design_points in enumerate(design_points_vector):
+            best = -1
             start = time.time()
             for k in range(50):
                 bsp = BinarySpacePartition(design_variables=design_variables[key],
