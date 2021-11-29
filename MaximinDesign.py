@@ -97,8 +97,8 @@ class MaxiMinDesign:
                  dimension=self.dataframe.shape[0],
                  variable_type='bool',
                  convergence_curve=False,
-                 algorithm_parameters={'max_num_iteration': 10000,
-                                  'population_size': 100,
+                 algorithm_parameters={'max_num_iteration': 200,
+                                  'population_size': 20,
                                   'mutation_probability': 0.1,
                                   'elit_ratio': 0.01,
                                   'crossover_probability': 0.5,
@@ -157,7 +157,7 @@ def main():
     else:
         file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
         keys_list = [list(design_variables)[indeksi]]
-        design_points_vector = numpy.arange(10,500,10)
+        design_points_vector = numpy.arange(100,500,100)
 
 
 

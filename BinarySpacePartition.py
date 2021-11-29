@@ -58,7 +58,7 @@ class BinarySpacePartition:
 
     def shuffleList(self, array):
         shuffledArray = deepcopy(array)
-        random.seed(787)
+        
         random.shuffle(shuffledArray)
 
         return shuffledArray
@@ -144,7 +144,7 @@ def main():
     else:
         file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
         keys_list = [list(design_variables)[indeksi]]
-        design_points_vector = numpy.arange(10,500,10)
+        design_points_vector = numpy.arange(10,510,10)
 
 
     for key in keys_list:
@@ -159,7 +159,9 @@ def main():
         for ind, design_points in enumerate(design_points_vector):
             best = -1
             start = time.time()
-            for k in range(50):
+            print("design_points", design_points)
+            for k in range(10):
+                print("iteration:", k)
                 bsp = BinarySpacePartition(design_variables=design_variables[key],
                                    design_points=design_points,
                                    sourcefile=file,
