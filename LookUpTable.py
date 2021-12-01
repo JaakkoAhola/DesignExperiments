@@ -181,7 +181,7 @@ class LookUpTable:
         if index_search_function is None:
             index_search_function = self.log_search
         if estimate_function is None:
-            estimate_function = self.down_scale_linearfit
+            estimate_function = self.down_scale_mean
 
         hypercube_dataframe = deepcopy(up_scaled)
         for key in up_scaled.columns:
