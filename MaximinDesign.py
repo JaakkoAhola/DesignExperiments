@@ -16,6 +16,7 @@ from scipy.spatial import distance
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
 from geneticalgorithm import geneticalgorithm as ga
+from LookUpTable import LookUpTable
 
 def generalised_distance(x_array, y_array, s=2):
     p = x_array.shape[0]
@@ -65,6 +66,7 @@ class MaxiMinDesign:
         self.design = None
         self.solution = {"function":numpy.nan,
                          "variable":None}
+        self.look = LookUpTable()
 
     def get_dataframe(self):
         return self.dataframe
@@ -78,7 +80,8 @@ class MaxiMinDesign:
     def cost(self, boolean_array):
         selection = pandas.array(boolean_array.astype("bool"))
         candidates = self.dataframe[ selection ]
-        matrix = numpy.asarray(candidates)
+        candidates_hypercube = self.look.downscale_dataframe(candidates)
+        matrix = numpy.asarray(candidates_hypercube)
 
         minimum_distance = 0.
 
@@ -97,7 +100,7 @@ class MaxiMinDesign:
                  dimension=self.dataframe.shape[0],
                  variable_type='bool',
                  convergence_curve=False,
-                 algorithm_parameters={'max_num_iteration': 200,
+                 algorithm_parameters={'max_num_iteration': 350,
                                   'population_size': 20,
                                   'mutation_probability': 0.1,
                                   'elit_ratio': 0.01,
@@ -157,7 +160,7 @@ def main():
     else:
         file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
         keys_list = [list(design_variables)[indeksi]]
-        design_points_vector = numpy.arange(100,500,100)
+        design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
 
 
