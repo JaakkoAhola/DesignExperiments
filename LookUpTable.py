@@ -15,6 +15,7 @@ import pandas
 import numpy
 from datetime import datetime
 from copy import deepcopy
+from bisect import bisect_right
 
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
@@ -102,8 +103,27 @@ class LookUpTable:
 
         return up_scaled
 
-    def function_downscale_value(self, key, up_scaled_value, estimate_function):
+    def function_downscale_value(self,
+                                 key,
+                                 up_scaled_value,
+                                 index_search_function=None,
+                                 estimate_function=None):
+        if index_search_function is None:
+            index_search_function = self.log_search
+        if estimate_function is None:
+            estimate_function = self.down_scale_linearfit
+
         look_up_table = self.look_up_tables[key]
+
+        lower_ind, upper_ind = index_search_function(look_up_table, up_scaled_value)
+
+
+        hyper_cube_value = estimate_function(look_up_table, lower_ind, upper_ind, up_scaled_value)
+
+        return hyper_cube_value
+
+    def lin_search(self, look_up_table, up_scaled_value):
+
         samples_in_look_up_table = look_up_table.shape[0]
         last_index = samples_in_look_up_table-1
 
@@ -117,9 +137,19 @@ class LookUpTable:
         else:
             lower_ind = max(upper_ind - 1,0)
 
-        hyper_cube_value = estimate_function(look_up_table, lower_ind, upper_ind, up_scaled_value)
+        return lower_ind, upper_ind
 
-        return hyper_cube_value
+    def log_search(self, look_up_table, up_scaled_value):
+        upper_ind = bisect_right(look_up_table.values, up_scaled_value)
+        samples_in_look_up_table = look_up_table.shape[0]
+        last_index = samples_in_look_up_table-1
+
+        upper_ind = min(upper_ind, last_index)
+
+        lower_ind = max(upper_ind - 1,0)
+
+        return lower_ind, upper_ind
+
 
     def down_scale_mean(self, look_up_table, lower_ind, upper_ind, up_scaled_value):
 
@@ -143,11 +173,20 @@ class LookUpTable:
 
         return hyper_cube_value
 
-    def downscale_dataframe(self, up_scaled, estimate_function):
+    def downscale_dataframe(self,
+                            up_scaled,
+                            index_search_function=None,
+                            estimate_function=None):
+
+        if index_search_function is None:
+            index_search_function = self.log_search
+        if estimate_function is None:
+            estimate_function = self.down_scale_linearfit
+
         hypercube_dataframe = deepcopy(up_scaled)
         for key in up_scaled.columns:
             for row in range(up_scaled.shape[0]):
-                hypercube_dataframe[key].iloc[row] = self.function_downscale_value(key, up_scaled[key].iloc[row], estimate_function)
+                hypercube_dataframe[key].iloc[row] = self.function_downscale_value(key, up_scaled[key].iloc[row], index_search_function, estimate_function)
 
         return hypercube_dataframe
 
@@ -164,19 +203,19 @@ def main():
         print(f"{key} {up[key].min():.2f} {up[key].max():.2f} collection {look.get_collection_dataframe()[key].min():.2f} {look.get_collection_dataframe()[key].max():.2f}")
 
     print()
-    print(look.function_downscale_value("q_inv", -1, look.down_scale_mean))
+    print(look.function_downscale_value("q_inv", -1, estimate_function=look.down_scale_mean))
 
     print()
     start = time.time()
-    print(look.downscale_dataframe(look.get_collection_dataframe(), look.down_scale_mean))
+    print(look.downscale_dataframe(look.get_collection_dataframe(),  estimate_function=look.down_scale_mean))
     end = time.time()
-    print(f"Downscaling  mean {end-start} seconds")
+    print(f"Downscaling log search,  mean {end-start} seconds")
 
     print()
     start = time.time()
-    print(look.downscale_dataframe(look.get_collection_dataframe(), look.down_scale_linearfit))
+    print(look.downscale_dataframe(look.get_collection_dataframe(),  estimate_function=look.down_scale_linearfit))
     end = time.time()
-    print(f"Downscaling  linfit {end-start} seconds")
+    print(f"Downscaling log search, linfit {end-start} seconds")
 
 if __name__ == "__main__":
     start = time.time()
