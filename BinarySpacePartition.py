@@ -18,6 +18,7 @@ import pandas
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
 import MaximinDesign
+from LookUpTable import LookUpTable
 
 class BinarySpacePartition:
 
@@ -47,6 +48,7 @@ class BinarySpacePartition:
         self.outputfolder = os.path.dirname(self.outputfile)
         os.makedirs(self.outputfolder, exist_ok=True)
 
+
     def set_collection(self, dataframe):
         self.collection = dataframe
 
@@ -58,7 +60,7 @@ class BinarySpacePartition:
 
     def shuffleList(self, array):
         shuffledArray = deepcopy(array)
-        
+
         random.shuffle(shuffledArray)
 
         return shuffledArray
@@ -144,8 +146,9 @@ def main():
     else:
         file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
         keys_list = [list(design_variables)[indeksi]]
-        design_points_vector = numpy.arange(10,510,10)
+        design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
+    look = LookUpTable()
 
     for key in keys_list:
         solutions_bsp = numpy.zeros(numpy.shape(design_points_vector))
@@ -160,7 +163,7 @@ def main():
             best = -1
             start = time.time()
             print("design_points", design_points)
-            for k in range(10):
+            for k in range(1):
                 print("iteration:", k)
                 bsp = BinarySpacePartition(design_variables=design_variables[key],
                                    design_points=design_points,
@@ -169,7 +172,9 @@ def main():
 
                 bsp.create_bs_partitions()
                 bsp.sample_partitions_to_design()
-                bsp_matrix = numpy.asarray(bsp.get_design())
+                upscaled_design = bsp.get_design()
+                hypercube_design = look.downscale_dataframe(upscaled_design)
+                bsp_matrix = numpy.asarray(hypercube_design)
 
                 solution = MaximinDesign.matrix_minimum_distance(bsp_matrix)
 
