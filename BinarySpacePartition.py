@@ -19,6 +19,8 @@ sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
 import MaximinDesign
 from LookUpTable import LookUpTable
+sys.path.append(os.environ["CODEX"] + "/LES-superfolder/LES-emulator-02postpros")
+import LES2emu
 
 class BinarySpacePartition:
 
@@ -101,8 +103,15 @@ class BinarySpacePartition:
     def sample_partitions_to_design(self):
         design_helper_list = [None]*self.design_points
         for part_ind, partition in enumerate(self.partitions):
-            pass
-            row = partition.sample()
+            constraintPass = False
+            while not constraintPass:
+                row = partition.sample()
+                q_pbl =  LES2emu.solve_rw_lwp( 101780,
+                                     row.iloc[0]["tpot_pbl"],
+                                     row.iloc[0]["lwp"]*1e-3,
+                                     row.iloc[0]["pbl"]*100.)*1e3
+                constraintPass = (q_pbl - row.iloc[0]["q_inv"] > 1)
+
             design_helper_list[part_ind] = row
 
         self.design = pandas.concat(design_helper_list)
@@ -119,12 +128,13 @@ class BinarySpacePartition:
 def main():
     testing = False
     if testing:
-        bsp = BinarySpacePartition(design_points = 500,
+        bsp = BinarySpacePartition(design_points = 10,
                                    outputfile="/home/aholaj/Data/ECLAIR/design_stats/test/bsp_test.csv")
         bsp.create_bs_partitions()
 
         bsp.sample_partitions_to_design()
         bsp.write_design()
+        sys.exit()
 
     debug = False
 
