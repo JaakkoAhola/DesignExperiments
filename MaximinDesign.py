@@ -31,13 +31,13 @@ def logarithmic_euclidian_distance(x,y):
 
     return distance.euclidean(x_log, y_log)
 
-def matrix_minimum_distance(mm, dist_func=generalised_distance):
+def matrix_minimum_distance(mm, dist_func=distance.euclidean):
     minimum = numpy.nan
 
     for row in range(mm.shape[0]):
-        for otherRow in range(mm.shape[0]):
+        for otherRow in range(row, mm.shape[0]):
             if row != otherRow:
-                dd = dist_func(mm[row,], mm[otherRow])
+                dd = dist_func(mm[row,], mm[otherRow,])
                 minimum = numpy.nanmin([dd, minimum])
     return minimum
 
