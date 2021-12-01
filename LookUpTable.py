@@ -24,7 +24,7 @@ from sklearn.linear_model import LinearRegression
 
 class LookUpTable:
 
-    def __init__(self, debug = True):
+    def __init__(self, debug = False):
         self.all_variables = ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]
         self.datarootfolder = pathlib.Path(os.environ["DATAT"])
         self.mainfolder = self.datarootfolder / "ECLAIR"
