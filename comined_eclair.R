@@ -242,7 +242,7 @@ getPoints <- function(design_points){
 
     if (nrow(comined.feasible) > design_points){
       # CoMinED maximin design by one-point-at-a-time greedy algorithm
-      print("CoMinED maximin design by one-point-at-a-time greedy algorithm")
+      print(paste("CoMinED", measure, "design by one-point-at-a-time greedy algorithm"))
       ptm <- proc.time()
       if (useUpscaling) {
         comined.feasible <- matrix_look_up_table(comined.feasible)  
@@ -300,7 +300,7 @@ getPoints <- function(design_points){
 
       if (nrow(scmc.feasible) > design_points){
         # SCMC Maximin design
-        print("SCMC maximin design by one-point-at-a-time greedy algorithm")
+        print(paste("SCMC", measure, "design by one-point-at-a-time greedy algorithm"))
         ptm <- proc.time()
         if (useUpscaling) {
           scmc.feasible <- matrix_look_up_table(scmc.feasible)
@@ -311,7 +311,6 @@ getPoints <- function(design_points){
           
         } else {
           scmc.optimised <- maxpro.seq(design_points, scmc.feasible, return.obj = T)
-          measure <- "maxpro"
         }
         inter_time <- proc.time() - ptm
         print(paste(measure, "measure from SCMC candidate points", scmc.optimised$obj,
@@ -357,11 +356,16 @@ getPoints <- function(design_points){
       if (useUpscaling) {
 	      lhs.in <- matrix_look_up_table(lhs.in)
       }
+      ptm <- proc.time()
       if (! use_max_pro){
 	      lhs_optimised <- maximin.seq(design_points, lhs.in, return.obj = T)
       } else {
 	      lhs_optimised <- maxpro.seq(design_points, lhs.in, return.obj = T)
-	    }
+      }
+      inter_time <- proc.time() - ptm
+      print(paste(measure, "measure from lhs candidate points", lhs_optimised$obj,
+                  "time: ", inter_time[1]))
+      
 	    lhs_design <- lhs.in[lhs_optimised$idx,]
 	    write.table(lhs_design,
 	              file=get_file_name_create_folder("lhs", design_points),
