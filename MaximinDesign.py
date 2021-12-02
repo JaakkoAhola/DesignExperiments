@@ -16,7 +16,6 @@ from scipy.spatial import distance
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
 from geneticalgorithm import geneticalgorithm as ga
-from LookUpTable import LookUpTable
 
 def generalised_distance(x_array, y_array, s=2):
     p = x_array.shape[0]
@@ -66,7 +65,6 @@ class MaxiMinDesign:
         self.design = None
         self.solution = {"function":numpy.nan,
                          "variable":None}
-        self.look = LookUpTable()
 
     def get_dataframe(self):
         return self.dataframe
@@ -80,8 +78,7 @@ class MaxiMinDesign:
     def cost(self, boolean_array):
         selection = pandas.array(boolean_array.astype("bool"))
         candidates = self.dataframe[ selection ]
-        candidates_hypercube = self.look.downscale_dataframe(candidates)
-        matrix = numpy.asarray(candidates_hypercube)
+        matrix = numpy.asarray(candidates)
 
         minimum_distance = 0.
 
@@ -100,7 +97,7 @@ class MaxiMinDesign:
                  dimension=self.dataframe.shape[0],
                  variable_type='bool',
                  convergence_curve=False,
-                 algorithm_parameters={'max_num_iteration': 350,
+                 algorithm_parameters={'max_num_iteration': 200,
                                   'population_size': 20,
                                   'mutation_probability': 0.1,
                                   'elit_ratio': 0.01,
