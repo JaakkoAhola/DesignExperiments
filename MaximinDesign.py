@@ -41,6 +41,17 @@ def matrix_minimum_distance(mm, dist_func=distance.euclidean):
                 minimum = numpy.nanmin([dd, minimum])
     return minimum
 
+def max_pro_measure(mm):
+    distance_prod = numpy.zeros(mm.shape[0])
+    for row in range(mm.shape[0]):
+        for otherRow in range(row, mm.shape[0]):
+            if row != otherRow:
+                distance_prod[row] = numpy.power(numpy.prod(numpy.power(mm[row,] - mm[otherRow,], 2)), -1)
+
+    maxpro = numpy.power(numpy.mean(distance_prod), 1./mm.shape[1])
+
+    return maxpro
+
 
 class MaxiMinDesign:
 
