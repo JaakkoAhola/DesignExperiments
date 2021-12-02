@@ -76,7 +76,15 @@ source_data <- read.csv(source_data_file_name)
 
 look_up_table_hash <- hash()
 
-use_max_pro <- FALSE
+use_max_pro <- TRUE
+
+if (use_max_pro){
+  measure <- "maxpro"
+} else {
+  measure <- "maximin"
+}
+
+subfolder <- paste("/ECLAIR/design_stats", "_", measure, "/", sep="")
 
 
 for (key in all_keys){
@@ -199,7 +207,7 @@ if (FALSE){
 
 get_file_name_create_folder <- function(design, design_points){
 
-  design_filename <- paste(datahakemisto, "/ECLAIR/design_stats/", moodi, "/", design, "/", design, "_", as.character(design_points), ".csv", sep="")
+  design_filename <- paste(datahakemisto, subfolder, moodi, "/", design, "/", design, "_", as.character(design_points), ".csv", sep="")
   dir.create(dirname(design_filename), recursive = TRUE)
   return (design_filename)
 }
@@ -240,15 +248,19 @@ getPoints <- function(design_points){
         comined.feasible <- matrix_look_up_table(comined.feasible)  
       }
       
-      comined.maximin <- maximin.seq(design_points, comined.feasible, return.obj = T)
+      if (! use_max_pro){
+        comined.optimised <- maximin.seq(design_points, comined.feasible, return.obj = T)
+      } else{
+        comined.optimised <- maxpro.seq(design_points, comined.feasible, return.obj = T)
+      }
 
-      comined_design <- comined.feasible[comined.maximin$idx,]
+      comined_design <- comined.feasible[comined.optimised$idx,]
       inter_time <- proc.time() - ptm
 
-      print(paste("CoMinED maximin measure", comined.maximin$obj,
+      print(paste("CoMinED",  measure,  "measure", comined.optimised$obj,
                   "time: ", inter_time[1]))
       comined_time[time_ind] <- inter_time[1]
-      comined_obj[time_ind] <- comined.maximin$obj
+      comined_obj[time_ind] <- comined.optimised$obj
 
       write.table(comined_design,
                   file=get_file_name_create_folder("comined", design_points),
@@ -257,15 +269,6 @@ getPoints <- function(design_points){
 
       print(" ")
 
-      if (use_max_pro){
-      # CoMinED maxpro design by one-point-at-a-time greedy algorithm
-      print("CoMinED maxpro design by one-point-at-a-time greedy algorithm")
-      ptm <- proc.time()
-      comined.maxpro <- maxpro.seq(design_points, comined.feasible, return.obj = T)
-      inter_time <- proc.time() - ptm
-      print(paste("CoMinED maxpro measure", comined.maxpro$obj,
-                  "time: ", inter_time[1]))
-      }
     }
   }
 
@@ -302,34 +305,31 @@ getPoints <- function(design_points){
         if (useUpscaling) {
           scmc.feasible <- matrix_look_up_table(scmc.feasible)
         }
-        scmc.maximin <- maximin.seq(design_points, scmc.feasible, return.obj = T)
+        
+        if (! use_max_pro){
+          scmc.optimised <- maximin.seq(design_points, scmc.feasible, return.obj = T)
+          
+        } else {
+          scmc.optimised <- maxpro.seq(design_points, scmc.feasible, return.obj = T)
+          measure <- "maxpro"
+        }
         inter_time <- proc.time() - ptm
-        print(paste("Maximin measure from SCMC candidate points", scmc.maximin$obj,
+        print(paste(measure, "measure from SCMC candidate points", scmc.optimised$obj,
                     "time: ", inter_time[1]))
         print(" ")
 
-        if (scmc.maximin$obj > best_scmc_obj){
-          scmc_design <- scmc.feasible[scmc.maximin$idx,]
+        if (scmc.optimised$obj > best_scmc_obj){
+          scmc_design <- scmc.feasible[scmc.optimised$idx,]
         }
 
 
-        # SCMC MAXPRO
-        if (use_max_pro){
-          print("SCMC maxpro design by one-point-at-a-time greedy algorithm")
-          ptm <- proc.time()
-          scmc.maxpro <- maxpro.seq(design_points, scmc.feasible, return.obj = T)
-          inter_time <- proc.time() - ptm
-          print(paste("Maxpro measure from SCMC candidate points", scmc.maximin$obj,
-                      "time: ", inter_time[1]))
-          print(" ")
-        }
       }
 
     }
 
     inter_time <- proc.time() - ptm_all
     scmc_time[time_ind] <- inter_time[1]
-    scmc_obj[time_ind] <- scmc.maximin$obj
+    scmc_obj[time_ind] <- scmc.optimised$obj
 
     write.table(scmc_design,
                 file=get_file_name_create_folder("scmc", design_points),
@@ -357,13 +357,17 @@ getPoints <- function(design_points){
       if (useUpscaling) {
 	      lhs.in <- matrix_look_up_table(lhs.in)
       }
-	    lhs.maximin <- maximin.seq(design_points, lhs.in, return.obj = T)
-	    lhs_design <- lhs.in[lhs.maximin$idx,]
+      if (! use_max_pro){
+	      lhs_optimised <- maximin.seq(design_points, lhs.in, return.obj = T)
+      } else {
+	      lhs_optimised <- maxpro.seq(design_points, lhs.in, return.obj = T)
+	    }
+	    lhs_design <- lhs.in[lhs_optimised$idx,]
 	    write.table(lhs_design,
 	              file=get_file_name_create_folder("lhs", design_points),
 	              col.names = design_variables,
 	              sep=",")
-	    lhs.best <- lhs.maximin$obj
+	    lhs.best <- lhs_optimised$obj
 
     }
     inter_time <- proc.time() - ptm
@@ -397,41 +401,6 @@ for (p in design_points_vector){
 stats_df <- data.frame(comined_time, scmc_time, lhs_time,
                        comined_obj, scmc_obj, lhs_obj)
 write.table(stats_df,
-            file=paste(datahakemisto, "/ECLAIR/design_stats/", moodi, "/comined_scmc_lhs_stats.csv", sep=""),
+            file=paste(datahakemisto, subfolder, moodi, "/comined_scmc_lhs_stats.csv", sep=""),
             sep=",")
 
-  # print(" ")
-  # # CoMinED
-  # print("Constrained Minimum Energy Design AUTOSCALED")
-  # ptm <- proc.time()
-  # comined.output <- comined(n = design_points, p = design_dimension, tau = tau, constraint = constraint,
-  #                           n.aug = 5, auto.scale = T, s = 2)
-  # comined.all <- comined.output$cand
-  # comined.feasible <- comined.output$cand[comined.output$feasible.idx,]
-  # inter_time <- proc.time() - ptm
-  # print(paste("CoMinED autoscaled: number of total samples", nrow(comined.all),
-  #             "number of feasible samples", nrow(comined.feasible),
-  #             "time: ", inter_time[1]))
-
-
-
-# # Source maximin design by one-point-at-a-time greedy algorithm
-# print("Source maximin design by one-point-at-a-time greedy algorithm")
-# ptm <- proc.time()
-# source.maximin <- maximin.seq(design_points, candidate_points_source, return.obj = T)
-# inter_time <- proc.time() - ptm
-#
-# print(paste("Source maximin measure", comined.maximin$obj,
-#             "time: ", inter_time[1]))
-#
-# print(" ")
-#
-# # Source maxpro design by one-point-at-a-time greedy algorithm
-# print("Source maxpro design by one-point-at-a-time greedy algorithm")
-# ptm <- proc.time()
-# comined.maxpro <- maxpro.seq(design_points, candidate_points_source, return.obj = T)
-# inter_time <- proc.time() - ptm
-# print(paste("Source maxpro measure", comined.maxpro$obj,
-#             "time: ", inter_time[1]))
-
-# BSP maximin & maxpro measure???
