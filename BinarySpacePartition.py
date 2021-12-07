@@ -159,6 +159,11 @@ def main():
         design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
     look = LookUpTable()
+    use_max_pro = True
+    if use_max_pro:
+        upfolder = "maxpro"
+    else:
+        upfolder = "maximin"
 
     for key in keys_list:
         solutions_bsp = numpy.zeros(numpy.shape(design_points_vector))
@@ -170,7 +175,11 @@ def main():
             subfolder = key
 
         for ind, design_points in enumerate(design_points_vector):
-            best = -1
+            if not use_max_pro:
+                best = -numpy.inf
+            else:
+                best = numpy.inf
+
             start = time.time()
             print("design_points", design_points)
             for k in range(1):
@@ -178,7 +187,7 @@ def main():
                 bsp = BinarySpacePartition(design_variables=design_variables[key],
                                    design_points=design_points,
                                    sourcefile=file,
-                                   outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/bsp/bsp_" + str(design_points) + ".csv")
+                                   outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats_"+ upfolder + "/" + subfolder + "/bsp/bsp_" + str(design_points) + ".csv")
 
                 bsp.create_bs_partitions()
                 bsp.sample_partitions_to_design()
@@ -186,11 +195,21 @@ def main():
                 hypercube_design = look.downscale_dataframe(upscaled_design)
                 bsp_matrix = numpy.asarray(hypercube_design)
 
-                solution = MaximinDesign.matrix_minimum_distance(bsp_matrix)
+                if not use_max_pro:
+                    solution = MaximinDesign.matrix_minimum_distance(bsp_matrix)
 
-                if solution > best:
-                    best = solution
-                    bsp.write_design()
+                    if solution > best:
+                        best = solution
+                        bsp.write_design()
+
+                else:
+                    solution = MaximinDesign.max_pro_measure(bsp_matrix)
+
+                    if solution < best:
+                        best = solution
+                        bsp.write_design()
+
+
             duration_bsp = time.time() - start
 
             solutions_bsp[ind] = best
@@ -204,7 +223,7 @@ def main():
                                         index= design_points_vector)
         solutions_df.index.name = "design_points"
 
-        solutions_df.to_csv(os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/bsp_stats.csv")
+        solutions_df.to_csv(os.environ["DATAT"] + "/ECLAIR/design_stats_"+ upfolder + "/" + subfolder + "/bsp_stats.csv")
 
 
 
