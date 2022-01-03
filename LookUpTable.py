@@ -183,7 +183,12 @@ class LookUpTable:
         if estimate_function is None:
             estimate_function = self.down_scale_mean
 
+        if "pblh" in up_scaled.columns:
+            up_scaled["pbl"] = up_scaled["pblh"]
+            up_scaled.drop(columns="pblh", inplace=True)
+
         hypercube_dataframe = deepcopy(up_scaled)
+
         for key in up_scaled.columns:
             for row in range(up_scaled.shape[0]):
                 hypercube_dataframe[key].iloc[row] = self.function_downscale_value(key, up_scaled[key].iloc[row], index_search_function, estimate_function)
