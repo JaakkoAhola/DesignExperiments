@@ -23,6 +23,7 @@ from PlotTweak import PlotTweak
 
 import MaximinDesign
 import random
+from LookUpTable import LookUpTable
 
 def get_design_points_from_filename(file_name):
     stringi = str(file_name.name)
@@ -35,7 +36,8 @@ def get_design_points_from_filename(file_name):
 class DesignAnalysis:
 
     def __init__(self,
-                 folder = "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats"):
+                 folder = "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
+                 ):
 
         self.figure_folder = "/home/aholaj/Dropbox/Apps/Overleaf/väitöskirja/figures"
         self.design_sets = ["SBnight", "SBday", "SALSAnight", "SALSAday"]
@@ -79,6 +81,8 @@ class DesignAnalysis:
 
         self.debug = False
 
+        self.look = LookUpTable()
+
         self.annotationValues = ["(a) SB Night",
             "(b) SB Day",
             "(c) SALSA Night",
@@ -105,7 +109,8 @@ class DesignAnalysis:
         for file_name in list(manu_path_folder.glob("**/*.csv")):
             design = pandas.read_csv(file_name, index_col=0)
             seeti = str(file_name.name).split(".")[0]
-            maximin = MaximinDesign.matrix_minimum_distance(design.values)
+            hypercube_design = self.look.downscale_dataframe(design)
+            maximin = MaximinDesign.matrix_minimum_distance(hypercube_design.values)
 
             print(maximin)
 
@@ -151,7 +156,10 @@ class DesignAnalysis:
         for dd_set in self.design_sets:
             for method in self.design_methods_all:
                 stats_file = self.folder / dd_set / (method + "_stats.csv")
-                assert stats_file.is_file(), stats_file
+                if not stats_file.is_file() and method == "ga":
+                    continue
+                else:
+                    assert stats_file.is_file(), stats_file
 
                 df = pandas.read_csv(stats_file, index_col = 0 )
 
@@ -218,13 +226,15 @@ class DesignAnalysis:
             for method_column in self.normalised_maximin_column_names[dd_set]:
                 method_name = method_column.split("_")[-1]
                 df = self.joined_stats[dd_set]
-                df.plot(kind="line",
-                        marker="x",
+                df.plot(kind="scatter",
+                        marker="X",
                             x="design_points",
                             y=method_column,
                             ax = current_axis,
                             color = self.method_with_color[method_name],
                             legend = False,
+                            s=40,
+                            alpha=0.45
                             )
 
             if dd_ind in [1,3]:
@@ -238,9 +248,13 @@ class DesignAnalysis:
             PlotTweak.setXaxisLabel(current_axis,"")
 
             if dd_ind == 3:
-                current_axis.text(-250,-0.25,
+                current_axis.text(-175,0,
                                   "Number of design points", #PlotTweak.getLatexLabel(, ""),
                                   size=8)
+
+            if dd_ind == 2:
+                current_axis.text(PlotTweak.getXPosition(current_axis, -0.25), PlotTweak.getYPosition(current_axis, 0.2),
+                        "Maximin measure relative to the highest measure within a set", size=8 , rotation =90)
 
             if dd_ind == 0:
 
@@ -254,7 +268,7 @@ class DesignAnalysis:
                 artist = current_axis.legend(handles=legendLabelColors,
                                              loc=(-0.25, 1.05),
                                              frameon=True,
-                                             framealpha=1.0,
+                                             framealpha=0.8,
                                              ncol=len(list(self.method_with_color)))
 
                 current_axis.add_artist(artist)
@@ -281,7 +295,7 @@ def main():
 
 
 
-    update_results = True
+    update_results = False
 
     if update_results:
         dd.get_manuscript_results()
