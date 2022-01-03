@@ -215,9 +215,9 @@ def main():
             solutions_bsp[ind] = best
             timing_vector_bsp[ind] = duration_bsp
 
-
+        df_key = upfolder + "_bsp"
         solutions_df = pandas.DataFrame(data={
-                                         "maximin_bsp": solutions_bsp,
+                                         df_key: solutions_bsp,
                                          "duration_bsp": timing_vector_bsp,
                                          },
                                         index= design_points_vector)
