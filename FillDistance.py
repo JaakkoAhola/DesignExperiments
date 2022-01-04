@@ -24,7 +24,6 @@ from LookUpTable import LookUpTable
 sys.path.append(os.environ["CODEX"] + "/LES-superfolder/LES-emulator-02postpros")
 import LES2emu
 from copy import deepcopy
-import MaximinDesign
 
 class FillDistance(DesignAnalysis.DesignAnalysis):
     def __init__(self, sobol_points_exponent_of_two = 3,
