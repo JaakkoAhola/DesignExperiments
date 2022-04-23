@@ -13,7 +13,6 @@ from datetime import datetime
 import pandas
 
 sys.path.append(os.environ["LESMAINSCRIPTS"])
-sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
 from Colorful import Colorful
 from Figure import Figure

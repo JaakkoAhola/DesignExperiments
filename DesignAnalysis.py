@@ -88,6 +88,11 @@ class DesignAnalysis:
             "(c) SALSA Night",
             "(d) SALSA Day"]
 
+        self.design_sensible_names = dict(zip(self.design_sets, ["SB Night",
+            "SB Day",
+            "SALSA Night",
+            "SALSA Day"]))
+
         self.annotationCollection = dict(zip(self.design_sets, self.annotationValues))
 
         self.annotationXPositions = dict(zip(self.design_sets, [0.57, 0.63, 0.45, 0.50 ]))
@@ -98,7 +103,7 @@ class DesignAnalysis:
         sensible_dict = {"scmc" : "SCMC",
                          "comined" : "CoMinED",
                          "bsp": "BSP",
-                         "manuscript": "Ahola et al 2021 (BSP)"}
+                         "manuscript": "Ahola et al 2022 (BSP)"}
 
         return sensible_dict[key]
 
@@ -219,7 +224,6 @@ class DesignAnalysis:
                                         hspace=0.05, bottom=0.1, wspace = 0.05, top = 0.93)
 
         fig = self.figures["maximin"]
-
         for dd_ind, dd_set in enumerate(list(self.design_sets)):
             current_axis = fig.getAxes(dd_ind)
 
