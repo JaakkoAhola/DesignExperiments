@@ -19,7 +19,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 
-sys.path.append("/home/aholaj/Nextcloud/000_WORK/000_Codex/LES-superfolder/LES-emulator-02postpros")
+sys.path.append(os.environ["CODEX"] + "/LES-superfolder/LES-emulator-02postpros")
 import LES2emu
 from SourceVsSampleVsDesign import SourceVsSampleVsDesign
 
@@ -120,7 +120,7 @@ class LatinHyperCubeSampleDesign:
                                                             axis = 1)
 
     def write_design_latin(self):
-        self.design_latin_plain.to_csv("/home/aholaj/Data/ECLAIR/design_lhs_sb_night_500_c.csv")
+        self.design_latin_plain.to_csv(os.environ["DESIGNRESULTS"] + "/design_lhs_sb_night_500_c.csv")
 
 
 

@@ -53,7 +53,7 @@ class test_SourceVsSampleVsDesign(unittest.TestCase):
     @unittest.skip("a bit too time consuming")
     def test_write_sample(self):
         test_sample = "/tmp/test.csv"
-        test_latin = SourceVsSampleVsDesign(files={"big": "/home/aholaj/Data/ECLAIR/eclair_dataset_2001_designvariables.csv",
+        test_latin = SourceVsSampleVsDesign(files={"big": os.environ["DESIGNRESULTS"] + "/eclair_dataset_2001_designvariables.csv",
                                                    "sample": test_sample})
         test_latin.read_big()
         test_latin.create_sample(1)
@@ -106,7 +106,7 @@ class test_SourceVsSampleVsDesign(unittest.TestCase):
             test_latin2 = SourceVsSampleVsDesign()
             test_latin2.figure_lhs()
 
-    def test_lhs
+    #def test_lhs
 
 
 

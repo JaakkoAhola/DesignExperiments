@@ -23,7 +23,7 @@ from DesignAnalysis import DesignAnalysis
 
 class FillDistanceAnalysis(DesignAnalysis):
     def __init__(self,
-                 folder="/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
+                 folder=os.environ["DESIGNRESULTSMAXIMIN"],
                  postfix="maximin"):
         super().__init__(folder)
         self.postfix = postfix
@@ -67,7 +67,7 @@ class FillDistanceAnalysis(DesignAnalysis):
                 method_name = method_column.split("_")[-1]
                 df = self.joined_stats[dd_set]
                 df.plot(kind="scatter",
-                        marker="X",
+                        marker=self.method_with_marker[method_name],
                             x="design_points",
                             y=method_column,
                             ax = current_axis,
@@ -106,7 +106,7 @@ class FillDistanceAnalysis(DesignAnalysis):
 
                 legendLabelColors = PlotTweak.getPatches(sensible_names_with_color)
                 artist = current_axis.legend(handles=legendLabelColors,
-                                             loc=(-0.32, 1.05),
+                                             loc=(-0.1, 1.05),
                                              frameon=True,
                                              framealpha=0.8,
                                              ncol=len(list(self.method_with_color)))
@@ -119,8 +119,8 @@ class FillDistanceAnalysis(DesignAnalysis):
                                     yPosition=PlotTweak.getYPosition(current_axis, 0.93))
 
 def main():
-    optim_methods = {"maximin":"/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
-                     "maxpro": "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats_maxpro"}
+    optim_methods = {"maximin":os.environ["DESIGNRESULTSMAXIMIN"],
+                     "maxpro": os.environ["DESIGNRESULTSMAXPRO"]}
     for key in optim_methods:
         fill = FillDistanceAnalysis(optim_methods[key],
                                     key)

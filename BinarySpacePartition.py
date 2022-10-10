@@ -27,8 +27,8 @@ class BinarySpacePartition:
     def __init__(self,
                  design_variables=['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc'],
                  design_points=500,
-                 sourcefile="/home/aholaj/Data/ECLAIR/sample20000.csv",
-                 outputfile="/home/aholaj/Data/ECLAIR/bsp_test_sb_night_500.csv"
+                 sourcefile=os.environ["DESIGNRESULTS"] + "/sample20000.csv",
+                 outputfile=os.environ["DESIGNRESULTS"] + "/bsp_test_sb_night_500.csv"
                  ):
 
         self.design_variables = design_variables
@@ -129,7 +129,7 @@ def main():
     testing = False
     if testing:
         bsp = BinarySpacePartition(design_points = 10,
-                                   outputfile="/home/aholaj/Data/ECLAIR/design_stats/test/bsp_test.csv")
+                                   outputfile=os.environ["DESIGNRESULTS"] + "/design_stats/test/bsp_test.csv")
         bsp.create_bs_partitions()
 
         bsp.sample_partitions_to_design()

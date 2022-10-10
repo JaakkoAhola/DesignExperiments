@@ -53,8 +53,8 @@ class SourceVsSampleVsDesign():
 
     def __init__(
                 self,
-                yaml_config_file="/home/aholaj/Data/ECLAIR/all_but_source_updated_lhs.yaml",
-                figure_folder="/home/aholaj/Nextcloud/000_WORK/000_Codex/lhs/figures"
+                yaml_config_file=os.environ["DESIGNRESULTS"] + "/all_but_source_updated_lhs.yaml",
+                figure_folder=os.environ["CODEX"]+ "/lhs/figures"
                 ):
 
         self.yaml_config_file = FileSystem.readYAML(yaml_config_file)

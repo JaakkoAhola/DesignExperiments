@@ -1,0 +1,14 @@
+dependencies:
+  - python
+  - scikit-learn
+  - numpy
+  - matplotlib
+  - seaborn
+  - pandas
+  - spyder
+  - scipy
+  - pyyaml
+  - yaml
+  - pip
+  - pip:
+    - geneticalgorithm

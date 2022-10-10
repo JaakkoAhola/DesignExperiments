@@ -27,7 +27,7 @@ from copy import deepcopy
 
 class FillDistance(DesignAnalysis.DesignAnalysis):
     def __init__(self, sobol_points_exponent_of_two = 3,
-                 folder = "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
+                 folder = os.environ["DESIGNRESULTSMAXIMIN"],
                  design_methods_to_be_executed= ["scmc", "comined", "bsp", "manuscript"],
                  simulation_sets_to_be_executed = ['SBnight', 'SBday', 'SALSAnight', 'SALSAday'],
                  fill_distance_filename = "filldistance_stats.csv",
@@ -189,7 +189,7 @@ def main():
         parameterFile = sys.argv[1]
         parameterDict = FileSystem.readYAML(parameterFile)
     except KeyError:
-        parameterDict = {"folder": "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
+        parameterDict = {"folder": os.environ["DESIGNRESULTSMAXIMIN"],
                          "sobol_points_exponent_of_two": 3,
                          "design_methods_to_be_executed": ["scmc", "comined", "bsp", "manuscript"],
                          "simulation_sets_to_be_executed": ['SBnight', 'SBday', 'SALSAnight', 'SALSAday'],

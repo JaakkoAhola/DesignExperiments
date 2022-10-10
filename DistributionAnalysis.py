@@ -30,7 +30,7 @@ from DesignAnalysis import DesignAnalysis
 
 class DistributionAnalysis(DesignAnalysis):
     def __init__(self,
-                 folder="/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
+                 folder=os.environ["DESIGNRESULTSMAXIMIN"],
                  postfix="maximin"):
         super().__init__(folder)
         self.postfix = postfix
@@ -65,7 +65,7 @@ class DistributionAnalysis(DesignAnalysis):
         sensible_dict = {"scmc" : "SCMC",
                          "comined" : "CoMinED",
                          "bsp": "BSP",
-                         "manuscript": "Ahola et al 2022\n (BSP)"}
+                         "manuscript": "Paper III (BSP)"}
 
         return sensible_dict[key]
 
@@ -78,7 +78,7 @@ class DistributionAnalysis(DesignAnalysis):
 
 
     def initReadFilteredSourceData(self):
-        localPath = pathlib.Path("/home/aholaj/Data/ECLAIR")
+        localPath = pathlib.Path(os.environ["DESIGNRESULTS"])
         if localPath.is_dir():
             try:
                 self.filteredSourceData = pandas.read_csv( localPath / "eclair_dataset_2001_designvariables.csv", index_col = 0 )
@@ -289,8 +289,8 @@ Design points
                 ax.set_xticklabels(xticklabels)
 
 def main():
-    optim_methods = {"maximin":"/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
-                     "maxpro": "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats_maxpro"}
+    optim_methods = {"maximin":os.environ["DESIGNRESULTSMAXIMIN"],
+                     "maxpro": os.environ["DESIGNRESULTSMAXPRO"]}
     for key in optim_methods:
         fill = DistributionAnalysis(optim_methods[key],
                                     key)

@@ -36,10 +36,10 @@ def get_design_points_from_filename(file_name):
 class DesignAnalysis:
 
     def __init__(self,
-                 folder = "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/design_stats",
+                 folder = os.environ["DESIGNRESULTSMAXIMIN"],
                  ):
 
-        self.figure_folder = "/home/aholaj/Dropbox/Apps/Overleaf/väitöskirja/figures"
+        self.figure_folder = f'{os.environ["HOME"]}/Dropbox/Apps/Overleaf/väitöskirja/figures'
         self.design_sets = ["SBnight", "SBday", "SALSAnight", "SALSAday"]
 
         self.design_methods_with_R = ["scmc", "comined"]
@@ -68,6 +68,10 @@ class DesignAnalysis:
         color_list = Colorful.getDistinctColorList(["green", "blue", "yellow", "orange", "red"])
 
         self.method_with_color = dict(zip(self.design_methods_all, color_list))
+
+        marker_list = ["3", "4", "X", "^", "v"]
+
+        self.method_with_marker = dict(zip(self.design_methods_all, marker_list))
 
         self.maximin_column_names = {}
         for dd_set in self.design_sets:
@@ -103,12 +107,12 @@ class DesignAnalysis:
         sensible_dict = {"scmc" : "SCMC",
                          "comined" : "CoMinED",
                          "bsp": "BSP",
-                         "manuscript": "Ahola et al 2022 (BSP)"}
+                         "manuscript": "Paper III (BSP)"}
 
         return sensible_dict[key]
 
     def get_manuscript_results(self):
-        manu_folder = "/home/aholaj/mounttauskansiot/puhtiwork/ECLAIR/manuscript_designs"
+        manu_folder = os.environ["DESIGNRESULTSMANUSCRIPT"]
         manu_path_folder = pathlib.Path(manu_folder)
 
         for file_name in list(manu_path_folder.glob("**/*.csv")):
@@ -231,7 +235,7 @@ class DesignAnalysis:
                 method_name = method_column.split("_")[-1]
                 df = self.joined_stats[dd_set]
                 df.plot(kind="scatter",
-                        marker="X",
+                        marker=self.method_with_marker[method_name],
                             x="design_points",
                             y=method_column,
                             ax = current_axis,
@@ -270,7 +274,7 @@ class DesignAnalysis:
 
                 legendLabelColors = PlotTweak.getPatches(sensible_names_with_color)
                 artist = current_axis.legend(handles=legendLabelColors,
-                                             loc=(-0.25, 1.05),
+                                             loc=(-0.02, 1.05),
                                              frameon=True,
                                              framealpha=0.8,
                                              ncol=len(list(self.method_with_color)))
