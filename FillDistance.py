@@ -25,13 +25,14 @@ sys.path.append(os.environ["CODEX"] + "/LES-superfolder/LES-emulator-02postpros"
 import LES2emu
 from copy import deepcopy
 
+
 class FillDistance(DesignAnalysis.DesignAnalysis):
-    def __init__(self, sobol_points_exponent_of_two = 3,
-                 folder = os.environ["DESIGNRESULTSMAXIMIN"],
-                 design_methods_to_be_executed= ["scmc", "comined", "bsp", "manuscript"],
-                 simulation_sets_to_be_executed = ['SBnight', 'SBday', 'SALSAnight', 'SALSAday'],
-                 fill_distance_filename = "filldistance_stats.csv",
-                 feasibility_ratio_filename = "feasibility_ratios.csv"):
+    def __init__(self, sobol_points_exponent_of_two=3,
+                 folder=os.environ["DESIGNRESULTSMAXIMIN"],
+                 design_methods_to_be_executed=["scmc", "comined", "bsp", "manuscript"],
+                 simulation_sets_to_be_executed=['SBnight', 'SBday', 'SALSAnight', 'SALSAday'],
+                 fill_distance_filename="filldistance_stats.csv",
+                 feasibility_ratio_filename="feasibility_ratios.csv"):
 
         super().__init__(folder=folder)
         self.sobol_points_exponent_of_two = sobol_points_exponent_of_two
@@ -47,7 +48,6 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
         print("number of sobol points:", sobol_points_exponent_of_two)
         print("")
 
-
         self.fill_distance_stats = {}
         for dd_set in self.simulation_sets_to_be_executed:
             self.fill_distance_stats[dd_set] = {}
@@ -56,11 +56,10 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
 
         self.look = LookUpTable()
 
-
         self.design_variables = {"SBnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc"],
-                            "SBday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "cos_mu"],
-                            "SALSAnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff"],
-                            "SALSAday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]}
+                                 "SBday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "cos_mu"],
+                                 "SALSAnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff"],
+                                 "SALSAday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]}
 
         self.sobol_hypercubes_dict = {}
         for key in self.simulation_sets_to_be_executed:
@@ -75,7 +74,6 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
         self.joined_filldistance_stats = {}
         for key in self.simulation_sets_to_be_executed:
             self.joined_filldistance_stats[key] = None
-
 
     def get_all_sobol_hypercubes(self):
 
@@ -94,20 +92,19 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
         upscale_dataframe = self.look.upscale_dataframe(sobol_hybercube_dataframe)
 
         upscale_dataframe["constraintPass"] = upscale_dataframe.apply(lambda row: (LES2emu.solve_rw_lwp(101780,
-                                                                 row["tpot_pbl"],
-                                                                 row["lwp"]*1e-3,
-                                                                 row["pbl"]*100.)*1e3- row["q_inv"] > 1),
+                                                                                                        row["tpot_pbl"],
+                                                                                                        row["lwp"] * 1e-3,
+                                                                                                        row["pbl"] * 100.) * 1e3 - row["q_inv"] > 1),
                                                                       axis=1)
 
         sobol_hybercube_dataframe["constraintPass"] = upscale_dataframe["constraintPass"]
 
-        sobol_accepted = deepcopy(sobol_hybercube_dataframe[ sobol_hybercube_dataframe["constraintPass"]])
+        sobol_accepted = deepcopy(sobol_hybercube_dataframe[sobol_hybercube_dataframe["constraintPass"]])
         sobol_accepted.drop(columns="constraintPass", inplace=True)
 
         feasibility_ratio = sobol_accepted.shape[0] / upscale_dataframe.shape[0]
 
         return sobol_accepted, feasibility_ratio
-
 
     def get_fill_distance(self, hypercube_design_dataframe, sobol_accepted_hypercube):
         """
@@ -135,7 +132,7 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
                     design_points = int(DesignAnalysis.get_design_points_from_filename(file_name))
                     design_dataframe = pandas.read_csv(file_name, index_col=0)
 
-                    if method in  ["bsp", "manuscript"]:
+                    if method in ["bsp", "manuscript"]:
                         hypercube_design_dataframe = self.look.downscale_dataframe(design_dataframe)
                     else:
                         hypercube_design_dataframe = design_dataframe
@@ -152,10 +149,9 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
                 list_of_tuples = self.fill_distance_stats[dd_set][method]
 
                 self.fill_distance_stats[dd_set][method] = pandas.DataFrame.from_records(list_of_tuples,
-                                                                           columns =['design_points',
-                                                                                     'filldistance_' + method])
-                self.fill_distance_stats[dd_set][method].set_index("design_points", inplace = True)
-
+                                                                                         columns=['design_points',
+                                                                                                  'filldistance_' + method])
+                self.fill_distance_stats[dd_set][method].set_index("design_points", inplace=True)
 
     def join_fill_distance_stats(self):
         for dd_set in self.simulation_sets_to_be_executed:
@@ -169,7 +165,6 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
                                                                                                             on="design_points")
             self.joined_filldistance_stats[dd_set].sort_values(by="design_points", inplace=True)
 
-
     def save_fill_distance_csv(self):
         for dd_set in self.simulation_sets_to_be_executed:
             self.joined_filldistance_stats[dd_set].to_csv(self.folder / dd_set / self.fill_distance_filename)
@@ -177,12 +172,13 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
     def get_feasibility_ratio_as_dataframe(self):
         self.feasibility_ratio_dataframe = pandas.DataFrame.from_dict(self.feasibility_ratio,
                                                                       orient="index",
-                                                                      columns = ["Feasibility ratio"])
+                                                                      columns=["Feasibility ratio"])
 
         return self.feasibility_ratio_dataframe
 
     def save_feasibility_ratio_as_dataframe(self):
         self.feasibility_ratio_dataframe.to_csv(self.folder / self.feasibility_ratio_filename)
+
 
 def main():
     try:
@@ -193,8 +189,8 @@ def main():
                          "sobol_points_exponent_of_two": 3,
                          "design_methods_to_be_executed": ["scmc", "comined", "bsp", "manuscript"],
                          "simulation_sets_to_be_executed": ['SBnight', 'SBday', 'SALSAnight', 'SALSAday'],
-                         "fill_distance_filename" : "filldistance_stats.csv",
-                         "feasibility_ratio_filename" : "feasibility_ratios.csv",
+                         "fill_distance_filename": "filldistance_stats.csv",
+                         "feasibility_ratio_filename": "feasibility_ratios.csv",
                          }
 
     fd = FillDistance(folder=parameterDict["folder"],

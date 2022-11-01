@@ -45,19 +45,19 @@ class FillDistanceAnalysis(DesignAnalysis):
         for dd_set in self.joined_stats:
             for column_name in self.joined_stats[dd_set].columns:
                 splitted = column_name.split("_")
-                if splitted[1] in  ["ga"]:
+                if splitted[1] in ["ga"]:
                     continue
 
                 if splitted[0] == "filldistance":
                     self.maximin_column_names[dd_set].append(column_name)
 
     def plot_results(self):
-        self.figures["filldistance"] = Figure(self.figure_folder,"filldistance_"+self.postfix,
-                                        figsize=[self.figure_width, 6],
-                                        ncols=2,nrows=2,
-                                        hspace=0.05, wspace=0.05,
-                                        left=0.15, right=0.97,
-                                        bottom=0.1, top = 0.93)
+        self.figures["filldistance"] = Figure(self.figure_folder, "filldistance_" + self.postfix,
+                                              figsize=[self.figure_width, 6],
+                                              ncols=2, nrows=2,
+                                              hspace=0.05, wspace=0.05,
+                                              left=0.15, right=0.97,
+                                              bottom=0.1, top=0.93)
 
         fig = self.figures["filldistance"]
         for dd_ind, dd_set in enumerate(list(self.design_sets)):
@@ -68,24 +68,23 @@ class FillDistanceAnalysis(DesignAnalysis):
                 df = self.joined_stats[dd_set]
                 df.plot(kind="scatter",
                         marker=self.method_with_marker[method_name],
-                            x="design_points",
-                            y=method_column,
-                            ax = current_axis,
-                            color = self.method_with_color[method_name],
-                            legend = False,
-                            s=40,
-                            alpha=0.45
-                            )
+                        x="design_points",
+                        y=method_column,
+                        ax=current_axis,
+                        color=self.method_with_color[method_name],
+                        legend=False,
+                        s=40,
+                        alpha=0.45
+                        )
 
-            if dd_ind in [1,3]:
+            if dd_ind in [1, 3]:
                 PlotTweak.hideYTickLabels(current_axis)
 
-            if dd_ind in [0,1]:
+            if dd_ind in [0, 1]:
                 PlotTweak.hideXTickLabels(current_axis)
 
-
-            PlotTweak.setYaxisLabel(current_axis,"")
-            PlotTweak.setXaxisLabel(current_axis,"")
+            PlotTweak.setYaxisLabel(current_axis, "")
+            PlotTweak.setXaxisLabel(current_axis, "")
 
             if dd_ind == 3:
                 current_axis.text(PlotTweak.getXPosition(current_axis, -0.5), PlotTweak.getYPosition(current_axis, -0.2),
@@ -94,7 +93,7 @@ class FillDistanceAnalysis(DesignAnalysis):
 
             if dd_ind == 2:
                 current_axis.text(PlotTweak.getXPosition(current_axis, -0.32), PlotTweak.getYPosition(current_axis, 0.2),
-                        "Fill Distance measure with designs optimised with " + self.postfix, size=8 , rotation=90)
+                                  "Fill Distance measure with designs optimised with " + self.postfix, size=8, rotation=90)
 
             if dd_ind == 0:
 
@@ -118,8 +117,9 @@ class FillDistanceAnalysis(DesignAnalysis):
                                     xPosition=PlotTweak.getXPosition(current_axis, self.annotationXPositions[dd_set]),
                                     yPosition=PlotTweak.getYPosition(current_axis, 0.93))
 
+
 def main():
-    optim_methods = {"maximin":os.environ["DESIGNRESULTSMAXIMIN"],
+    optim_methods = {"maximin": os.environ["DESIGNRESULTSMAXIMIN"],
                      "maxpro": os.environ["DESIGNRESULTSMAXPRO"]}
     for key in optim_methods:
         fill = FillDistanceAnalysis(optim_methods[key],
@@ -129,7 +129,6 @@ def main():
         fill.reset_index()
         fill.plot_results()
         fill.save_figures()
-
 
 
 if __name__ == "__main__":

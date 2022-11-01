@@ -22,6 +22,7 @@ from LookUpTable import LookUpTable
 sys.path.append(os.environ["CODEX"] + "/LES-superfolder/LES-emulator-02postpros")
 import LES2emu
 
+
 class BinarySpacePartition:
 
     def __init__(self,
@@ -50,7 +51,6 @@ class BinarySpacePartition:
         self.outputfolder = os.path.dirname(self.outputfile)
         os.makedirs(self.outputfolder, exist_ok=True)
 
-
     def set_collection(self, dataframe):
         self.collection = dataframe
 
@@ -73,7 +73,7 @@ class BinarySpacePartition:
         make_partition = True
 
         while make_partition:
-            shuffled_dimensions = self.shuffleList( self.design_variables )
+            shuffled_dimensions = self.shuffleList(self.design_variables)
             for dim_ind, dimension in enumerate(shuffled_dimensions):
                 part_ind = 0
                 iterate_partitions = True
@@ -86,7 +86,7 @@ class BinarySpacePartition:
                             part_ind += 1
                             continue
 
-                        median = len(partition)//2
+                        median = len(partition) // 2
                         bin_zero = partition.sort_values(by=dimension).iloc[:median]
                         bin_one = partition.sort_values(by=dimension).iloc[median:]
 
@@ -101,15 +101,15 @@ class BinarySpacePartition:
                     iterate_partitions = (make_partition and (part_ind < len(self.partitions)))
 
     def sample_partitions_to_design(self):
-        design_helper_list = [None]*self.design_points
+        design_helper_list = [None] * self.design_points
         for part_ind, partition in enumerate(self.partitions):
             constraintPass = False
             while not constraintPass:
-                row = partition.sample()
-                q_pbl =  LES2emu.solve_rw_lwp( 101780,
-                                     row.iloc[0]["tpot_pbl"],
-                                     row.iloc[0]["lwp"]*1e-3,
-                                     row.iloc[0]["pbl"]*100.)*1e3
+                row = partition.sample(random_state=321)
+                q_pbl = LES2emu.solve_rw_lwp(101780,
+                                             row.iloc[0]["tpot_pbl"],
+                                             row.iloc[0]["lwp"] * 1e-3,
+                                             row.iloc[0]["pbl"] * 100.) * 1e3
                 constraintPass = (q_pbl - row.iloc[0]["q_inv"] > 1)
 
             design_helper_list[part_ind] = row
@@ -124,11 +124,10 @@ class BinarySpacePartition:
         self.design.to_csv(self.outputfile)
 
 
-
 def main():
     testing = False
     if testing:
-        bsp = BinarySpacePartition(design_points = 10,
+        bsp = BinarySpacePartition(design_points=10,
                                    outputfile=os.environ["DESIGNRESULTS"] + "/design_stats/test/bsp_test.csv")
         bsp.create_bs_partitions()
 
@@ -185,9 +184,9 @@ def main():
             for k in range(1):
                 print("iteration:", k)
                 bsp = BinarySpacePartition(design_variables=design_variables[key],
-                                   design_points=design_points,
-                                   sourcefile=file,
-                                   outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats_"+ upfolder + "/" + subfolder + "/bsp/bsp_" + str(design_points) + ".csv")
+                                           design_points=design_points,
+                                           sourcefile=file,
+                                           outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats_" + upfolder + "/" + subfolder + "/bsp/bsp_" + str(design_points) + ".csv")
 
                 bsp.create_bs_partitions()
                 bsp.sample_partitions_to_design()
@@ -209,7 +208,6 @@ def main():
                         best = solution
                         bsp.write_design()
 
-
             duration_bsp = time.time() - start
 
             solutions_bsp[ind] = best
@@ -217,14 +215,13 @@ def main():
 
         df_key = upfolder + "_bsp"
         solutions_df = pandas.DataFrame(data={
-                                         df_key: solutions_bsp,
-                                         "duration_bsp": timing_vector_bsp,
-                                         },
-                                        index= design_points_vector)
+            df_key: solutions_bsp,
+            "duration_bsp": timing_vector_bsp,
+        },
+            index=design_points_vector)
         solutions_df.index.name = "design_points"
 
-        solutions_df.to_csv(os.environ["DATAT"] + "/ECLAIR/design_stats_"+ upfolder + "/" + subfolder + "/bsp_stats.csv")
-
+        solutions_df.to_csv(os.environ["DATAT"] + "/ECLAIR/design_stats_" + upfolder + "/" + subfolder + "/bsp_stats.csv")
 
 
 if __name__ == "__main__":
