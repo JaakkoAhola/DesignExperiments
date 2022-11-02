@@ -158,7 +158,11 @@ def main():
         design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
     look = LookUpTable()
-    use_max_pro = True
+    try:
+        use_max_pro = bool(int(sys.argv[2]))
+    except IndexError:
+        sys.exit("Did not get a integer-boolean cmd-line argument for use_max_pro")
+
     if use_max_pro:
         upfolder = "maxpro"
     else:
