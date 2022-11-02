@@ -71,14 +71,15 @@ class BinarySpacePartition:
         self.partitions = [self.collection]
 
         make_partition = True
-
+        print("Creating partitions")
+        print("\t", end="")
         while make_partition:
             shuffled_dimensions = self.shuffleList(self.design_variables)
             for dim_ind, dimension in enumerate(shuffled_dimensions):
                 part_ind = 0
                 iterate_partitions = True
                 while iterate_partitions:
-
+                    print(f"{len(self.partitions)}", end=" ")
                     if len(self.partitions) < self.design_points:
                         partition = self.partitions[part_ind]
 
@@ -102,8 +103,11 @@ class BinarySpacePartition:
 
     def sample_partitions_to_design(self):
         design_helper_list = [None] * self.design_points
+        print("Sampling partitions")
+        print("\t", end="")
         for part_ind, partition in enumerate(self.partitions):
             constraintPass = False
+            print(f"{part_ind}", end=" ")
             while not constraintPass:
                 row = partition.sample(random_state=321)
                 q_pbl = LES2emu.solve_rw_lwp(101780,
@@ -158,10 +162,13 @@ def main():
         design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
     look = LookUpTable()
-    try:
-        use_max_pro = bool(int(sys.argv[2]))
-    except IndexError:
-        sys.exit("Did not get a integer-boolean cmd-line argument for use_max_pro")
+    if not debug:
+        try:
+            use_max_pro = bool(int(sys.argv[2]))
+        except IndexError:
+            sys.exit("Did not get a integer-boolean cmd-line argument for use_max_pro")
+    else:
+        use_max_pro = False
 
     if use_max_pro:
         upfolder = "maxpro"
