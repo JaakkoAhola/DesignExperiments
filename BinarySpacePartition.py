@@ -110,7 +110,7 @@ class BinarySpacePartition:
             constraintPass = False
             print(f"{part_ind}", end=" ")
             random_seed_increment = 0
-            print("(constrain iteration", end=" ")
+            print("(", end=" ")
             while not constraintPass:
                 print(f"{random_seed_increment}", end=" ")
                 row = partition.sample(random_state=part_ind + random_seed_increment)
@@ -125,7 +125,8 @@ class BinarySpacePartition:
             design_helper_list[part_ind] = row
 
         self.design = pandas.concat(design_helper_list)
-        print("")
+        print(" ")
+        print(" ")
         return self.design
 
     def get_design(self):
@@ -198,6 +199,8 @@ def main():
                 best = numpy.inf
 
             start = time.time()
+            print(" ")
+            print(" ")
             print("design_points", design_points)
             for k in range(1):
                 print("iteration:", k)
