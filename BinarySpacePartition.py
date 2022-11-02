@@ -51,6 +51,8 @@ class BinarySpacePartition:
         self.outputfolder = os.path.dirname(self.outputfile)
         os.makedirs(self.outputfolder, exist_ok=True)
 
+        random.seed(321)
+
     def set_collection(self, dataframe):
         self.collection = dataframe
 
