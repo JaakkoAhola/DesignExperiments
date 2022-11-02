@@ -100,6 +100,7 @@ class BinarySpacePartition:
                     part_ind += 2
 
                     iterate_partitions = (make_partition and (part_ind < len(self.partitions)))
+        print("")
 
     def sample_partitions_to_design(self):
         design_helper_list = [None] * self.design_points
@@ -108,17 +109,23 @@ class BinarySpacePartition:
         for part_ind, partition in enumerate(self.partitions):
             constraintPass = False
             print(f"{part_ind}", end=" ")
+            random_seed_increment = 0
+            print("(constrain iteration", end=" ")
             while not constraintPass:
-                row = partition.sample(random_state=321)
+                print(f"{random_seed_increment}", end=" ")
+                row = partition.sample(random_state=part_ind + random_seed_increment)
                 q_pbl = LES2emu.solve_rw_lwp(101780,
                                              row.iloc[0]["tpot_pbl"],
                                              row.iloc[0]["lwp"] * 1e-3,
                                              row.iloc[0]["pbl"] * 100.) * 1e3
                 constraintPass = (q_pbl - row.iloc[0]["q_inv"] > 1)
+                random_seed_increment += 1
+            print(")", end=" ")
 
             design_helper_list[part_ind] = row
 
         self.design = pandas.concat(design_helper_list)
+        print("")
         return self.design
 
     def get_design(self):
