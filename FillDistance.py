@@ -193,7 +193,7 @@ def main():
                          "feasibility_ratio_filename": "feasibility_ratios.csv",
                          }
 
-    fd = FillDistance(folder=parameterDict["folder"],
+    fd = FillDistance(folder=eval(parameterDict["folder"]),
                       sobol_points_exponent_of_two=parameterDict["sobol_points_exponent_of_two"],
                       design_methods_to_be_executed=parameterDict["design_methods_to_be_executed"],
                       simulation_sets_to_be_executed=parameterDict["simulation_sets_to_be_executed"],
