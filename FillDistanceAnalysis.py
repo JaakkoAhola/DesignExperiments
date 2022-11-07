@@ -10,15 +10,16 @@ import os
 import sys
 import time
 from datetime import datetime
+import numpy
 import pandas
 
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
-from Colorful import Colorful
 from Figure import Figure
 from PlotTweak import PlotTweak
 
 from DesignAnalysis import DesignAnalysis
+from matplotlib.lines import Line2D
 
 
 class FillDistanceAnalysis(DesignAnalysis):
@@ -55,17 +56,37 @@ class FillDistanceAnalysis(DesignAnalysis):
         self.figures["filldistance"] = Figure(self.figure_folder, "filldistance_" + self.postfix,
                                               figsize=[self.figure_width, 6],
                                               ncols=2, nrows=2,
-                                              hspace=0.05, wspace=0.05,
                                               left=0.15, right=0.97,
-                                              bottom=0.1, top=0.93)
+                                              hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
 
         fig = self.figures["filldistance"]
+
+        xstart = 0
+        xend = 500
+        xticks = numpy.arange(xstart, xend + 1, 50)
+        xtickLabels = [f"{t:.0f}" for t in xticks]
+        xshowList = Data.cycleBoolean(len(xticks))
+        xshowList[0] = False
+
+        ystart = 1.90
+        yend = 2.55
+        yticks = numpy.arange(ystart, yend + 0.1, 0.05)
+        ytickLabels = [f"{t:.1f}" for t in yticks]
+
+        yshowList = Data.cycleBoolean(len(yticks))
+        yshowList[0] = False
+        maxi = -numpy.inf
+        mini = numpy.inf
+
         for dd_ind, dd_set in enumerate(list(self.design_sets)):
             current_axis = fig.getAxes(dd_ind)
 
             for method_column in self.maximin_column_names[dd_set]:
                 method_name = method_column.split("_")[-1]
                 df = self.joined_stats[dd_set]
+                maxi = max(maxi, df[method_column].max())
+                mini = min(mini, df[method_column].min())
+
                 df.plot(kind="scatter",
                         marker=self.method_with_marker[method_name],
                         x="design_points",
@@ -76,6 +97,19 @@ class FillDistanceAnalysis(DesignAnalysis):
                         s=40,
                         alpha=0.45
                         )
+            PlotTweak.setXaxisLabel(current_axis, "")
+            current_axis.set_xlim([xstart, xend + 20])
+            current_axis.set_xticks(xticks)
+            current_axis.set_xticklabels(xtickLabels)
+            PlotTweak.hideLabels(current_axis.xaxis, xshowList)
+            PlotTweak.setXTickSizes(current_axis, Data.cycleBoolean(len(xticks)))
+
+            PlotTweak.setYaxisLabel(current_axis, "")
+            current_axis.set_ylim([ystart, yend + 0.03])
+            current_axis.set_yticks(yticks)
+            current_axis.set_yticklabels(ytickLabels)
+            PlotTweak.hideLabels(current_axis.yaxis, yshowList)
+            PlotTweak.setYTickSizes(current_axis, Data.cycleBoolean(len(yticks)))
 
             if dd_ind in [1, 3]:
                 PlotTweak.hideYTickLabels(current_axis)
@@ -87,7 +121,7 @@ class FillDistanceAnalysis(DesignAnalysis):
             PlotTweak.setXaxisLabel(current_axis, "")
 
             if dd_ind == 3:
-                current_axis.text(PlotTweak.getXPosition(current_axis, -0.5), PlotTweak.getYPosition(current_axis, -0.2),
+                current_axis.text(-175, PlotTweak.getYPosition(current_axis, -0.19),
                                   "Number of design points",
                                   size=8)
 
@@ -98,14 +132,23 @@ class FillDistanceAnalysis(DesignAnalysis):
             if dd_ind == 0:
 
                 names = [key for key in self.method_with_color if key != "ga"]
-                colors = [self.method_with_color[key] for key in names]
-                sensible_names = [self.get_sensible_name(key) for key in names]
 
-                sensible_names_with_color = dict(zip(sensible_names, colors))
+                legendLabelColors = []
+                for key in names:
+                    color = self.method_with_color[key]
+                    sensible_name = self.get_sensible_name(key)
+                    marker = self.method_with_marker[key]
+                    legendLabelColors.append(Line2D([], [],
+                                                    color=color,
+                                                    linewidth=0,
+                                                    marker=marker,
+                                                    label=sensible_name,
+                                                    markerfacecolor=color,
+                                                    markersize=8,
+                                                    alpha=0.45))
 
-                legendLabelColors = PlotTweak.getPatches(sensible_names_with_color)
                 artist = current_axis.legend(handles=legendLabelColors,
-                                             loc=(-0.1, 1.05),
+                                             loc=(-0.02, 1.05),
                                              frameon=True,
                                              framealpha=0.8,
                                              ncol=len(list(self.method_with_color)))
@@ -114,8 +157,9 @@ class FillDistanceAnalysis(DesignAnalysis):
 
             PlotTweak.setAnnotation(current_axis,
                                     self.annotationCollection[dd_set],
-                                    xPosition=PlotTweak.getXPosition(current_axis, self.annotationXPositions[dd_set]),
+                                    xPosition=PlotTweak.getXPosition(current_axis, 0.05),
                                     yPosition=PlotTweak.getYPosition(current_axis, 0.93))
+        print("min", mini, "max", maxi)
 
 
 def main():

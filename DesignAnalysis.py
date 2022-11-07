@@ -22,8 +22,9 @@ from Figure import Figure
 from PlotTweak import PlotTweak
 
 import MaximinDesign
-import random
 from LookUpTable import LookUpTable
+from matplotlib.lines import Line2D
+
 
 def get_design_points_from_filename(file_name):
     stringi = str(file_name.name)
@@ -33,10 +34,11 @@ def get_design_points_from_filename(file_name):
 
     return second
 
+
 class DesignAnalysis:
 
     def __init__(self,
-                 folder = os.environ["DESIGNRESULTSMAXIMIN"],
+                 folder=os.environ["DESIGNRESULTSMAXIMIN"],
                  ):
 
         self.figure_folder = f'{os.environ["HOME"]}/Dropbox/Apps/Overleaf/väitöskirja/figures'
@@ -63,7 +65,7 @@ class DesignAnalysis:
             self.joined_stats[dd_set] = None
 
         self.figures = {}
-        self.figure_width = 12/2.54
+        self.figure_width = 12 / 2.54
 
         color_list = Colorful.getDistinctColorList(["green", "blue", "yellow", "orange", "red"])
 
@@ -88,24 +90,23 @@ class DesignAnalysis:
         self.look = LookUpTable()
 
         self.annotationValues = ["(a) SB Night",
-            "(b) SB Day",
-            "(c) SALSA Night",
-            "(d) SALSA Day"]
+                                 "(b) SB Day",
+                                 "(c) SALSA Night",
+                                 "(d) SALSA Day"]
 
         self.design_sensible_names = dict(zip(self.design_sets, ["SB Night",
-            "SB Day",
-            "SALSA Night",
-            "SALSA Day"]))
+                                                                 "SB Day",
+                                                                 "SALSA Night",
+                                                                 "SALSA Day"]))
 
         self.annotationCollection = dict(zip(self.design_sets, self.annotationValues))
 
-        self.annotationXPositions = dict(zip(self.design_sets, [0.57, 0.63, 0.45, 0.50 ]))
-
+        self.annotationXPositions = dict(zip(self.design_sets, [0.57, 0.63, 0.45, 0.50]))
 
     def get_sensible_name(self, key):
 
-        sensible_dict = {"scmc" : "SCMC",
-                         "comined" : "CoMinED",
+        sensible_dict = {"scmc": "SCMC",
+                         "comined": "CoMinED",
                          "bsp": "BSP",
                          "manuscript": "Paper III (BSP)"}
 
@@ -126,14 +127,13 @@ class DesignAnalysis:
             design_points = design.shape[0]
 
             df = pandas.DataFrame(data=[maximin],
-                                  index = [design_points],
+                                  index=[design_points],
                                   columns=["maximin_manuscript"])
             df.index.name = "design_points"
 
             df.to_csv(self.folder / seeti / ("manuscript_stats.csv"))
 
     def get_maximin_results_with_R(self):
-
 
         for dd_set in self.stats:
             for method in self.design_methods_with_R:
@@ -149,16 +149,15 @@ class DesignAnalysis:
                 list_of_tuples = self.stats[dd_set][method]
 
                 self.stats[dd_set][method] = pandas.DataFrame.from_records(list_of_tuples,
-                                                                           columns =['design_points',
-                                                                                     'maximin_' + method])
-                self.stats[dd_set][method].set_index("design_points", inplace = True)
+                                                                           columns=['design_points',
+                                                                                    'maximin_' + method])
+                self.stats[dd_set][method].set_index("design_points", inplace=True)
 
     def save_results_with_R(self):
         for dd_set in self.design_sets:
             for method in self.design_methods_with_R:
                 stats_file = self.folder / dd_set / (method + "_stats.csv")
                 self.stats[dd_set][method].to_csv(stats_file)
-
 
     def read_all_results(self):
 
@@ -170,7 +169,7 @@ class DesignAnalysis:
                 else:
                     assert stats_file.is_file(), stats_file
 
-                df = pandas.read_csv(stats_file, index_col = 0 )
+                df = pandas.read_csv(stats_file, index_col=0)
 
                 if self.joined_stats[dd_set] is None:
                     self.joined_stats[dd_set] = df
@@ -187,12 +186,11 @@ class DesignAnalysis:
                                                   inplace=True)
             self.joined_stats[dd_set].reset_index(inplace=True)
 
-
     def get_maximin_column_names(self):
         for dd_set in self.joined_stats:
             for column_name in self.joined_stats[dd_set].columns:
                 splitted = column_name.split("_")
-                if splitted[1] in  ["ga"]:
+                if splitted[1] in ["ga"]:
                     continue
 
                 if splitted[0] == "maximin":
@@ -204,12 +202,11 @@ class DesignAnalysis:
                 for method_result in self.maximin_column_names[dd_set]:
                     print(f"{dd_set} {method_result} min: {numpy.log(self.joined_stats[dd_set][method_result].min()):.1f} max: {numpy.log(self.joined_stats[dd_set][method_result].max()):.1f}")
 
-
     def get_maximum_values_of_maximins(self):
         for dd_set in self.design_sets:
             for method_result in self.maximin_column_names[dd_set]:
                 self.maximum_dict[dd_set] = numpy.nanmax([self.maximum_dict[dd_set],
-                                                    self.joined_stats[dd_set][method_result].max()])
+                                                          self.joined_stats[dd_set][method_result].max()])
 
     def normalise_maximin_results_based_on_maximum(self):
         for dd_set in self.design_sets:
@@ -221,13 +218,28 @@ class DesignAnalysis:
                 self.normalised_maximin_column_names[dd_set].append(normalised_name)
 
     def plot_results(self):
-        self.figures["maximin"] = Figure(self.figure_folder,"maximin",
-                                        figsize=[self.figure_width, 6],
-                                        ncols=2,
-                                        nrows=2,
-                                        hspace=0.05, bottom=0.1, wspace = 0.05, top = 0.93)
+        self.figures["maximin"] = Figure(self.figure_folder, "maximin",
+                                         figsize=[self.figure_width, 6],
+                                         ncols=2,
+                                         nrows=2,
+                                         hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
 
         fig = self.figures["maximin"]
+        xstart = 0
+        xend = 500
+        xticks = numpy.arange(xstart, xend + 1, 50)
+        xtickLabels = [f"{t:.0f}" for t in xticks]
+        xshowList = Data.cycleBoolean(len(xticks))
+        xshowList[0] = False
+
+        ystart = 0
+        yend = 1.0
+        yticks = numpy.arange(ystart, yend + 0.1, 0.1)
+        ytickLabels = [f"{t:.1f}" for t in yticks]
+
+        yshowList = Data.cycleBoolean(len(yticks))
+        yshowList[0] = False
+
         for dd_ind, dd_set in enumerate(list(self.design_sets)):
             current_axis = fig.getAxes(dd_ind)
 
@@ -236,43 +248,65 @@ class DesignAnalysis:
                 df = self.joined_stats[dd_set]
                 df.plot(kind="scatter",
                         marker=self.method_with_marker[method_name],
-                            x="design_points",
-                            y=method_column,
-                            ax = current_axis,
-                            color = self.method_with_color[method_name],
-                            legend = False,
-                            s=40,
-                            alpha=0.45
-                            )
+                        x="design_points",
+                        y=method_column,
+                        ax=current_axis,
+                        color=self.method_with_color[method_name],
+                        legend=False,
+                        s=40,
+                        alpha=0.45
+                        )
 
-            if dd_ind in [1,3]:
+            PlotTweak.setXaxisLabel(current_axis, "")
+            current_axis.set_xlim([xstart, xend + 20])
+            current_axis.set_xticks(xticks)
+            current_axis.set_xticklabels(xtickLabels)
+            PlotTweak.hideLabels(current_axis.xaxis, xshowList)
+            PlotTweak.setXTickSizes(current_axis, Data.cycleBoolean(len(xticks)))
+
+            PlotTweak.setYaxisLabel(current_axis, "")
+            current_axis.set_ylim([ystart, yend + 0.03])
+            current_axis.set_yticks(yticks)
+            current_axis.set_yticklabels(ytickLabels)
+            PlotTweak.hideLabels(current_axis.yaxis, yshowList)
+            PlotTweak.setYTickSizes(current_axis, Data.cycleBoolean(len(yticks)))
+
+            if dd_ind in [1, 3]:
                 PlotTweak.hideYTickLabels(current_axis)
 
-            if dd_ind in [0,1]:
+            if dd_ind in [0, 1]:
                 PlotTweak.hideXTickLabels(current_axis)
 
-
-            PlotTweak.setYaxisLabel(current_axis,"")
-            PlotTweak.setXaxisLabel(current_axis,"")
+            PlotTweak.setYaxisLabel(current_axis, "")
+            PlotTweak.setXaxisLabel(current_axis, "")
 
             if dd_ind == 3:
-                current_axis.text(-175,0,
-                                  "Number of design points", #PlotTweak.getLatexLabel(, ""),
+                current_axis.text(-175, -0.2,
+                                  "Number of design points",  # PlotTweak.getLatexLabel(, ""),
                                   size=8)
 
             if dd_ind == 2:
                 current_axis.text(PlotTweak.getXPosition(current_axis, -0.25), PlotTweak.getYPosition(current_axis, 0.2),
-                        "Maximin measure relative to the highest measure within a set", size=8 , rotation =90)
+                                  "Maximin measure relative to the highest measure within a set", size=8, rotation=90)
 
             if dd_ind == 0:
 
                 names = [key for key in self.method_with_color if key != "ga"]
-                colors = [self.method_with_color[key] for key in names]
-                sensible_names = [self.get_sensible_name(key) for key in names]
 
-                sensible_names_with_color = dict(zip(sensible_names, colors))
+                legendLabelColors = []
+                for key in names:
+                    color = self.method_with_color[key]
+                    sensible_name = self.get_sensible_name(key)
+                    marker = self.method_with_marker[key]
+                    legendLabelColors.append(Line2D([], [],
+                                                    color=color,
+                                                    linewidth=0,
+                                                    marker=marker,
+                                                    label=sensible_name,
+                                                    markerfacecolor=color,
+                                                    markersize=8,
+                                                    alpha=0.45))
 
-                legendLabelColors = PlotTweak.getPatches(sensible_names_with_color)
                 artist = current_axis.legend(handles=legendLabelColors,
                                              loc=(-0.02, 1.05),
                                              frameon=True,
@@ -286,22 +320,14 @@ class DesignAnalysis:
                                     xPosition=PlotTweak.getXPosition(current_axis, self.annotationXPositions[dd_set]),
                                     yPosition=PlotTweak.getYPosition(current_axis, 0.93))
 
-
-
     def save_figures(self):
 
         for fig in self.figures.values():
-            fig.save(file_extension = ".pdf")
-
-
-
+            fig.save(file_extension=".pdf")
 
 
 def main():
     dd = DesignAnalysis()
-
-
-
 
     update_results = False
 
@@ -309,7 +335,6 @@ def main():
         dd.get_manuscript_results()
         dd.get_maximin_results_with_R()
         dd.save_results_with_R()
-
 
     dd.read_all_results()
     dd.get_maximin_column_names()
@@ -319,6 +344,7 @@ def main():
     dd.normalise_maximin_results_based_on_maximum()
     dd.plot_results()
     dd.save_figures()
+
 
 if __name__ == "__main__":
     start = time.time()
