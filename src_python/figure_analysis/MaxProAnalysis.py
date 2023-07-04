@@ -21,8 +21,8 @@ from Colorful import Colorful
 from Figure import Figure
 from PlotTweak import PlotTweak
 
-import MaximinDesign
-from LookUpTable import LookUpTable
+from algorithms import MaximinDesign
+from algorithms import LookUpTable
 from matplotlib.lines import Line2D
 
 
@@ -169,7 +169,8 @@ class MaxProxAnalysis:
                 if self.joined_stats[dd_set] is None:
                     self.joined_stats[dd_set] = df
                 else:
-                    self.joined_stats[dd_set] = df.merge(self.joined_stats[dd_set], how="outer", on="design_points")
+                    self.joined_stats[dd_set] = df.merge(
+                        self.joined_stats[dd_set], how="outer", on="design_points")
 
     def reset_index(self):
         for dd_set in self.design_sets:
@@ -195,7 +196,8 @@ class MaxProxAnalysis:
             for dd_set in self.design_sets:
                 print(dd_set)
                 for method_result in self.maxpro_column_names[dd_set]:
-                    print(f"{dd_set} {method_result} min: {numpy.log(self.joined_stats[dd_set][method_result].min()):.1f} max: {numpy.log(self.joined_stats[dd_set][method_result].max()):.1f}")
+                    print(
+                        f"{dd_set} {method_result} min: {numpy.log(self.joined_stats[dd_set][method_result].min()):.1f} max: {numpy.log(self.joined_stats[dd_set][method_result].max()):.1f}")
 
     def get_maximum_values_of_maxpros(self):
         for dd_set in self.design_sets:
@@ -208,7 +210,8 @@ class MaxProxAnalysis:
             for method_result in self.maxpro_column_names[dd_set]:
 
                 normalised_name = "normalised_" + method_result
-                self.joined_stats[dd_set][normalised_name] = self.joined_stats[dd_set][method_result] / self.maximum_dict[dd_set]
+                self.joined_stats[dd_set][normalised_name] = self.joined_stats[dd_set][method_result] / \
+                    self.maximum_dict[dd_set]
 
                 self.normalised_maxpro_column_names[dd_set].append(normalised_name)
 
@@ -309,40 +312,11 @@ class MaxProxAnalysis:
 
             PlotTweak.setAnnotation(current_axis,
                                     self.annotationCollection[dd_set],
-                                    xPosition=PlotTweak.getXPosition(current_axis, self.annotationXPositions[dd_set]),
+                                    xPosition=PlotTweak.getXPosition(
+                                        current_axis, self.annotationXPositions[dd_set]),
                                     yPosition=PlotTweak.getYPosition(current_axis, 0.83))
 
     def save_figures(self):
 
         for fig in self.figures.values():
             fig.save(file_extension=".pdf")
-
-
-def main():
-    dd = MaxProxAnalysis()
-
-    update_results = False
-
-    if update_results:
-        dd.get_manuscript_results()
-        dd.get_maxpro_results_with_R()
-        dd.save_results_with_R()
-
-    dd.read_all_results()
-    dd.get_maxpro_column_names()
-    dd.reset_index()
-    dd.sort_by_design_points()
-    dd.get_maximum_values_of_maxpros()
-    dd.normalise_maxpro_results_based_on_maximum()
-    dd.plot_results()
-    dd.save_figures()
-
-
-if __name__ == "__main__":
-    start = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script started {now}.")
-    main()
-    end = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script completed {now} in {Data.timeDuration(end - start)}")

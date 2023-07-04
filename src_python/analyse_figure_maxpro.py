@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 @author: Jaakko Ahola
-@company:  Virnex Oy
-@date: 
+@affiliation:  University of Turku
+@date: 4.7.2023
+@licence: MIT licence Copyright
 """
 
 import os
@@ -13,10 +14,27 @@ from datetime import datetime
 
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
+from figure_analysis import MaxProAnalysis
 
 
 def main():
-    pass
+    dd = MaxProAnalysis.MaxProxAnalysis()
+
+    update_results = False
+
+    if update_results:
+        dd.get_manuscript_results()
+        dd.get_maxpro_results_with_R()
+        dd.save_results_with_R()
+
+    dd.read_all_results()
+    dd.get_maxpro_column_names()
+    dd.reset_index()
+    dd.sort_by_design_points()
+    dd.get_maximum_values_of_maxpros()
+    dd.normalise_maxpro_results_based_on_maximum()
+    dd.plot_results()
+    dd.save_figures()
 
 
 if __name__ == "__main__":

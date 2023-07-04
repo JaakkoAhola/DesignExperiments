@@ -4,8 +4,8 @@ datahakemisto <- Sys.getenv("DATAT")
 if (dir.exists("/fmi/projappl/project_2001927/project_rpackages_3.6.3")){
   .libPaths(c("/fmi/projappl/project_2001927/project_rpackages_3.6.3", .libPaths()))
 }
-source("lib.R")
-source("lib_meteo.R")
+source("lib/lib.R")
+source("lib/lib_meteo.R")
 
 require("rngWELL")
 require("lattice")
