@@ -7,7 +7,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mail-type=END #uncomment to enable mail
-#SBATCH --mail-user=jaakko.ahola@virnex.fi
+#SBATCH --mail-user=jjahol@utu.fi
 #SBATCH --output=logs/bsp/SBnight_bsp_1_v2_%j.log
 
 source ${HOME}/init.login.sh
