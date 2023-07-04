@@ -8,9 +8,6 @@ Created on 19.1.2022
 """
 
 import os
-import sys
-import time
-from datetime import datetime
 import pandas
 import pathlib
 from math import ceil
@@ -19,12 +16,11 @@ import matplotlib
 import matplotlib.ticker as mticker
 from copy import deepcopy
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-from Colorful import Colorful
-from Figure import Figure
-from PlotTweak import PlotTweak
-
+# package imports
+from library import Data
+from library import Colorful
+from library import Figure
+from library import PlotTweak
 from figure_analysis import MaximinAnalysis
 
 
@@ -113,13 +109,13 @@ class DistributionAnalysis(MaximinAnalysis):
         nrows = 4
         ncols = ceil(len(self.designVariablePool) / nrows)
         name = "figure_design_variable_distribution_" + self.postfix
-        self.figures[name] = Figure(self.figure_folder,
-                                    name,
-                                    figsize=[self.figure_width, 7],
-                                    ncols=ncols, nrows=nrows,
-                                    bottom=0.04, top=0.98,
-                                    hspace=0.17, wspace=0.07,
-                                    left=0.05, right=0.99)
+        self.figures[name] = Figure.Figure(self.figure_folder,
+                                           name,
+                                           figsize=[self.figure_width, 7],
+                                           ncols=ncols, nrows=nrows,
+                                           bottom=0.04, top=0.98,
+                                           hspace=0.17, wspace=0.07,
+                                           left=0.05, right=0.99)
 
         fig = self.figures[name]
 

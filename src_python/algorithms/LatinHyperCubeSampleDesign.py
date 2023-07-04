@@ -6,18 +6,16 @@ Created on Wed Oct 20 19:13:17 2021
 @author: Jaakko Ahola, Finnish Meteorological Institute
 @licence: MIT licence Copyright
 """
-from copy import deepcopy
-import sys
-import pandas
 import os
+from copy import deepcopy
+import pandas
+
 
 from scipy.stats import qmc
 from sklearn.preprocessing import StandardScaler
 
-sys.path.append(os.environ["CODEX"] +
-                "/LES-superfolder/LES-emulator-02postpros")
-from SourceVsSampleVsDesign import SourceVsSampleVsDesign
-import LES2emu
+from figure_analysis import SourceVsSampleVsDesign
+from library import Meteo
 
 
 class LatinHyperCubeSampleDesign:
@@ -94,20 +92,20 @@ class LatinHyperCubeSampleDesign:
     def get_humidity_jump(self):
 
         self.design_latin_plain["aux_q_pbl_kg_kg"] = self.design_latin_plain.apply(lambda row:
-                                                                                   LES2emu.solve_rw_lwp(101780,
-                                                                                                        row["tpot_pbl"],
-                                                                                                        row["lwp"]
-                                                                                                        * 1e-3,
-                                                                                                        row["pbl"] * 100.),
+                                                                                   Meteo.solve_rw_lwp(101780,
+                                                                                                      row["tpot_pbl"],
+                                                                                                      row["lwp"] *
+                                                                                                      1e-3,
+                                                                                                      row["pbl"] * 100.),
                                                                                    axis=1)
 
     def get_pblh_in_meters(self):
         self.design_latin_plain["aux_pblh_m"] = self.design_latin_plain.apply(lambda row:
-                                                                              LES2emu.calc_lwp(101780,
-                                                                                               row["tpot_pbl"],
-                                                                                               row["pbl"]
-                                                                                               * 100.,
-                                                                                               row["aux_q_pbl_kg_kg"])[2], axis=1)
+                                                                              Meteo.calc_lwp(101780,
+                                                                                             row["tpot_pbl"],
+                                                                                             row["pbl"] *
+                                                                                             100.,
+                                                                                             row["aux_q_pbl_kg_kg"])[2], axis=1)
 
     def get_humidity_jump_in_grams(self):
 

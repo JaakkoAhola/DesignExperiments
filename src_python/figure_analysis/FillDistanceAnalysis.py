@@ -7,22 +7,20 @@ Created on %(date)s
 @licence: MIT licence Copyright
 """
 import os
-import sys
-import time
-from datetime import datetime
 import numpy
 import pandas
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-from Figure import Figure
-from PlotTweak import PlotTweak
 
-from DesignAnalysis import DesignAnalysis
+# package imports
+from library import Data
+from library import Figure
+from library import PlotTweak
+
+from figure_analysis import MaximinAnalysis
 from matplotlib.lines import Line2D
 
 
-class FillDistanceAnalysis(DesignAnalysis):
+class FillDistanceAnalysis(MaximinAnalysis):
     def __init__(self,
                  folder=os.environ["DESIGNRESULTSMAXIMIN"],
                  postfix="maximin"):
@@ -53,11 +51,11 @@ class FillDistanceAnalysis(DesignAnalysis):
                     self.maximin_column_names[dd_set].append(column_name)
 
     def plot_results(self):
-        self.figures["filldistance"] = Figure(self.figure_folder, "filldistance_" + self.postfix,
-                                              figsize=[self.figure_width, 6],
-                                              ncols=2, nrows=2,
-                                              left=0.15, right=0.97,
-                                              hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
+        self.figures["filldistance"] = Figure.Figure(self.figure_folder, "filldistance_" + self.postfix,
+                                                     figsize=[self.figure_width, 6],
+                                                     ncols=2, nrows=2,
+                                                     left=0.15, right=0.97,
+                                                     hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
 
         fig = self.figures["filldistance"]
 

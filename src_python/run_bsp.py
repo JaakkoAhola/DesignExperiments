@@ -14,12 +14,11 @@ import numpy
 import pandas
 from datetime import datetime
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-
+# package imports
 from algorithms import BinarySpacePartition
 from algorithms import LookUpTable
 from library import Metrics
+from library import Data
 
 
 def main():

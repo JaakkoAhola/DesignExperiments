@@ -7,18 +7,15 @@
 @licence: MIT licence Copyright
 """
 import os
-import sys
 import time
 import pathlib
 from datetime import datetime
+# 3rd party imports
 import pandas
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-sys.path.append(os.environ["CODEX"] +
-                "/LES-superfolder/LES-emulator-02postpros")
-import LES2emu
-
-from LookUpTable import LookUpTable
+# package imports
+from library import Data
+from library import Meteo
+from algorithms import LookUpTable
 
 
 def main():
@@ -36,11 +33,11 @@ def main():
     start = time.time()
     print("solving rw")
     dataframe["aux_q_pbl_kg_kg"] = dataframe.apply(lambda row:
-                                                   LES2emu.solve_rw_lwp(101780,
-                                                                        row["tpot_pbl"],
-                                                                        row["lwp"] *
-                                                                        1e-3,
-                                                                        row["pbl"] * 100.),
+                                                   Meteo.solve_rw_lwp(101780,
+                                                                      row["tpot_pbl"],
+                                                                      row["lwp"] *
+                                                                      1e-3,
+                                                                      row["pbl"] * 100.),
                                                    axis=1)
     print(f"rw solved in {time.time()-start} seconds")
 

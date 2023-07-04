@@ -7,14 +7,12 @@
 @licence: MIT licence Copyright
 """
 
-import os
-import sys
 import time
 from datetime import datetime
 import numpy
 import pandas
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
+# package imports
+from library import Data
 from algorithms import LookUpTable
 
 

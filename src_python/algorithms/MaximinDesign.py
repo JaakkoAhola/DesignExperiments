@@ -6,15 +6,17 @@ Created on %(date)s
 @author: Jaakko Ahola, Finnish Meteorological Institute
 @licence: MIT licence Copyright
 """
+
+# standard imports
 import os
-import sys
+
+# 3rd party imports
 import numpy
 import pandas
-
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
 from geneticalgorithm import geneticalgorithm as ga
 
+# package imports
+from library import Data
 from library import Metrics
 
 

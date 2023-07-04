@@ -7,14 +7,12 @@ Created on %(date)s
 @licence: MIT licence Copyright
 """
 import os
-import sys
 import random
 from copy import deepcopy
 import pandas
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-
+# package imports
+from library import Data
 from library import Meteo
 
 
@@ -70,7 +68,7 @@ class BinarySpacePartition:
         print("\t", end="")
         while make_partition:
             shuffled_dimensions = self.shuffleList(self.design_variables)
-            for dim_ind, dimension in enumerate(shuffled_dimensions):
+            for _, dimension in enumerate(shuffled_dimensions):
                 part_ind = 0
                 iterate_partitions = True
                 while iterate_partitions:

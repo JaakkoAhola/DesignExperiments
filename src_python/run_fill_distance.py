@@ -12,9 +12,9 @@ import sys
 import time
 from datetime import datetime
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-from FileSystem import FileSystem
+# package imports
+from library import Data
+from library import FileSystem
 
 from algorithms import FillDistance
 

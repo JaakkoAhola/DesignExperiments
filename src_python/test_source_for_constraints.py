@@ -7,15 +7,13 @@
 @licence: MIT licence Copyright
 """
 import os
-import sys
 import time
 from datetime import datetime
-import pandas
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-sys.path.append(os.environ["CODEX"] + "/LES-superfolder/LES-emulator-02postpros")
-import LES2emu
 import pathlib
+import pandas
+# package imports
+from library import Data
+from library import Meteo
 
 
 def main():
@@ -29,10 +27,10 @@ def main():
     dataframe = pandas.read_csv(collection_filename, index_col=0)
     print("solving rw")
     dataframe["aux_q_pbl_kg_kg"] = dataframe.apply(lambda row:
-                                                   LES2emu.solve_rw_lwp(101780,
-                                                                        row["tpot_pbl"],
-                                                                        row["lwp"] * 1e-3,
-                                                                        row["pbl"] * 100.),
+                                                   Meteo.solve_rw_lwp(101780,
+                                                                      row["tpot_pbl"],
+                                                                      row["lwp"] * 1e-3,
+                                                                      row["pbl"] * 100.),
                                                    axis=1)
     dataframe["aux_q_pbl_g_kg"] = dataframe["aux_q_pbl_kg_kg"] * 1e3
     print("solving q constraint")

@@ -7,21 +7,20 @@ Created on %(date)s
 @licence: MIT licence Copyright
 """
 import os
-import sys
+from copy import deepcopy
 import pandas
 import numpy
 from scipy.stats import qmc
 from scipy.spatial import distance
 
-import DesignAnalysis
-from LookUpTable import LookUpTable
-sys.path.append(os.environ["CODEX"] +
-                "/LES-superfolder/LES-emulator-02postpros")
-import LES2emu
-from copy import deepcopy
+from algorithms import LookUpTable
+from figure_analysis import MaximinAnalysis
+from library import FileSystem
+from library import Meteo
 
 
-class FillDistance(DesignAnalysis.DesignAnalysis):
+class FillDistance(MaximinAnalysis.MaximinAnalysis):
+
     def __init__(self, sobol_points_exponent_of_two=3,
                  folder=os.environ["DESIGNRESULTSMAXIMIN"],
                  design_methods_to_be_executed=[
@@ -90,11 +89,11 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
         upscale_dataframe = self.look.upscale_dataframe(
             sobol_hybercube_dataframe)
 
-        upscale_dataframe["constraintPass"] = upscale_dataframe.apply(lambda row: (LES2emu.solve_rw_lwp(101780,
-                                                                                                        row["tpot_pbl"],
-                                                                                                        row["lwp"] *
-                                                                                                        1e-3,
-                                                                                                        row["pbl"] * 100.) * 1e3 - row["q_inv"] > 1),
+        upscale_dataframe["constraintPass"] = upscale_dataframe.apply(lambda row: (Meteo.solve_rw_lwp(101780,
+                                                                                                      row["tpot_pbl"],
+                                                                                                      row["lwp"] *
+                                                                                                      1e-3,
+                                                                                                      row["pbl"] * 100.) * 1e3 - row["q_inv"] > 1),
                                                                       axis=1)
 
         sobol_hybercube_dataframe["constraintPass"] = upscale_dataframe["constraintPass"]
@@ -118,8 +117,8 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
         :rtype: TYPE
         """
         fill_distance = -numpy.inf
-        for sobol_idx, sobol_row in sobol_accepted_hypercube.iterrows():
-            for hypercube_idx, hypercube_row in hypercube_design_dataframe.iterrows():
+        for _, sobol_row in sobol_accepted_hypercube.iterrows():
+            for _, hypercube_row in hypercube_design_dataframe.iterrows():
                 fill_distance = max(distance.euclidean(sobol_row.values, hypercube_row.values),
                                     fill_distance)
 
@@ -132,7 +131,7 @@ class FillDistance(DesignAnalysis.DesignAnalysis):
                 subfolder = self.folder / dd_set / method
                 for file_name in list(subfolder.glob("**/*.csv")):
                     design_points = int(
-                        DesignAnalysis.get_design_points_from_filename(file_name))
+                        FileSystem.get_design_points_from_filename(file_name))
                     design_dataframe = pandas.read_csv(file_name, index_col=0)
 
                     if method in ["bsp", "manuscript"]:

@@ -7,20 +7,16 @@ Created on %(date)s
 @licence: MIT licence Copyright
 """
 import os
-import sys
-import time
-
 import pathlib
 import pandas
 import numpy
-from datetime import datetime
 from copy import deepcopy
 from bisect import bisect_right
-
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
 from itertools import repeat
 from sklearn.linear_model import LinearRegression
+
+# package imports
+from library import Data
 
 
 class LookUpTable:

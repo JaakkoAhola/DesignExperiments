@@ -7,32 +7,22 @@ Created on %(date)s
 @licence: MIT licence Copyright
 """
 import os
-import sys
-import time
 import numpy
 import pathlib
-import pandas
-from itertools import repeat
-from datetime import datetime
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-from Colorful import Colorful
-from Figure import Figure
-from PlotTweak import PlotTweak
+from itertools import repeat
+import pandas
+from matplotlib.lines import Line2D
+
+# package imports
+from library import Data
+from library import Colorful
+from library import Figure
+from library import FileSystem
+from library import PlotTweak
 
 from algorithms import MaximinDesign
 from algorithms import LookUpTable
-from matplotlib.lines import Line2D
-
-
-def get_design_points_from_filename(file_name):
-    stringi = str(file_name.name)
-    first = stringi.split("_")[1]
-
-    second = first.split(".")[0]
-
-    return second
 
 
 class MaxProxAnalysis:
@@ -134,7 +124,7 @@ class MaxProxAnalysis:
             for method in self.design_methods_with_R:
                 subfolder = self.folder / dd_set / method
                 for file_name in list(subfolder.glob("**/*.csv")):
-                    design_points = get_design_points_from_filename(file_name)
+                    design_points = FileSystem.get_design_points_from_filename(file_name)
                     maxpro = MaximinDesign.max_pro_measure(pandas.read_csv(file_name).values)
                     tupp = (design_points, maxpro)
                     self.stats[dd_set][method].append(tupp)
@@ -216,11 +206,11 @@ class MaxProxAnalysis:
                 self.normalised_maxpro_column_names[dd_set].append(normalised_name)
 
     def plot_results(self):
-        self.figures["maxpro"] = Figure(self.figure_folder, "maxpro",
-                                        figsize=[self.figure_width, 6],
-                                        ncols=2,
-                                        nrows=2,
-                                        hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
+        self.figures["maxpro"] = Figure.Figure(self.figure_folder, "maxpro",
+                                               figsize=[self.figure_width, 6],
+                                               ncols=2,
+                                               nrows=2,
+                                               hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
 
         fig = self.figures["maxpro"]
 

@@ -7,14 +7,11 @@
 @licence: MIT licence Copyright
 """
 
-import os
-import sys
 import time
 from datetime import datetime
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-
+# package imports
+from library import Data
 from algorithms import LatinHyperCubeSampleDesign
 
 

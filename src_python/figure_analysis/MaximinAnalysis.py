@@ -7,31 +7,22 @@ Created on %(date)s
 @licence: MIT licence Copyright
 """
 import os
-import sys
 import numpy
 import pathlib
 import pandas
 from itertools import repeat
 from matplotlib.lines import Line2D
 
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Data import Data
-from Colorful import Colorful
-from Figure import Figure
-from PlotTweak import PlotTweak
+# package imports
+from library import Data
+from library import Colorful
+from library import Figure
+from library import PlotTweak
+from library import FileSystem
 
 from algorithms import LookUpTable
 
 from library import Metrics
-
-
-def get_design_points_from_filename(file_name):
-    stringi = str(file_name.name)
-    first = stringi.split("_")[1]
-
-    second = first.split(".")[0]
-
-    return second
 
 
 class MaximinAnalysis:
@@ -138,7 +129,7 @@ class MaximinAnalysis:
             for method in self.design_methods_with_R:
                 subfolder = self.folder / dd_set / method
                 for file_name in list(subfolder.glob("**/*.csv")):
-                    design_points = get_design_points_from_filename(file_name)
+                    design_points = FileSystem.get_design_points_from_filename(file_name)
                     maximin = Metrics.matrix_minimum_distance(pandas.read_csv(file_name).values)
                     tupp = (design_points, maximin)
                     self.stats[dd_set][method].append(tupp)
@@ -220,11 +211,11 @@ class MaximinAnalysis:
                 self.normalised_maximin_column_names[dd_set].append(normalised_name)
 
     def plot_results(self):
-        self.figures["maximin"] = Figure(self.figure_folder, "maximin",
-                                         figsize=[self.figure_width, 6],
-                                         ncols=2,
-                                         nrows=2,
-                                         hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
+        self.figures["maximin"] = Figure.Figure(self.figure_folder, "maximin",
+                                                figsize=[self.figure_width, 6],
+                                                ncols=2,
+                                                nrows=2,
+                                                hspace=0.06, bottom=0.1, wspace=0.07, top=0.93)
 
         fig = self.figures["maximin"]
         xstart = 0

@@ -7,26 +7,23 @@ Created on Mon Oct 11 18:42:33 2021
 @licence: MIT licence Copyright
 """
 import math
-import sys
 import os
-
-
 import pathlib
 from itertools import repeat
 from itertools import combinations
+
+# 3rd party imports
 import numpy
 import pandas
-
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
 
-
-sys.path.append(os.environ["LESMAINSCRIPTS"])
-from Colorful import Colorful
-from Data import Data
-from Figure import Figure
-from PlotTweak import PlotTweak
-from FileSystem import FileSystem
+# package imports
+from library import Data
+from library import Colorful
+from library import Figure
+from library import PlotTweak
+from libray import FileSystem
 
 
 def my_scores(estimator, x):
@@ -151,17 +148,17 @@ class SourceVsSampleVsDesignAnalysis():
         ncols = 3
         nrows = math.ceil(len(self.parameters) / ncols)
 
-        self.figures[figure_name] = Figure(self.figure_folder,
-                                           figure_name,
-                                           figsize=[self.figure_width, 7],
-                                           ncols=ncols,
-                                           nrows=nrows,
-                                           bottom=0.04,
-                                           hspace=0.17,
-                                           wspace=0.07,
-                                           top=0.98,
-                                           left=0.05,
-                                           right=0.99)
+        self.figures[figure_name] = Figure.Figure(self.figure_folder,
+                                                  figure_name,
+                                                  figsize=[self.figure_width, 7],
+                                                  ncols=ncols,
+                                                  nrows=nrows,
+                                                  bottom=0.04,
+                                                  hspace=0.17,
+                                                  wspace=0.07,
+                                                  top=0.98,
+                                                  left=0.05,
+                                                  right=0.99)
 
         current_ax = self.figures[figure_name].getAxes(ncols * nrows - 1)
         current_ax.axis("off")
@@ -320,17 +317,17 @@ class SourceVsSampleVsDesignAnalysis():
 
             plot_matrix_boolean = numpy.array(numpy.zeros((nrows, ncols)), dtype='bool')
             figure_name = f"figure_scatter_plot_projections_{key}"
-            self.figures[figure_name] = Figure(self.figure_folder,
-                                               figure_name,
-                                               figsize=[ncols * 2, nrows * 2],
-                                               ncols=ncols,
-                                               nrows=nrows,
-                                               bottom=0.04,
-                                               hspace=0.37,
-                                               wspace=0.07,
-                                               top=0.98,
-                                               left=0.05,
-                                               right=0.99)
+            self.figures[figure_name] = Figure.Figure(self.figure_folder,
+                                                      figure_name,
+                                                      figsize=[ncols * 2, nrows * 2],
+                                                      ncols=ncols,
+                                                      nrows=nrows,
+                                                      bottom=0.04,
+                                                      hspace=0.37,
+                                                      wspace=0.07,
+                                                      top=0.98,
+                                                      left=0.05,
+                                                      right=0.99)
 
             fig = self.figures[figure_name]
 
