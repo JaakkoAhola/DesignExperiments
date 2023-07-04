@@ -3,7 +3,7 @@
 #SBATCH --account=project_2000360
 #SBATCH --time=01:00:00
 #SBATCH --mem-per-cpu=10G
-#SBATCH --partition=fmi
+#SBATCH --partition=small
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mail-type=END #uncomment to enable mail
