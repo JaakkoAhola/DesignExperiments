@@ -1,0 +1,11 @@
+folder: 'os.environ["DESIGNRESULTSMAXPRO"]'
+sobol_points_exponent_of_two: 14
+design_methods_to_be_executed:
+    - "scmc"
+    - "comined"
+    - "bsp"
+    - "manuscript"
+simulation_sets_to_be_executed:
+    - "SALSAnight"
+fill_distance_filename: "filldistance_stats_SALSAnight.csv"
+feasibility_ratio_filename: "feasibility_ratios_SALSAnight.csv"

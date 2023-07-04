@@ -9,13 +9,14 @@
 
 import time
 from datetime import datetime
-
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from algorithms import LatinHyperCubeSampleDesign
 
 
 def main():
+    load_dotenv()
     lhs_design = LatinHyperCubeSampleDesign.LatinHyperCubeSampleDesign()
     lhs_design.get_full_design_lhs()
 

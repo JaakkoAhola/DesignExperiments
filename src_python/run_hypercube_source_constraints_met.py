@@ -10,6 +10,7 @@ import os
 import time
 import pathlib
 from datetime import datetime
+from dotenv import load_dotenv
 # 3rd party imports
 import pandas
 # package imports
@@ -19,6 +20,7 @@ from algorithms import LookUpTable
 
 
 def main():
+    load_dotenv()
     look = LookUpTable.LookUpTable()
     datarootfolder = pathlib.Path(os.environ["DATAT"])
     mainfolder = datarootfolder / "ECLAIR"

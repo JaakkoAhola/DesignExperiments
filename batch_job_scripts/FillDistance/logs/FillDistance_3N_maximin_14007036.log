@@ -1,0 +1,13 @@
+rm: tiedostoa 'errors.log' ei voi poistaa: Tiedostoa tai hakemistoa ei ole
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) csc-tools
+Script started 03.11.2022 16.56.
+
+folder: /scratch/project_2000360/Dissertation_results/ECLAIR//design_stats_maximin
+sets: ['SBnight']
+methods: ['scmc', 'comined', 'bsp', 'manuscript']
+number of sobol points: 14
+
+Script completed 03.11.2022 17.26 in 30 minutes 7.4 seconds

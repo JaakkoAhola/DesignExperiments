@@ -13,7 +13,7 @@ import time
 import numpy
 import pandas
 from datetime import datetime
-
+from dotenv import load_dotenv
 # package imports
 from algorithms import BinarySpacePartition
 from algorithms import LookUpTable
@@ -30,6 +30,7 @@ def main():
                                         1: use MaxPro measure
 
 """
+    load_dotenv()
 
     debug = False
 

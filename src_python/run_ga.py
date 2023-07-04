@@ -13,7 +13,7 @@ import time
 from datetime import datetime
 import numpy
 import pandas
-
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from algorithms import MaximinDesignWithGeneticAlgorithm
@@ -27,6 +27,8 @@ def main():
                                 if non-existent, run in debug mode
 
 """
+    load_dotenv()
+
     debug = False
 
     try:

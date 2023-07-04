@@ -11,7 +11,7 @@ import os
 import sys
 import time
 from datetime import datetime
-
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from library import FileSystem
@@ -20,6 +20,7 @@ from algorithms import FillDistance
 
 
 def main():
+    load_dotenv()
     try:
         parameterFile = sys.argv[1]
         parameterDict = FileSystem.readYAML(parameterFile)

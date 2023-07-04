@@ -11,13 +11,14 @@
 import os
 import time
 from datetime import datetime
-
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from figure_analysis import FillDistanceAnalysis
 
 
 def main():
+    load_dotenv()
     optim_methods = {"maximin": os.environ["DESIGNRESULTSMAXIMIN"],
                      "maxpro": os.environ["DESIGNRESULTSMAXPRO"]}
     for key in optim_methods:

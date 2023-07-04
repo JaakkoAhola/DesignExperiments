@@ -9,15 +9,14 @@
 
 import time
 from datetime import datetime
-
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from figure_analysis import SourceVsSampleVsDesignAnalysis
 
-if __name__ == "__main__":
-    start = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script started {now}.")
+
+def main():
+    load_dotenv()
     comp = SourceVsSampleVsDesignAnalysis.SourceVsSampleVsDesignAnalysis()
 
     if False:
@@ -26,6 +25,14 @@ if __name__ == "__main__":
         comp.figure_scatter_plot_projections()
 
     comp.finalise_figures()
+
+
+if __name__ == "__main__":
+    start = time.time()
+    now = datetime.now().strftime('%d.%m.%Y %H.%M')
+    print(f"Script started {now}.")
+
+    main()
 
     end = time.time()
     now = datetime.now().strftime('%d.%m.%Y %H.%M')

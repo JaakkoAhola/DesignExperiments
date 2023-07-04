@@ -10,10 +10,12 @@
 import os
 import time
 from datetime import datetime
+from dotenv import load_dotenv
 import pandas
 
 
 def main():
+    load_dotenv()
     root_file = os.getenv("DESIGNRESULTS") + "eclair_dataset_2001_designvariables.csv"
     columns = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc', 'ks', 'as', 'cs',
                'rdry_AS_eff', 'cos_mu']

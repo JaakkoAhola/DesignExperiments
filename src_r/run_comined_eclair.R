@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+readRenviron(".env")
 koodihakemisto <- Sys.getenv("KOODIT")
 datahakemisto <- Sys.getenv("DATAT")
 if (dir.exists("/fmi/projappl/project_2001927/project_rpackages_3.6.3")){

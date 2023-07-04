@@ -1,0 +1,8 @@
+Script started 04.01.2022 16.54.
+
+folder: /fmi/scratch/project_2001927/aholaj/ECLAIR/design_stats_maxpro
+sets: ['SALSAnight']
+methods: ['scmc', 'comined', 'bsp', 'manuscript']
+number of sobol points: 14
+
+Script completed 04.01.2022 17.49 in 54 minutes 53.4 seconds

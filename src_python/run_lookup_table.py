@@ -9,14 +9,18 @@
 
 import time
 from datetime import datetime
+from dotenv import load_dotenv
+# 3rd party imports
 import numpy
 import pandas
+
 # package imports
 from library import Data
 from algorithms import LookUpTable
 
 
 def main():
+    load_dotenv()
     look = LookUpTable.LookUpTable(True)
     print(look.function_look_up_table("q_inv", 1))
     hypercube = pandas.DataFrame(data=numpy.random.rand(100, 6),

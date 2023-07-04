@@ -9,13 +9,14 @@
 
 import time
 from datetime import datetime
-
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from figure_analysis import MaximinAnalysis
 
 
 def main():
+    load_dotenv()
     dd = MaximinAnalysis.MaximinAnalysis()
 
     update_results = False

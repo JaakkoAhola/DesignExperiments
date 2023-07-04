@@ -10,13 +10,14 @@
 import os
 import time
 from datetime import datetime
-
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from algorithms import BinarySpacePartition
 
 
 def main():
+    load_dotenv()
     bsp = BinarySpacePartition.BinarySpacePartition(design_points=10,
                                                     outputfile=os.environ["DESIGNRESULTS"] + "/design_stats/test/bsp_test.csv")
 

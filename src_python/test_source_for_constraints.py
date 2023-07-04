@@ -11,12 +11,14 @@ import time
 from datetime import datetime
 import pathlib
 import pandas
+from dotenv import load_dotenv
 # package imports
 from library import Data
 from library import Meteo
 
 
 def main():
+    load_dotenv()
     datarootfolder = pathlib.Path(os.environ["DATAT"])
     mainfolder = datarootfolder / "ECLAIR"
 
