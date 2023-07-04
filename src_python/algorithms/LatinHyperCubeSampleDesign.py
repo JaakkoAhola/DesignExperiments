@@ -6,22 +6,18 @@ Created on Wed Oct 20 19:13:17 2021
 @author: Jaakko Ahola, Finnish Meteorological Institute
 @licence: MIT licence Copyright
 """
-import time
 from copy import deepcopy
 import sys
 import pandas
-
+import os
 
 from scipy.stats import qmc
 from sklearn.preprocessing import StandardScaler
 
-
-
-
-
-sys.path.append(os.environ["CODEX"] + "/LES-superfolder/LES-emulator-02postpros")
-import LES2emu
+sys.path.append(os.environ["CODEX"] +
+                "/LES-superfolder/LES-emulator-02postpros")
 from SourceVsSampleVsDesign import SourceVsSampleVsDesign
+import LES2emu
 
 
 class LatinHyperCubeSampleDesign:
@@ -30,8 +26,10 @@ class LatinHyperCubeSampleDesign:
 
         latin = SourceVsSampleVsDesign()
 
-        self.sb_night_variables = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc']
-        self.sb_night_sample = deepcopy(latin.get_sample()[self.sb_night_variables])
+        self.sb_night_variables = [
+            'q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc']
+        self.sb_night_sample = deepcopy(
+            latin.get_sample()[self.sb_night_variables])
 
         self.scaler_dict = {}
         self.lhs_sample_normalized = None
@@ -61,7 +59,7 @@ class LatinHyperCubeSampleDesign:
 
         for key in self.sb_night_sample.keys():
             print(key)
-            param_values = self.sb_night_sample[key].values.reshape(-1,1)
+            param_values = self.sb_night_sample[key].values.reshape(-1, 1)
             scaler = StandardScaler().fit(param_values)
             transformed = scaler.transform(param_values)
             self.sb_night_sample[key + "_scaled"] = transformed.reshape(-1,)
@@ -71,7 +69,6 @@ class LatinHyperCubeSampleDesign:
 
     def get_transformed_latin(self):
 
-
         for key in self.sb_night_sample:
             if "_scaled" in key:
                 self.scaled_names.append(key)
@@ -79,8 +76,8 @@ class LatinHyperCubeSampleDesign:
                 self.upper_bounds.append(self.sb_night_sample[key].max())
 
         self.lhs_as_transformed = qmc.scale(self.lhs_sample_normalized,
-                                       self.lower_bounds,
-                                       self.upper_bounds)
+                                            self.lower_bounds,
+                                            self.upper_bounds)
 
         return self.lhs_as_transformed
 
@@ -88,7 +85,7 @@ class LatinHyperCubeSampleDesign:
         lhs_plain = {}
         for ind, key in enumerate(self.sb_night_variables):
             lhs_plain[key] = self.scaler_dict[key].inverse_transform(
-                                self.lhs_as_transformed[:, ind].reshape(-1, 1)).reshape(-1, )
+                self.lhs_as_transformed[:, ind].reshape(-1, 1)).reshape(-1, )
 
         self.design_latin_plain = pandas.DataFrame.from_dict(lhs_plain)
 
@@ -97,49 +94,30 @@ class LatinHyperCubeSampleDesign:
     def get_humidity_jump(self):
 
         self.design_latin_plain["aux_q_pbl_kg_kg"] = self.design_latin_plain.apply(lambda row:
-                                                        LES2emu.solve_rw_lwp( 101780,
-                                                                             row["tpot_pbl"],
-                                                                             row["lwp"]*1e-3,
-                                                                             row["pbl"]*100.),
-                                                                             axis = 1)
+                                                                                   LES2emu.solve_rw_lwp(101780,
+                                                                                                        row["tpot_pbl"],
+                                                                                                        row["lwp"]
+                                                                                                        * 1e-3,
+                                                                                                        row["pbl"] * 100.),
+                                                                                   axis=1)
 
     def get_pblh_in_meters(self):
         self.design_latin_plain["aux_pblh_m"] = self.design_latin_plain.apply(lambda row:
-                                                          LES2emu.calc_lwp( 101780,
-                                                                               row["tpot_pbl"],
-                                                                               row["pbl"]*100.,
-                                                                               row["aux_q_pbl_kg_kg"])[2], axis = 1)
+                                                                              LES2emu.calc_lwp(101780,
+                                                                                               row["tpot_pbl"],
+                                                                                               row["pbl"]
+                                                                                               * 100.,
+                                                                                               row["aux_q_pbl_kg_kg"])[2], axis=1)
 
     def get_humidity_jump_in_grams(self):
 
-        self.design_latin_plain["aux_q_pbl_g_kg"] = self.design_latin_plain["aux_q_pbl_kg_kg"]*1e3
+        self.design_latin_plain["aux_q_pbl_g_kg"] = self.design_latin_plain["aux_q_pbl_kg_kg"] * 1e3
 
     def check_humidity_constraint(self):
         self.design_latin_plain["q_constraint"] = self.design_latin_plain.apply(lambda row:
-                                                            row["q_inv"] < row["aux_q_pbl_g_kg"],
-                                                            axis = 1)
+                                                                                row["q_inv"] < row["aux_q_pbl_g_kg"],
+                                                                                axis=1)
 
     def write_design_latin(self):
-        self.design_latin_plain.to_csv(os.environ["DESIGNRESULTS"] + "/design_lhs_sb_night_500_c.csv")
-
-
-
-
-def main():
-    lhs_design = LatinHyperCubeSampleDesign()
-    lhs_design.get_full_design_lhs()
-
-    if True: # constraints
-        lhs_design.get_humidity_jump()
-        lhs_design.get_pblh_in_meters()
-        lhs_design.get_humidity_jump_in_grams()
-        lhs_design.check_humidity_constraint()
-
-    lhs_design.write_design_latin()
-
-
-if __name__ == "__main__":
-    start = time.time()
-    main()
-    end = time.time()
-    print(f"\nScript completed in { end - start : .1f} seconds")
+        self.design_latin_plain.to_csv(
+            os.environ["DESIGNRESULTS"] + "/design_lhs_sb_night_500_c.csv")

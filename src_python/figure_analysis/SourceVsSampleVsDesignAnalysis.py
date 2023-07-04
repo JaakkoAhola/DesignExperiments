@@ -6,12 +6,9 @@ Created on Mon Oct 11 18:42:33 2021
 @author: Jaakko Ahola, Finnish Meteorological Institute
 @licence: MIT licence Copyright
 """
-from datetime import datetime
 import math
-import time
 import sys
 import os
-
 
 
 import pathlib
@@ -32,8 +29,6 @@ from PlotTweak import PlotTweak
 from FileSystem import FileSystem
 
 
-
-
 def my_scores(estimator, x):
     scores = estimator.score_samples(x)
     # Remove -inf
@@ -49,13 +44,13 @@ def filter_out_zeros(parameter_at_hand):
     return parameter_at_hand
 
 
-class SourceVsSampleVsDesign():
+class SourceVsSampleVsDesignAnalysis():
 
     def __init__(
-                self,
-                yaml_config_file=os.environ["DESIGNRESULTS"] + "/all_but_source_updated_lhs.yaml",
-                figure_folder=os.environ["CODEX"]+ "/lhs/figures"
-                ):
+        self,
+        yaml_config_file=os.environ["DESIGNRESULTS"] + "/all_but_source_updated_lhs.yaml",
+        figure_folder=os.environ["CODEX"] + "/lhs/figures"
+    ):
 
         self.yaml_config_file = FileSystem.readYAML(yaml_config_file)
 
@@ -71,19 +66,19 @@ class SourceVsSampleVsDesign():
 
         self.figures = {}
 
-        self.figure_width = 12/2.54
+        self.figure_width = 12 / 2.54
 
         self.parameters = sorted(['tpot_pbl',
-                           'tpot_inv',
-                           'q_inv',
-                           'lwp',
-                           'pbl',
-                           'cdnc',
-                           'ks',
-                           'as',
-                           'cs',
-                           'rdry_AS_eff',
-                           'cos_mu'])
+                                  'tpot_inv',
+                                  'q_inv',
+                                  'lwp',
+                                  'pbl',
+                                  'cdnc',
+                                  'ks',
+                                  'as',
+                                  'cs',
+                                  'rdry_AS_eff',
+                                  'cos_mu'])
         self.kernels = {}
 
         self._read_dataframes()
@@ -92,7 +87,7 @@ class SourceVsSampleVsDesign():
     def _read_dataframes(self):
         for key in self.files:
             self.dataframes[key] = pandas.read_csv(self.files[key],
-                                                        index_col=0)
+                                                   index_col=0)
 
     def get_source(self):
         return self.dataframes["source"]
@@ -129,8 +124,7 @@ class SourceVsSampleVsDesign():
             dataframe = self.dataframes[dataframe_name]
             for feature in dataframe.keys():
                 if feature in factor:
-                    dataframe[feature] = dataframe[feature]*factor[feature]
-
+                    dataframe[feature] = dataframe[feature] * factor[feature]
 
     def _init_kernel_search(self):
         kernels_base = ['cosine', 'gaussian', 'linear', 'tophat']
@@ -155,7 +149,7 @@ class SourceVsSampleVsDesign():
 
     def _figure_object_with_all_parameters(self, figure_name):
         ncols = 3
-        nrows = math.ceil(len(self.parameters)/ncols)
+        nrows = math.ceil(len(self.parameters) / ncols)
 
         self.figures[figure_name] = Figure(self.figure_folder,
                                            figure_name,
@@ -169,7 +163,7 @@ class SourceVsSampleVsDesign():
                                            left=0.05,
                                            right=0.99)
 
-        current_ax = self.figures[figure_name].getAxes(ncols*nrows-1)
+        current_ax = self.figures[figure_name].getAxes(ncols * nrows - 1)
         current_ax.axis("off")
 
         return self.figures[figure_name]
@@ -177,8 +171,6 @@ class SourceVsSampleVsDesign():
     def _figure_get_mins_and_max(self, figure_name):
 
         fig = self.figures[figure_name]
-
-
 
         for ind, parameter_name in enumerate(self.parameters):
             current_ax = fig.getAxes(ind)
@@ -223,7 +215,7 @@ class SourceVsSampleVsDesign():
                 math_label = PlotTweak.getMathLabelFromDict(plot_param_name)
                 unit_label = PlotTweak.getVariableUnit(plot_param_name)
                 annotation_of_variable = PlotTweak.getUnitLabel(math_label,
-                                                              unit_label)
+                                                                unit_label)
 
             annotation = f"({Data.getNthLetter(ind)}) {annotation_of_variable}"
             PlotTweak.setAnnotation(current_ax, annotation,
@@ -297,8 +289,8 @@ class SourceVsSampleVsDesign():
                     parameter_at_hand = filter_out_zeros(parameter_at_hand)
 
                 parameter_at_hand.plot.density(
-                                            ax=current_ax,
-                                            color=self.colors[key])
+                    ax=current_ax,
+                    color=self.colors[key])
 
         self._figure_final_tweaks_with_all_parameters(name)
 
@@ -310,13 +302,11 @@ class SourceVsSampleVsDesign():
         for key in self.dataframes:
             dataframe_at_hand = self.dataframes[key]
 
-
             if "q_constraint" in dataframe_at_hand.keys():
                 dataframe_at_hand["color"] = dataframe_at_hand.apply(lambda row:
-                                                                     blue if row["q_constraint"] else red, axis = 1)
+                                                                     blue if row["q_constraint"] else red, axis=1)
             else:
                 dataframe_at_hand["color"] = blue
-
 
             subset_keys = set(dataframe_at_hand.keys())
             all_keys = set(self.parameters)
@@ -328,19 +318,19 @@ class SourceVsSampleVsDesign():
 
             combs = list(combinations(parameters_at_hand, 2))
 
-            plot_matrix_boolean = numpy.array(numpy.zeros((nrows,ncols)),dtype='bool')
+            plot_matrix_boolean = numpy.array(numpy.zeros((nrows, ncols)), dtype='bool')
             figure_name = f"figure_scatter_plot_projections_{key}"
             self.figures[figure_name] = Figure(self.figure_folder,
-                                           figure_name,
-                                           figsize=[ncols*2, nrows*2],
-                                           ncols=ncols,
-                                           nrows=nrows,
-                                           bottom=0.04,
-                                           hspace=0.37,
-                                           wspace=0.07,
-                                           top=0.98,
-                                           left=0.05,
-                                           right=0.99)
+                                               figure_name,
+                                               figsize=[ncols * 2, nrows * 2],
+                                               ncols=ncols,
+                                               nrows=nrows,
+                                               bottom=0.04,
+                                               hspace=0.37,
+                                               wspace=0.07,
+                                               top=0.98,
+                                               left=0.05,
+                                               right=0.99)
 
             fig = self.figures[figure_name]
 
@@ -352,9 +342,8 @@ class SourceVsSampleVsDesign():
                 ind_abscissa = parameters_at_hand.index(abscissa)
                 ind_oordinaatta = parameters_at_hand.index(oordinaatta)
 
-                current_ax = fig.getAxesGridPoint({"row":ind_oordinaatta,
-                                                   "col":ind_abscissa})
-
+                current_ax = fig.getAxesGridPoint({"row": ind_oordinaatta,
+                                                   "col": ind_abscissa})
 
                 try:
                     dataframe_at_hand.plot.scatter(ax=current_ax,
@@ -367,32 +356,10 @@ class SourceVsSampleVsDesign():
                     continue
             for row in range(nrows):
                 for col in range(ncols):
-                    current_ax = fig.getAxesGridPoint({"row":row,
-                                                       "col":col})
+                    current_ax = fig.getAxesGridPoint({"row": row,
+                                                       "col": col})
                     if not plot_matrix_boolean[row, col]:
                         current_ax.axis("off")
                     if col > 0:
                         current_ax.set_ylabel("")
                         PlotTweak.hideYTickLabels(current_ax)
-
-
-
-
-
-
-if __name__ == "__main__":
-    start = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script started {now}.")
-    comp = SourceVsSampleVsDesign()
-
-    if False:
-        comp.figure_source_vs_sample_vs_designs_bar_plot()
-    if True:
-        comp.figure_scatter_plot_projections()
-
-    comp.finalise_figures()
-
-    end = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script completed {now} in {Data.timeDuration(end - start)}")

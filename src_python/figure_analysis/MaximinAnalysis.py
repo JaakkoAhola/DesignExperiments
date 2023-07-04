@@ -8,12 +8,11 @@ Created on %(date)s
 """
 import os
 import sys
-import time
 import numpy
 import pathlib
 import pandas
 from itertools import repeat
-from datetime import datetime
+from matplotlib.lines import Line2D
 
 sys.path.append(os.environ["LESMAINSCRIPTS"])
 from Data import Data
@@ -21,9 +20,9 @@ from Colorful import Colorful
 from Figure import Figure
 from PlotTweak import PlotTweak
 
-import MaximinDesign
-from LookUpTable import LookUpTable
-from matplotlib.lines import Line2D
+from algorithms import LookUpTable
+
+from library import Metrics
 
 
 def get_design_points_from_filename(file_name):
@@ -35,7 +34,7 @@ def get_design_points_from_filename(file_name):
     return second
 
 
-class DesignAnalysis:
+class MaximinAnalysis:
 
     def __init__(self,
                  folder=os.environ["DESIGNRESULTSMAXIMIN"],
@@ -120,7 +119,7 @@ class DesignAnalysis:
             design = pandas.read_csv(file_name, index_col=0)
             seeti = str(file_name.name).split(".")[0]
             hypercube_design = self.look.downscale_dataframe(design)
-            maximin = MaximinDesign.matrix_minimum_distance(hypercube_design.values)
+            maximin = Metrics.matrix_minimum_distance(hypercube_design.values)
 
             print(maximin)
 
@@ -140,7 +139,7 @@ class DesignAnalysis:
                 subfolder = self.folder / dd_set / method
                 for file_name in list(subfolder.glob("**/*.csv")):
                     design_points = get_design_points_from_filename(file_name)
-                    maximin = MaximinDesign.matrix_minimum_distance(pandas.read_csv(file_name).values)
+                    maximin = Metrics.matrix_minimum_distance(pandas.read_csv(file_name).values)
                     tupp = (design_points, maximin)
                     self.stats[dd_set][method].append(tupp)
 
@@ -174,7 +173,8 @@ class DesignAnalysis:
                 if self.joined_stats[dd_set] is None:
                     self.joined_stats[dd_set] = df
                 else:
-                    self.joined_stats[dd_set] = df.merge(self.joined_stats[dd_set], how="outer", on="design_points")
+                    self.joined_stats[dd_set] = df.merge(
+                        self.joined_stats[dd_set], how="outer", on="design_points")
 
     def reset_index(self):
         for dd_set in self.design_sets:
@@ -200,7 +200,8 @@ class DesignAnalysis:
             for dd_set in self.design_sets:
                 print(dd_set)
                 for method_result in self.maximin_column_names[dd_set]:
-                    print(f"{dd_set} {method_result} min: {numpy.log(self.joined_stats[dd_set][method_result].min()):.1f} max: {numpy.log(self.joined_stats[dd_set][method_result].max()):.1f}")
+                    print(
+                        f"{dd_set} {method_result} min: {numpy.log(self.joined_stats[dd_set][method_result].min()):.1f} max: {numpy.log(self.joined_stats[dd_set][method_result].max()):.1f}")
 
     def get_maximum_values_of_maximins(self):
         for dd_set in self.design_sets:
@@ -213,7 +214,8 @@ class DesignAnalysis:
             for method_result in self.maximin_column_names[dd_set]:
 
                 normalised_name = "normalised_" + method_result
-                self.joined_stats[dd_set][normalised_name] = self.joined_stats[dd_set][method_result] / self.maximum_dict[dd_set]
+                self.joined_stats[dd_set][normalised_name] = self.joined_stats[dd_set][method_result] / \
+                    self.maximum_dict[dd_set]
 
                 self.normalised_maximin_column_names[dd_set].append(normalised_name)
 
@@ -317,40 +319,11 @@ class DesignAnalysis:
 
             PlotTweak.setAnnotation(current_axis,
                                     self.annotationCollection[dd_set],
-                                    xPosition=PlotTweak.getXPosition(current_axis, self.annotationXPositions[dd_set]),
+                                    xPosition=PlotTweak.getXPosition(
+                                        current_axis, self.annotationXPositions[dd_set]),
                                     yPosition=PlotTweak.getYPosition(current_axis, 0.93))
 
     def save_figures(self):
 
         for fig in self.figures.values():
             fig.save(file_extension=".pdf")
-
-
-def main():
-    dd = DesignAnalysis()
-
-    update_results = False
-
-    if update_results:
-        dd.get_manuscript_results()
-        dd.get_maximin_results_with_R()
-        dd.save_results_with_R()
-
-    dd.read_all_results()
-    dd.get_maximin_column_names()
-    dd.reset_index()
-    dd.sort_by_design_points()
-    dd.get_maximum_values_of_maximins()
-    dd.normalise_maximin_results_based_on_maximum()
-    dd.plot_results()
-    dd.save_figures()
-
-
-if __name__ == "__main__":
-    start = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script started {now}.")
-    main()
-    end = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script completed {now} in {Data.timeDuration(end - start)}")

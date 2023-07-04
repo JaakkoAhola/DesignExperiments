@@ -11,7 +11,7 @@ import time
 import os
 import pandas
 import numpy
-from SourceVsSampleVsDesign import SourceVsSampleVsDesign
+from algorithms import SourceVsSampleVsDesign
 
 
 class test_SourceVsSampleVsDesign(unittest.TestCase):
@@ -106,13 +106,7 @@ class test_SourceVsSampleVsDesign(unittest.TestCase):
             test_latin2 = SourceVsSampleVsDesign()
             test_latin2.figure_lhs()
 
-    #def test_lhs
-
-
-
-
-
-
+    # def test_lhs
 
 
 if __name__ == "__main__":

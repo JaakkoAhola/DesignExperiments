@@ -160,26 +160,3 @@ class FillDistanceAnalysis(DesignAnalysis):
                                     xPosition=PlotTweak.getXPosition(current_axis, 0.05),
                                     yPosition=PlotTweak.getYPosition(current_axis, 0.93))
         print("min", mini, "max", maxi)
-
-
-def main():
-    optim_methods = {"maximin": os.environ["DESIGNRESULTSMAXIMIN"],
-                     "maxpro": os.environ["DESIGNRESULTSMAXPRO"]}
-    for key in optim_methods:
-        fill = FillDistanceAnalysis(optim_methods[key],
-                                    key)
-        fill.read_all_results()
-        fill.get_maximin_column_names()
-        fill.reset_index()
-        fill.plot_results()
-        fill.save_figures()
-
-
-if __name__ == "__main__":
-    start = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script started {now}.")
-    main()
-    end = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script completed {now} in {Data.timeDuration(end - start)}")

@@ -22,10 +22,12 @@ from Data import Data
 from itertools import repeat
 from sklearn.linear_model import LinearRegression
 
+
 class LookUpTable:
 
-    def __init__(self, debug = False):
-        self.all_variables = ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]
+    def __init__(self, debug=False):
+        self.all_variables = ["q_inv", "tpot_inv", "lwp", "tpot_pbl",
+                              "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]
         self.datarootfolder = pathlib.Path(os.environ["DATAT"])
         self.mainfolder = self.datarootfolder / "ECLAIR"
         if debug:
@@ -38,7 +40,6 @@ class LookUpTable:
         self.look_up_tables = dict(zip(self.all_variables, repeat(None)))
 
         self.__init__wrapper()
-
 
     def __init__wrapper(self):
         self.create_look_up_tables()
@@ -54,7 +55,8 @@ class LookUpTable:
 
     def create_look_up_tables(self):
         for key in self.all_variables:
-            file = self.mainfolder / (self.collection_filename.stem + "_look_up_table_" + key + ".csv")
+            file = self.mainfolder / (self.collection_filename.stem +
+                                      "_look_up_table_" + key + ".csv")
             if file.is_file():
                 next
             else:
@@ -62,7 +64,8 @@ class LookUpTable:
                     self.load_collection()
 
                 if (key in ["cos_mu", "rdry_AS_eff"]):
-                    filtered_data = deepcopy(self.collection_dataframe[ self.collection_dataframe[key] > Data.getEpsilon() ])
+                    filtered_data = deepcopy(
+                        self.collection_dataframe[self.collection_dataframe[key] > Data.getEpsilon()])
 
                 else:
                     filtered_data = deepcopy(self.collection_dataframe)
@@ -75,7 +78,8 @@ class LookUpTable:
 
     def load_look_up_tables(self):
         for key in self.all_variables:
-            file = self.mainfolder / (self.collection_filename.stem + "_look_up_table_" + key + ".csv")
+            file = self.mainfolder / (self.collection_filename.stem +
+                                      "_look_up_table_" + key + ".csv")
             assert file.is_file()
 
             df = pandas.read_csv(file)
@@ -89,7 +93,8 @@ class LookUpTable:
         look_up_table = self.look_up_tables[key]
         samples_in_look_up_table = look_up_table.shape[0]
         xth_point = int(round(value_within_unit_hyper_cube * samples_in_look_up_table, 0))
-        xth_point_of_look_up_table = max(0, min(xth_point, samples_in_look_up_table-1)) # index of R starts from 1, and point cant be greater than the number of samples
+        # index of R starts from 1, and point cant be greater than the number of samples
+        xth_point_of_look_up_table = max(0, min(xth_point, samples_in_look_up_table - 1))
 
         xth_value = look_up_table.iloc[xth_point_of_look_up_table].item()
 
@@ -99,7 +104,8 @@ class LookUpTable:
         up_scaled = deepcopy(hypercube_dataframe)
         for key in hypercube_dataframe.columns:
             for row in range(hypercube_dataframe.shape[0]):
-                up_scaled[key].iloc[row] = self.function_look_up_table(key, hypercube_dataframe[key].iloc[row])
+                up_scaled[key].iloc[row] = self.function_look_up_table(
+                    key, hypercube_dataframe[key].iloc[row])
 
         return up_scaled
 
@@ -117,7 +123,6 @@ class LookUpTable:
 
         lower_ind, upper_ind = index_search_function(look_up_table, up_scaled_value)
 
-
         hyper_cube_value = estimate_function(look_up_table, lower_ind, upper_ind, up_scaled_value)
 
         return hyper_cube_value
@@ -125,36 +130,36 @@ class LookUpTable:
     def lin_search(self, look_up_table, up_scaled_value):
 
         samples_in_look_up_table = look_up_table.shape[0]
-        last_index = samples_in_look_up_table-1
+        last_index = samples_in_look_up_table - 1
 
         try:
-            upper_ind =  next(idx for idx, value in enumerate(look_up_table.values) if value > up_scaled_value)
+            upper_ind = next(idx for idx, value in enumerate(
+                look_up_table.values) if value > up_scaled_value)
         except StopIteration:
             upper_ind = last_index
 
         if upper_ind == last_index:
             lower_ind = last_index
         else:
-            lower_ind = max(upper_ind - 1,0)
+            lower_ind = max(upper_ind - 1, 0)
 
         return lower_ind, upper_ind
 
     def log_search(self, look_up_table, up_scaled_value):
         upper_ind = bisect_right(look_up_table.values, up_scaled_value)
         samples_in_look_up_table = look_up_table.shape[0]
-        last_index = samples_in_look_up_table-1
+        last_index = samples_in_look_up_table - 1
 
         upper_ind = min(upper_ind, last_index)
 
-        lower_ind = max(upper_ind - 1,0)
+        lower_ind = max(upper_ind - 1, 0)
 
         return lower_ind, upper_ind
-
 
     def down_scale_mean(self, look_up_table, lower_ind, upper_ind, up_scaled_value):
 
         samples_in_look_up_table = look_up_table.shape[0]
-        hyper_cube_value = ((lower_ind + upper_ind)/2) / samples_in_look_up_table
+        hyper_cube_value = ((lower_ind + upper_ind) / 2) / samples_in_look_up_table
 
         return hyper_cube_value
 
@@ -163,11 +168,11 @@ class LookUpTable:
         upper_value = look_up_table.iloc[upper_ind]
         lower_value = look_up_table.iloc[lower_ind]
 
-        x = numpy.array([lower_value, upper_value]).reshape(-1,1)
+        x = numpy.array([lower_value, upper_value]).reshape(-1, 1)
         y = numpy.array([lower_ind, upper_ind])
-        reg = LinearRegression().fit(x,y)
+        reg = LinearRegression().fit(x, y)
 
-        lin_fit_ind = reg.predict(numpy.array([up_scaled_value]).reshape(-1,1)).item()
+        lin_fit_ind = reg.predict(numpy.array([up_scaled_value]).reshape(-1, 1)).item()
 
         hyper_cube_value = lin_fit_ind / samples_in_look_up_table
 
@@ -191,42 +196,7 @@ class LookUpTable:
 
         for key in up_scaled.columns:
             for row in range(up_scaled.shape[0]):
-                hypercube_dataframe[key].iloc[row] = self.function_downscale_value(key, up_scaled[key].iloc[row], index_search_function, estimate_function)
+                hypercube_dataframe[key].iloc[row] = self.function_downscale_value(
+                    key, up_scaled[key].iloc[row], index_search_function, estimate_function)
 
         return hypercube_dataframe
-
-def main():
-    look = LookUpTable(True)
-    print(look.function_look_up_table("q_inv", 1))
-    hypercube = pandas.DataFrame(data = numpy.random.rand(100,6),
-                                 columns = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc'])
-
-    up = look.upscale_dataframe(hypercube)
-    print(up)
-    look.load_collection()
-    for key in up.columns:
-        print(f"{key} {up[key].min():.2f} {up[key].max():.2f} collection {look.get_collection_dataframe()[key].min():.2f} {look.get_collection_dataframe()[key].max():.2f}")
-
-    print()
-    print(look.function_downscale_value("q_inv", -1, estimate_function=look.down_scale_mean))
-
-    print()
-    start = time.time()
-    print(look.downscale_dataframe(look.get_collection_dataframe(),  estimate_function=look.down_scale_mean))
-    end = time.time()
-    print(f"Downscaling log search,  mean {end-start} seconds")
-
-    print()
-    start = time.time()
-    print(look.downscale_dataframe(look.get_collection_dataframe(),  estimate_function=look.down_scale_linearfit))
-    end = time.time()
-    print(f"Downscaling log search, linfit {end-start} seconds")
-
-if __name__ == "__main__":
-    start = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script started {now}.")
-    main()
-    end = time.time()
-    now = datetime.now().strftime('%d.%m.%Y %H.%M')
-    print(f"Script completed {now} in {Data.timeDuration(end - start)}")
