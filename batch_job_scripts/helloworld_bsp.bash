@@ -17,4 +17,5 @@ echo "initialised"
 module load python-data/3.8-22.10
 echo "module loaded"
 
-cd ${KOODIT}/DesignExperiments/src_python python run_bsp.py
+cd ../src_python 
+python run_bsp.py

@@ -6,7 +6,7 @@
 #SBATCH --partition=test
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mail-type=ALL #uncomment to enable mail
+#SBATCH --mail-type=END #uncomment to enable mail
 #SBATCH --mail-user=jjahol@utu.fi
 #SBATCH --output=logs/R/test_R_%j.log
 
