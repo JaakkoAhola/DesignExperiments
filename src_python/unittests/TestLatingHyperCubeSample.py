@@ -9,6 +9,7 @@ Created on Mon Oct 11 18:43:55 2021
 import unittest
 import time
 import os
+import pathlib
 import pandas
 import numpy
 from algorithms import SourceVsSampleVsDesign
@@ -53,7 +54,8 @@ class test_SourceVsSampleVsDesign(unittest.TestCase):
     @unittest.skip("a bit too time consuming")
     def test_write_sample(self):
         test_sample = "/tmp/test.csv"
-        test_latin = SourceVsSampleVsDesign(files={"big": os.environ["DESIGNRESULTS"] + "/eclair_dataset_2001_designvariables.csv",
+        test_latin = SourceVsSampleVsDesign(files={"big": pathlib.Path(os.environ["REPO"]) /
+                                                   "data/01_source/eclair_dataset_2001_designvariables.csv",
                                                    "sample": test_sample})
         test_latin.read_big()
         test_latin.create_sample(1)

@@ -22,13 +22,13 @@ from algorithms import LookUpTable
 def main():
     load_dotenv()
     look = LookUpTable.LookUpTable()
-    datarootfolder = pathlib.Path(os.environ["DATAT"])
-    mainfolder = datarootfolder / "ECLAIR"
 
-    collection_filename = mainfolder / "eclair_dataset_2001_designvariables.csv"
+    collection_filename = pathlib.Path(os.environ["REPO"]) / \
+        "data/01_source/eclair_dataset_2001_designvariables.csv"
 
-    pure_hypercube_collection_filename = mainfolder / \
-        "hypercube_eclair_dataset_2001_designvariables_constraints_met.csv"
+    pure_hypercube_collection_filename = pathlib.Path(os.environ["REPO"]) / \
+        "data/02_raw_output/hypercube_eclair_dataset_2001_designvariables_constraints_met.csv"
+
     start = time.time()
     dataframe = pandas.read_csv(collection_filename, index_col=0)
     print(f"datafile read in {time.time()-start} seconds")

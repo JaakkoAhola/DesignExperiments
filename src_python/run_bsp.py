@@ -8,6 +8,7 @@
 """
 
 import os
+import pathlib
 import sys
 import time
 import numpy
@@ -51,11 +52,13 @@ def main():
                         "SALSAday": meteorological_variables + salsa_variables + daytime_variables}
 
     if debug:
-        file = os.environ["DATAT"] + "/ECLAIR/sample20000.csv"
+        file = pathlib.Path(os.environ["REPO"]) / "data/01_source/sample20000.csv",
         keys_list = list(design_variables)[:1]
         design_points_vector = numpy.array([5])
     else:
-        file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
+        file = pathlib.Path(os.environ["REPO"]) / \
+            "data/01_source/eclair_dataset_2001_designvariables.csv"
+
         keys_list = [list(design_variables)[indeksi]]
         design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
@@ -97,7 +100,9 @@ def main():
                 bsp = BinarySpacePartition(design_variables=design_variables[key],
                                            design_points=design_points,
                                            sourcefile=file,
-                                           outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats_" + upfolder + "/" + subfolder + "/bsp/bsp_" + str(design_points) + ".csv")
+                                           outputfile=pathlib.Path(os.environ["REPO"]) /
+                                           f"data/02_raw_output/design_stats_{upfolder}" /
+                                           subfolder / "bsp" / f"bsp_{design_points}.csv")
 
                 bsp.create_bs_partitions()
                 bsp.sample_partitions_to_design()
@@ -132,8 +137,9 @@ def main():
             index=design_points_vector)
         solutions_df.index.name = "design_points"
 
-        solutions_df.to_csv(os.environ["DATAT"] + "/ECLAIR/design_stats_" +
-                            upfolder + "/" + subfolder + "/bsp_stats.csv")
+        solutions_df.to_csv(pathlib.Path(os.environ["REPO"]) /
+                            f"data/02_raw_output/design_stats_{upfolder}" /
+                            subfolder / "/bsp_stats.csv")
 
 
 if __name__ == "__main__":

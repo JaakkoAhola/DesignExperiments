@@ -63,20 +63,6 @@ def get_indy_color_list(colorNumber=None,
     return colorList
 
 
-def get_scientific_colormap(cmap_name,
-                            scm_base_dir=os.environ["SCRIPT"] + "/" + "ScientificColourMaps5/",
-                            reverse=False):
-
-    cmap_file = pathlib.Path(scm_base_dir) / cmap_name / (cmap_name + '.txt')
-
-    cmap_data = numpy.loadtxt(cmap_file)
-
-    if reverse:
-        cmap_data = numpy.flip(cmap_data)
-
-    return matplotlib.colors.LinearSegmentedColormap.from_list(cmap_name, cmap_data)
-
-
 def get_distinct_colors_df():
 
     folder = pathlib.Path(__file__).parent

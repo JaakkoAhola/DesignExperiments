@@ -8,6 +8,7 @@
 """
 
 import os
+import pathlib
 import sys
 import time
 from datetime import datetime
@@ -42,12 +43,14 @@ def main():
                         "SALSAnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff"],
                         "SALSAday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]}
 
+    upfolder = "maximin"
     if debug:
-        file = os.environ["DATAT"] + "/ECLAIR/sample20000.csv"
+        file = pathlib.Path(os.environ["REPO"]) / "data/01_source/sample20000.csv"
         keys_list = list(design_variables)[:1]
         design_points_vector = numpy.array([5])
     else:
-        file = os.environ["DATAT"] + "/ECLAIR/eclair_dataset_2001_designvariables.csv"
+        file = pathlib.Path(os.environ["REPO"]) / \
+            "data/01_source/eclair_dataset_2001_designvariables.csv"
         keys_list = [list(design_variables)[indeksi]]
         design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
@@ -64,8 +67,7 @@ def main():
             ga_design = MaximinDesignWithGeneticAlgorithm.MaximinDesignWithGeneticAlgorithm(design_variables=design_variables[key],
                                                                                             design_points=design_points,
                                                                                             sourcefile=file,
-                                                                                            outputfile=os.environ["DATAT"] + "/ECLAIR/design_stats/" + subfolder + "/ga/ga_" + str(design_points) + ".csv")
-
+                                                                                            outputfile=pathlib.Path(os.environ["REPO"]) / f"design_stats_{upfolder}" / subfolder / "ga" / f"ga_{design_points}.csv")
             if debug:
                 df = ga_design.get_dataframe()
                 subsample = df.sample(10, random_state=0)

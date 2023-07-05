@@ -1,4 +1,4 @@
-folder: 'os.environ["DESIGNRESULTSMAXPRO"]'
+folder: 'pathlib.Path(os.environ["REPO"]) / "data/02_raw_output/design_stats_maximin"'
 sobol_points_exponent_of_two: 14
 design_methods_to_be_executed:
     - "scmc"

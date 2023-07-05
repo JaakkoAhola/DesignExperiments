@@ -71,8 +71,8 @@ All scripts are inteded to be run in their own directory.
 - Download source data from via web-interface:
   [https://doi.org/10.23729/cc187624-a282-4677-9cc8-c7f04be790ff](https://doi.org/10.23729/cc187624-a282-4677-9cc8-c7f04be790ff)
   in to [data/01_source](data/01_source) that was created in the previous step.
-- run `bash init_02.bash`. [init_02.bash](init_02.bash) to extract the downloaded zip file.
-
+- run `bash init_02.bash`. [init_02.bash](init_02.bash) extracts the downloaded zip file.
+- run `python init_03.py` [init_03.py](init_03.py) creates a sample set from source data for testing purposes.
 
 
 

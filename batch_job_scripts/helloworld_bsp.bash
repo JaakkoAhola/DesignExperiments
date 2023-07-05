@@ -10,12 +10,8 @@
 #SBATCH --mail-user=jjahol@utu.fi
 #SBATCH --output=logs/bsp/SBnight_testi.log
 
-source ${HOME}/init.login.sh
-source ${HOME}/init.aliases.sh
-echo "initialised"
-
 module load python-data/3.8-22.10
 echo "module loaded"
 
 cd ../src_python 
-python run_bsp.py
+srun python run_bsp.py

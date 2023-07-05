@@ -9,4 +9,5 @@ data/
 logs/
 batch_job_scripts/logs/
 *.logs
+*.log
 .env

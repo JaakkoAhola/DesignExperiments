@@ -8,6 +8,7 @@
 """
 
 import os
+import pathlib
 import sys
 import time
 from datetime import datetime
@@ -25,7 +26,8 @@ def main():
         parameterFile = sys.argv[1]
         parameterDict = FileSystem.readYAML(parameterFile)
     except KeyError:
-        parameterDict = {"folder": os.environ["DESIGNRESULTSMAXIMIN"],
+        parameterDict = {"folder": pathlib.Path(os.environ["REPO"]) /
+                         "data/02_raw_output/design_stats_maximin",
                          "sobol_points_exponent_of_two": 3,
                          "design_methods_to_be_executed": ["scmc",
                                                            "comined",

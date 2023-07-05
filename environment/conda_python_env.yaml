@@ -9,6 +9,7 @@ dependencies:
   - scipy
   - pyyaml
   - yaml
+  - duckdb
   - pip
   - pip:
     - geneticalgorithm

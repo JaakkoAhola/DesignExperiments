@@ -10,6 +10,7 @@
 # standard imports
 import os
 import time
+import pathlib
 from datetime import datetime
 from dotenv import load_dotenv
 # package imports
@@ -19,8 +20,10 @@ from figure_analysis import FillDistanceAnalysis
 
 def main():
     load_dotenv()
-    optim_methods = {"maximin": os.environ["DESIGNRESULTSMAXIMIN"],
-                     "maxpro": os.environ["DESIGNRESULTSMAXPRO"]}
+    optim_methods = {"maximin": pathlib.Path(os.environ["REPO"]) /
+                     "data/02_raw_output/design_stats_maximin",
+                     "maxpro": pathlib.Path(os.environ["REPO"]) /
+                     "data/02_raw_output/design_stats_maxpro"}
     for key in optim_methods:
         fill = FillDistanceAnalysis.FillDistanceAnalysis(optim_methods[key],
                                                          key)

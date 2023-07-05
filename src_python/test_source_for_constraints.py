@@ -19,12 +19,12 @@ from library import Meteo
 
 def main():
     load_dotenv()
-    datarootfolder = pathlib.Path(os.environ["DATAT"])
-    mainfolder = datarootfolder / "ECLAIR"
 
-    collection_filename = mainfolder / "eclair_dataset_2001_designvariables.csv"
+    collection_filename = pathlib.Path(os.environ["REPO"]) / \
+        "data/01_source/eclair_dataset_2001_designvariables.csv"
 
-    pure_collection_filename = mainfolder / "eclair_dataset_2001_designvariables_constraints_met.csv"
+    pure_collection_filename = pathlib.Path(os.environ["REPO"]) / \
+        "data/01_source/eclair_dataset_2001_designvariables_constraints_met.csv"
 
     dataframe = pandas.read_csv(collection_filename, index_col=0)
     print("solving rw")
@@ -40,8 +40,8 @@ def main():
                                                 row["aux_q_pbl_g_kg"] - row["q_inv"] > 1,
                                                 axis=1)
     print("checking number of violations")
-    violations = dataframe.loc[lambda df: df["q_constraint"] == False].shape[0]
-    pure = dataframe.loc[lambda df: df["q_constraint"] == True]
+    violations = dataframe.loc[lambda df: df["q_constraint"] is False].shape[0]
+    pure = dataframe.loc[lambda df: df["q_constraint"] is True]
     total = dataframe.shape[0]
     print(f"constraint violations {violations}, fraction {violations/total}")
     print("saving pure collection")

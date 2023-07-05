@@ -8,6 +8,7 @@ Created on %(date)s
 """
 import os
 from copy import deepcopy
+import pathlib
 import pandas
 import numpy
 from scipy.stats import qmc
@@ -22,7 +23,8 @@ from library import Meteo
 class FillDistance(MaximinAnalysis.MaximinAnalysis):
 
     def __init__(self, sobol_points_exponent_of_two=3,
-                 folder=os.environ["DESIGNRESULTSMAXIMIN"],
+                 folder=pathlib.Path(os.environ["REPO"]) /
+                 "data/02_raw_output/design_stats_maximin",
                  design_methods_to_be_executed=[
                      "scmc", "comined", "bsp", "manuscript"],
                  simulation_sets_to_be_executed=[

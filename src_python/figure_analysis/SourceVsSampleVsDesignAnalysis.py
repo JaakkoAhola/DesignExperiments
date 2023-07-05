@@ -45,8 +45,9 @@ class SourceVsSampleVsDesignAnalysis():
 
     def __init__(
         self,
-        yaml_config_file=os.environ["DESIGNRESULTS"] + "/all_but_source_updated_lhs.yaml",
-        figure_folder=os.environ["CODEX"] + "/lhs/figures"
+        yaml_config_file=pathlib.Path(os.environ["REPO"]) /
+        "input_yaml/all_but_source_updated_lhs.yaml",
+        figure_folder=pathlib.Path(os.environ["REPO"]) / + "data/03_figure_analysis/lhs/figures"
     ):
 
         self.yaml_config_file = FileSystem.readYAML(yaml_config_file)
@@ -60,6 +61,8 @@ class SourceVsSampleVsDesignAnalysis():
         self.dataframes = {}
 
         self.figure_folder = pathlib.Path(figure_folder)
+
+        self.figure_folder.mkdir(parents=True, exist_ok=True)
 
         self.figures = {}
 

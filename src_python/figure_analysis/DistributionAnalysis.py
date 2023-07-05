@@ -26,10 +26,15 @@ from figure_analysis import MaximinAnalysis
 
 class DistributionAnalysis(MaximinAnalysis):
     def __init__(self,
-                 folder=os.environ["DESIGNRESULTSMAXIMIN"],
-                 postfix="maximin"):
+                 folder=pathlib.Path(os.environ["REPO"]) /
+                 "data/02_raw_output/design_stats_maximin",
+                 postfix="maximin",
+                 debug=False):
+
         super().__init__(folder)
         self.postfix = postfix
+
+        self.debug = debug
 
         self._initDesignVariables()
 
@@ -76,20 +81,18 @@ class DistributionAnalysis(MaximinAnalysis):
              for item in sublist] + self.solarZenithAngle
 
     def initReadFilteredSourceData(self):
-        localPath = pathlib.Path(os.environ["DESIGNRESULTS"])
-        if localPath.is_dir():
-            try:
-                self.filteredSourceData = pandas.read_csv(
-                    localPath / "eclair_dataset_2001_designvariables.csv", index_col=0)
-                print("FilteredSourceData locally")
-            except FileNotFoundError:
-                self.filteredSourceData = None
+        localPath = pathlib.Path(os.environ["REPO"])
+
+        if not self.debug:
+
+            self.filteredSourceData = pandas.read_csv(
+                localPath / "data/01_source/eclair_dataset_2001_designvariables.csv",
+                index_col=0)
         else:
-            try:
-                self.filteredSourceData = pandas.read_csv(
-                    self.postProsDataRootFolder / "eclair_dataset_2001.csv", index_col=0)
-            except FileNotFoundError:
-                self.filteredSourceData = None
+
+            self.filteredSourceData = pandas.read_csv(
+                localPath / "data/01_source/sample20000.csv",
+                index_col=0)
 
     def read_all_designs(self):
         for trainingSet in self.design_sets:
@@ -166,7 +169,7 @@ class DistributionAnalysis(MaximinAnalysis):
             for method in self.design_methods_all:
                 if method == "manuscript" and variable == "pbl":
                     variable = "pblh"
-                #print("design maximi", trainingSet, method, max(self.stats[trainingSet][method].keys()))
+                # print("design maximi", trainingSet, method, max(self.stats[trainingSet][method].keys()))
                 design_points = max(self.stats[trainingSet][method].keys())
 
                 try:

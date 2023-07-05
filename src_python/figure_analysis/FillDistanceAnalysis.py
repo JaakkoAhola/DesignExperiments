@@ -8,6 +8,7 @@ Created on %(date)s
 """
 import os
 import numpy
+import pathlib
 import pandas
 
 
@@ -22,7 +23,8 @@ from matplotlib.lines import Line2D
 
 class FillDistanceAnalysis(MaximinAnalysis):
     def __init__(self,
-                 folder=os.environ["DESIGNRESULTSMAXIMIN"],
+                 folder=pathlib.Path(os.environ["REPO"]) /
+                 "data/02_raw_output/design_stats_maximin",
                  postfix="maximin"):
         super().__init__(folder)
         self.postfix = postfix

@@ -22,10 +22,11 @@ from library import Data
 class LookUpTable:
 
     def __init__(self, debug=False):
+
         self.all_variables = ["q_inv", "tpot_inv", "lwp", "tpot_pbl",
                               "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]
-        self.datarootfolder = pathlib.Path(os.environ["DATAT"])
-        self.mainfolder = self.datarootfolder / "ECLAIR"
+
+        self.mainfolder = pathlib.Path(os.environ["REPO"]) / "data/01_source"
         if debug:
             self.collection_filename = self.mainfolder / "sample20000.csv"
         else:

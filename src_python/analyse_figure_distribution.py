@@ -9,6 +9,7 @@
 
 # standard imports
 import os
+import pathlib
 import time
 from datetime import datetime
 from dotenv import load_dotenv
@@ -20,14 +21,17 @@ from figure_analysis import DistributionAnalysis
 
 def main():
     load_dotenv()
-    optim_methods = {"maximin": os.environ["DESIGNRESULTSMAXIMIN"],
-                     "maxpro": os.environ["DESIGNRESULTSMAXPRO"]}
+    optim_methods = {"maximin": pathlib.Path(os.environ["REPO"]) /
+                     "data/02_raw_output/design_stats_maximin",
+                     "maxpro": pathlib.Path(os.environ["REPO"]) /
+                     "data/02_raw_output/design_stats_maxpro"}
+
     for key in optim_methods:
         fill = DistributionAnalysis.DistributionAnalysis(optim_methods[key],
-                                                         key)
+                                                         key,
+                                                         debug=False)
         fill.read_all_designs()
-        if True:
-            fill.initReadFilteredSourceData()
+        fill.initReadFilteredSourceData()
         fill.figure_design_variable_distribution()
         fill.save_figures()
 

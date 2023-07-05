@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 readRenviron(".env")
-datahakemisto <- "../data/"
+datahakemisto <- paste(Sys.getenv("REPO"), "data/", sep="/")
 
 datasource <- "01_source/"
 

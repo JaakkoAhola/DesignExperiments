@@ -8,6 +8,7 @@ Created on Wed Oct 20 19:13:17 2021
 """
 import os
 from copy import deepcopy
+import pathlib
 import pandas
 
 
@@ -118,4 +119,4 @@ class LatinHyperCubeSampleDesign:
 
     def write_design_latin(self):
         self.design_latin_plain.to_csv(
-            os.environ["DESIGNRESULTS"] + "/design_lhs_sb_night_500_c.csv")
+            pathlib.Path(os.environ["REPO"]) / "data/02_raw_output/design_lhs_sb_night_500_c.csv")

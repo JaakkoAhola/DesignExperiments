@@ -8,6 +8,7 @@
 """
 
 import os
+import pathlib
 import time
 from datetime import datetime
 from dotenv import load_dotenv
@@ -19,7 +20,8 @@ from algorithms import BinarySpacePartition
 def main():
     load_dotenv()
     bsp = BinarySpacePartition.BinarySpacePartition(design_points=10,
-                                                    outputfile=os.environ["DESIGNRESULTS"] + "/design_stats/test/bsp_test.csv")
+                                                    outputfile=pathlib.Path(os.environ["REPO"]) /
+                                                    "data/02_raw_output/design_stats_maximin/test/bsp_test.csv")
 
     bsp.create_bs_partitions()
 

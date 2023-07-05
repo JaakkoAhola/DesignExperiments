@@ -9,6 +9,7 @@ Created on %(date)s
 import os
 import random
 from copy import deepcopy
+import pathlib
 import pandas
 
 # package imports
@@ -21,8 +22,9 @@ class BinarySpacePartition:
     def __init__(self,
                  design_variables=['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc'],
                  design_points=500,
-                 sourcefile=os.environ["DESIGNRESULTS"] + "/sample20000.csv",
-                 outputfile=os.environ["DESIGNRESULTS"] + "/bsp_test_sb_night_500.csv"
+                 sourcefile=pathlib.Path(os.environ["REPO"]) / "data/01_source/sample20000.csv",
+                 outputfile=pathlib.Path(os.environ["REPO"]) /
+                 "data/02_raw_output/bsp_test_sb_night_500.csv"
                  ):
 
         self.design_variables = design_variables

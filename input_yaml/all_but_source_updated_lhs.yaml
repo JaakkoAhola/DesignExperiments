@@ -1,0 +1,9 @@
+sample:
+    file : "/home/aholaj/Data/ECLAIR/sample20000.csv"
+    color : orange
+lhs:
+    file : "/home/aholaj/Data/ECLAIR/design_lhs_sb_night_500_c.csv"
+    color : green
+bsp:
+    file : "/home/aholaj/Data/ECLAIR/sb_sb_night_500.csv"
+    color : blue

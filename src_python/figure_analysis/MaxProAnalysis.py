@@ -28,10 +28,11 @@ from algorithms import LookUpTable
 class MaxProxAnalysis:
 
     def __init__(self,
-                 folder=os.environ["DESIGNRESULTSMAXPRO"],
+                 folder=pathlib.Path(os.environ["REPO"]) /
+                 "data/02_raw_output/design_stats_maxpro",
                  ):
 
-        self.figure_folder = f'{os.environ["HOME"]}/Dropbox/Apps/Overleaf/väitöskirja/figures'
+        self.figure_folder = pathlib.Path(os.environ["REPO"]) / "data/03_figure_analysis"
         self.design_sets = ["SBnight", "SBday", "SALSAnight", "SALSAday"]
 
         self.design_methods_with_R = ["scmc", "comined"]
@@ -98,8 +99,7 @@ class MaxProxAnalysis:
         return sensible_dict[key]
 
     def get_manuscript_results(self):
-        manu_folder = os.environ["DESIGNRESULTSMANUSCRIPT"]
-        manu_path_folder = pathlib.Path(manu_folder)
+        manu_path_folder = pathlib.Path(os.environ["REPO"]) / "data/01_source/manuscript_designs"
 
         for file_name in list(manu_path_folder.glob("**/*.csv")):
             design = pandas.read_csv(file_name, index_col=0)

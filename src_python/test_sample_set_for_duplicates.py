@@ -8,6 +8,7 @@
 """
 
 import os
+import pathlib
 import time
 from datetime import datetime
 from dotenv import load_dotenv
@@ -16,12 +17,12 @@ import pandas
 
 def main():
     load_dotenv()
-    root_file = os.getenv("DESIGNRESULTS") + "eclair_dataset_2001_designvariables.csv"
     columns = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc', 'ks', 'as', 'cs',
                'rdry_AS_eff', 'cos_mu']
     for col in columns:
 
-        base = f'{os.getenv("DESIGNRESULTS")}/eclair_dataset_2001_designvariables_look_up_table_{col}.csv'
+        base = pathlib.Path(os.environ["REPO"]) / \
+            f"data/02_raw_output/eclair_dataset_2001_designvariables_look_up_table_{col}.csv"
         df = pandas.read_csv(base)
         tot = len(df)
         for ind in range(1, tot):
