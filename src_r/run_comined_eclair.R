@@ -2,6 +2,10 @@
 readRenviron(".env")
 datahakemisto <- "../data/"
 
+datasource <- "01_source/"
+
+datarawoutput <- "02_raw_output/"
+
 if (dir.exists("/projappl/project_2000360/project_rpackages_4.3.0")){
   .libPaths(c("/projappl/project_2000360/project_rpackages_4.3.0", .libPaths()))
 }
@@ -30,8 +34,8 @@ if (length(args)==0) {
 moodi <- switch(moodi_nro, "test", "SBnight", "SBday", "SALSAnight", "SALSAday")
 print(paste("moodi:", moodi))
 
-full_collection <- paste(datahakemisto, "eclair_dataset_2001_designvariables.csv", sep="")
-sample_collection <- paste(datahakemisto, "sample20000.csv", sep="")
+full_collection <- paste(datahakemisto, datasource, "eclair_dataset_2001_designvariables.csv", sep="")
+sample_collection <- paste(datahakemisto, datasource, "sample20000.csv", sep="")
 
 if (moodi == "test"){
   filename <- sample_collection
@@ -87,7 +91,7 @@ if (use_max_pro){
   measure <- "maximin"
 }
 
-subfolder <- paste("02_raw_output/design_stats", "_", measure, "/", sep="")
+subfolder <- paste(datarawoutput, "design_stats", "_", measure, "/", sep="")
 
 
 for (key in all_keys){
