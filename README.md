@@ -43,8 +43,42 @@ find out how many duplicates there is in the source dataset.
 [src_python/test_source_for_constraints.py](src_python/test_source_for_constraints.py)
 test if the source is valid conserning the constraints.
 
-## Not in use in PhD
+## Environments
 
+### Python
+
+[environment/conda_python_env.yaml](environment/conda_python_env.yaml)
+describes a working python conda environment.
+
+For HPC environments, there might be a different way for installing packages.
+
+### R
+
+[environment/conda_r_env.yaml](environment/conda_r_env.yaml)
+describes a R conda environment named rbase.
+
+- Activate rbase with `conda activate rbase`
+- open R terminal with `R`
+- run `install.packages("mined")` should be enough to include all necessary packages.
+
+For HPC environments, there might be a different way for installing packages.
+
+## Flow
+
+All scripts are inteded to be run in their own directory.
+
+- run `bash init_01.bash`. [init_01.bash](init_01.bash) creates necessary data and log directories.
+- Download source data from via web-interface:
+  [https://doi.org/10.23729/cc187624-a282-4677-9cc8-c7f04be790ff](https://doi.org/10.23729/cc187624-a282-4677-9cc8-c7f04be790ff)
+  in to [data/01_source](data/01_source) that was created in the previous step.
+- run `bash init_02.bash`. [init_02.bash](init_02.bash) to extract the downloaded zip file.
+
+
+
+
+
+
+## Not in use in PhD
 
 ### Designs
 
@@ -63,3 +97,4 @@ test how source, sampled source and design compare to each other.
 
 [src_python/run_hypercube_source_constraints_met.py](src_python/run_hypercube_source_constraints_met.py)
 ???
+

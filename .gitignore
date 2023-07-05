@@ -5,3 +5,6 @@ figures/
 .spyproject/
 .RData
 .Rhistory
+data/
+*.logs
+.env

@@ -1,10 +1,11 @@
 #!/usr/bin/env Rscript
 readRenviron(".env")
-koodihakemisto <- Sys.getenv("KOODIT")
-datahakemisto <- Sys.getenv("DATAT")
-if (dir.exists("/fmi/projappl/project_2001927/project_rpackages_3.6.3")){
-  .libPaths(c("/fmi/projappl/project_2001927/project_rpackages_3.6.3", .libPaths()))
+datahakemisto <- "../data/"
+
+if (dir.exists("/projappl/project_2000360/project_rpackages_4.3.0")){
+  .libPaths(c("/projappl/project_2000360/project_rpackages_4.3.0", .libPaths()))
 }
+
 source("lib/lib.R")
 source("lib/lib_meteo.R")
 
@@ -29,8 +30,8 @@ if (length(args)==0) {
 moodi <- switch(moodi_nro, "test", "SBnight", "SBday", "SALSAnight", "SALSAday")
 print(paste("moodi:", moodi))
 
-full_collection <- paste(datahakemisto, "/ECLAIR/eclair_dataset_2001_designvariables.csv", sep="")
-sample_collection <- paste(datahakemisto, "/ECLAIR/sample20000.csv", sep="")
+full_collection <- paste(datahakemisto, "eclair_dataset_2001_designvariables.csv", sep="")
+sample_collection <- paste(datahakemisto, "sample20000.csv", sep="")
 
 if (moodi == "test"){
   filename <- sample_collection
@@ -86,7 +87,7 @@ if (use_max_pro){
   measure <- "maximin"
 }
 
-subfolder <- paste("/ECLAIR/design_stats", "_", measure, "/", sep="")
+subfolder <- paste("02_raw_output/design_stats", "_", measure, "/", sep="")
 
 
 for (key in all_keys){
