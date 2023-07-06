@@ -21,7 +21,7 @@ from algorithms import LookUpTable
 
 def main():
     load_dotenv()
-    look = LookUpTable.LookUpTable(True)
+    look = LookUpTable.LookUpTable(debug=False)
     print(look.function_look_up_table("q_inv", 1))
     hypercube = pandas.DataFrame(data=numpy.random.rand(100, 6),
                                  columns=['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc'])
