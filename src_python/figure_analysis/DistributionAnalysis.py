@@ -23,6 +23,9 @@ from library import Figure
 from library import PlotTweak
 from figure_analysis import MaximinAnalysis
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class DistributionAnalysis(MaximinAnalysis):
     def __init__(self,

@@ -24,6 +24,9 @@ from library import PlotTweak
 from algorithms import MaximinDesign
 from algorithms import LookUpTable
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class MaxProxAnalysis:
 

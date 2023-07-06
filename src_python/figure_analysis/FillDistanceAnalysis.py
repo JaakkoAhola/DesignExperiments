@@ -20,6 +20,9 @@ from library import PlotTweak
 from figure_analysis import MaximinAnalysis
 from matplotlib.lines import Line2D
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class FillDistanceAnalysis(MaximinAnalysis):
     def __init__(self,

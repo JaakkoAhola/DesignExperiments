@@ -18,6 +18,9 @@ from sklearn.preprocessing import StandardScaler
 from figure_analysis import SourceVsSampleVsDesign
 from library import Meteo
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class LatinHyperCubeSampleDesign:
 

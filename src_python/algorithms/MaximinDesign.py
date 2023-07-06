@@ -19,6 +19,9 @@ from geneticalgorithm import geneticalgorithm as ga
 from library import Data
 from library import Metrics
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class MaximinDesignWithGeneticAlgorithm:
 

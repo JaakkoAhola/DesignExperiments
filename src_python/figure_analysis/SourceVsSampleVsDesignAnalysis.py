@@ -25,6 +25,9 @@ from library import Figure
 from library import PlotTweak
 from libray import FileSystem
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 def my_scores(estimator, x):
     scores = estimator.score_samples(x)

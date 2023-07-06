@@ -18,6 +18,9 @@ from sklearn.linear_model import LinearRegression
 # package imports
 from library import Data
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class LookUpTable:
 

@@ -18,6 +18,8 @@ from algorithms import LookUpTable
 from figure_analysis import MaximinAnalysis
 from library import FileSystem
 from library import Meteo
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class FillDistance(MaximinAnalysis.MaximinAnalysis):
