@@ -1,0 +1,5 @@
+runtype: R # bsp filldistance R
+setname: sbnight # sbnight sbday salsanight salsaday
+measure: maximin # maximin maxpro
+account: project_2000360
+email: jjahol@utu.fi
