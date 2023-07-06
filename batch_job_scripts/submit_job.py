@@ -7,13 +7,12 @@
 @licence: MIT licence Copyright
 """
 
-import os
-import pathlib
 import sys
 import time
 from datetime import datetime
 from dotenv import load_dotenv
 import yaml
+import subprocess
 
 
 def readYAML(path):
@@ -27,7 +26,7 @@ def readYAML(path):
 
 def validate_input_yaml(parameter_dict):
     assert parameter_dict["runtype"] in ["bsp", "filldistance", "R"]
-    assert parameter_dict["setname"] in ["sbnight" "sbday" "salsanight" "salsaday"]
+    assert parameter_dict["setname"] in ["sbnight", "sbday", "salsanight", "salsaday"]
     assert parameter_dict["measure"] in ["maximin", "maxpro"]
 
 
@@ -99,7 +98,7 @@ def get_logfile(parameter_dict):
 
 def get_command(runtype):
 
-    command_dict = {"R": f"srun apptainer_wrapper exec Rscript --no-save run_comined_eclair.R",
+    command_dict = {"R": "srun apptainer_wrapper exec Rscript --no-save run_comined_eclair.R",
                     "filldistance": "srun python run_fill_distance.py",
                     "bsp": "srun python run_bsp.py"}
 
@@ -113,13 +112,19 @@ def get_argument(parameter_dict):
     measure = parameter_dict["measure"]
 
     if runtype == "R":
-        argument_dict = {'test': 1,
-                         'sbnight': 2,
-                         'sbday': 3,
-                         'salsanight': 4,
-                         'salsaday': 5}
+        setint_dict = {'test': 1,
+                       'sbnight': 2,
+                       'sbday': 3,
+                       'salsanight': 4,
+                       'salsaday': 5}
 
-        argument = argument_dict[setname]
+        setint = setint_dict[setname]
+
+        measureint_dict = {"maximin": 0, "maxpro": 1}
+
+        measureint = measureint_dict[measure]
+
+        argument = f"{setint} {measureint}"
 
     elif runtype == "filldistance":
 
@@ -184,9 +189,9 @@ def get_batch_job_script(parameter_dict):
 
     memory = get_memory(parameter_dict["runtype"])
 
-    logfile = get_logfile()
+    logfile = get_logfile(parameter_dict)
 
-    module_and_setup = get_module_and_setup()
+    module_and_setup = get_module_and_setup(parameter_dict)
 
     command = get_command(parameter_dict["runtype"])
 
@@ -206,21 +211,23 @@ def get_batch_job_script(parameter_dict):
 # SBATCH --output={logfile}
 
 {module_and_setup}
-
 {command} {argument}
 """
 
     return batch_job_script
 
-    def submit_job(parameter_dict):
-        batch_job_script = get_batch_job_script(parameter_dict)
 
-        runtype = parameter_dict["runtype"]
-        setname = parameter_dict["setname"]
-        measure = parameter_dict["measure"]
+def submit_job(parameter_dict):
+    batch_job_script = get_batch_job_script(parameter_dict)
 
-        with open(f"submit_{runtype}_{setname}_{measure}.bash", "w") as file:
-            file.write(batch_job_script)
+    runtype = parameter_dict["runtype"]
+    setname = parameter_dict["setname"]
+    measure = parameter_dict["measure"]
+
+    with open(f"temp_submit_{runtype}_{setname}_{measure}.bash", "w") as file:
+        file.write(batch_job_script)
+        subprocess.call(["sbatch", batch_job_script])
+        subprocess.call(["rm", batch_job_script])
 
 
 def main():
@@ -228,19 +235,21 @@ def main():
     try:
         parameterFile = sys.argv[1]
         parameter_dict = readYAML(parameterFile)
-    except KeyError:
+        validate_input_yaml(parameter_dict)
+        submit_job(parameter_dict)
+    except IndexError:
         for runtype in ["bsp", "filldistance", "R"]:
-            for setname in ["sbnight" "sbday" "salsanight" "salsaday"]:
+            for setname in ["sbnight", "sbday", "salsanight", "salsaday"]:
                 for measure in ["maximin", "maxpro"]:
+
                     parameter_dict = {"runtype": runtype,
                                       "setname": setname,
                                       "measure": measure,
                                       "account": "project_2000360",
                                       "email": "jjahol@utu.fi"}
-
-    validate_input_yaml(parameter_dict)
-
-    get_batch_job_script(parameter_dict)
+                    print(parameter_dict)
+                    validate_input_yaml(parameter_dict)
+                    submit_job(parameter_dict)
 
 
 if __name__ == "__main__":
