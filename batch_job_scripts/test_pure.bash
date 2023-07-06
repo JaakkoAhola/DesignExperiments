@@ -16,6 +16,5 @@ source ${HOME}/init.aliases.sh
 
 module load python-data/3.8-22.10
 
-cd ${KOODIT}/DesignExperiments/src_python
-
+cd ../src_python
 srun python test_source_for_constraints.py

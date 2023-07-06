@@ -10,12 +10,7 @@
 #SBATCH --mail-user=jjahol@utu.fi
 #SBATCH --output=PURE_%j.log
 
-source ${HOME}/init.login.sh
-source ${HOME}/init.aliases.sh
-
-
 module load python-data/3.8-22.10
 
-cd ${KOODIT}/DesignExperiments/src_python
-
+cd ../src_python
 srun python run_hypercube_source_constraints_met.py
