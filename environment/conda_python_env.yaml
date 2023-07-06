@@ -5,11 +5,12 @@ dependencies:
   - matplotlib
   - seaborn
   - pandas
-  - spyder
   - scipy
   - pyyaml
   - yaml
-  - duckdb
+  - python-duckdb
+  - python-dotenv
+  - pytest
   - pip
   - pip:
     - geneticalgorithm
