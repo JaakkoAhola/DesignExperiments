@@ -8,12 +8,10 @@
 #SBATCH --ntasks=1
 #SBATCH --mail-type=END #uncomment to enable mail
 #SBATCH --mail-user=jjahol@utu.fi
-#SBATCH --output=logs/bsp/SBday_bsp_0_v2_%j.log
+#SBATCH --output=logs/bsp/SBday_bsp_0_%j.log
 
-source ${HOME}/init.login.sh
-source ${HOME}/init.aliases.sh
-
-echo "initialised"
-module load python-data/3.8-22.10 #python-data/3.7.3-1
+module load python-data/3.8-22.10
 echo "module loaded"
-srun python ${KOODIT}/DesignExperiments/BinarySpacePartition.py 1 0
+
+cd ../src_python
+srun python run_bsp.py 1 0
