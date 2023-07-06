@@ -27,8 +27,10 @@ useUpscaling <- FALSE
 
 if (length(args)==0) {
   moodi_nro <- 1
+  use_max_pro <- FALSE
 }else{
   moodi_nro <- as.integer(args[1])
+  use_max_pro <- as.logical(as.integer(args[2]))
 }
 
 moodi <- switch(moodi_nro, "test", "SBnight", "SBday", "SALSAnight", "SALSAday")
@@ -83,7 +85,6 @@ source_data <- read.csv(source_data_file_name)
 
 look_up_table_hash <- hash()
 
-use_max_pro <- TRUE
 
 if (use_max_pro){
   measure <- "maxpro"
