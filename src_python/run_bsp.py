@@ -63,6 +63,7 @@ def main():
         design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
 
     look = LookUpTable.LookUpTable()
+    look.load_look_up_tables()
     if not debug:
         try:
             use_max_pro = bool(int(sys.argv[2]))

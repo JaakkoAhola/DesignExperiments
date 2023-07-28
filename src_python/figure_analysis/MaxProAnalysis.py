@@ -82,7 +82,7 @@ class MaxProxAnalysis:
         self.debug = False
 
         self.look = LookUpTable()
-
+        self.look.load_look_up_tables()
         self.annotationValues = ["(a) SB Night",
                                  "(b) SB Day",
                                  "(c) SALSA Night",

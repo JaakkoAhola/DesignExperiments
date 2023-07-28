@@ -15,4 +15,4 @@ echo "module loaded"
 
 export PYTHONUSERBASE=/projappl/project_2000360/project_pip_packages_python-data_3.8-22.10
 cd ../src_python
-srun python run_lookup_table.py
+srun python test_lookup_table.py

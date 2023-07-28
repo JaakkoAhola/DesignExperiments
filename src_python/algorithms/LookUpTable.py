@@ -24,10 +24,20 @@ load_dotenv()
 
 class LookUpTable:
 
-    def __init__(self, debug=False):
+    def __init__(self, variable=None, debug=False):
 
-        self.all_variables = ["q_inv", "tpot_inv", "lwp", "tpot_pbl",
-                              "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]
+        valid_variables = ["q_inv", "tpot_inv", "lwp", "tpot_pbl",
+                           "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]
+
+        if variable is None:
+
+            self.selected_variables = valid_variables
+
+        else:
+            for var in variable:
+                assert var in valid_variables
+
+            self.selected_variables = variable
 
         self.mainfolder = pathlib.Path(os.environ["REPO"]) / "data/01_source"
         if debug:
@@ -37,7 +47,7 @@ class LookUpTable:
 
         self.collection_dataframe = None
 
-        self.look_up_tables = dict(zip(self.all_variables, repeat(None)))
+        self.look_up_tables = dict(zip(self.selected_variables, repeat(None)))
 
         self.__init__wrapper()
 
@@ -54,30 +64,39 @@ class LookUpTable:
         return self.collection_dataframe
 
     def create_look_up_tables(self):
-        for key in self.all_variables:
+        for key in self.selected_variables:
+            print()
+            print(f"Creating lookup table for variable {key}")
             file = self.mainfolder / (self.collection_filename.stem +
                                       "_look_up_table_" + key + ".csv")
             if file.is_file():
+                print(f"Lookup table for variable {key} already exists")
                 next
             else:
                 if self.collection_dataframe is None:
+                    print("Let us read the source")
                     self.load_collection()
 
                 if (key in ["cos_mu", "rdry_AS_eff"]):
+                    print(f"For variable {key} let us filter out values smaller than epsilon.")
                     filtered_data = deepcopy(
                         self.collection_dataframe[self.collection_dataframe[key] > Data.getEpsilon()])
 
                 else:
                     filtered_data = deepcopy(self.collection_dataframe)
 
+                print(f"Let us sort the values for variable {key}")
                 sorted_dataframe = filtered_data.sort_values(key)
+                print(f"Values sorted for {key}")
                 sorted_series = sorted_dataframe[key]
                 sorted_series.reset_index(inplace=True, drop=True)
 
+                print(f"Save lookup table for variable {key}")
                 sorted_series.to_csv(file)
+                print(f"Lookuptable creation finished for variable {key}.")
 
     def load_look_up_tables(self):
-        for key in self.all_variables:
+        for key in self.selected_variables:
             file = self.mainfolder / (self.collection_filename.stem +
                                       "_look_up_table_" + key + ".csv")
             assert file.is_file()

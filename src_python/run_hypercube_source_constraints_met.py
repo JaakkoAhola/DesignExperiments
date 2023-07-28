@@ -22,7 +22,7 @@ from algorithms import LookUpTable
 def main():
     load_dotenv()
     look = LookUpTable.LookUpTable()
-
+    look = load_look_up_tables()
     collection_filename = pathlib.Path(os.environ["REPO"]) / \
         "data/01_source/eclair_dataset_2001_designvariables.csv"
 

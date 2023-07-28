@@ -34,6 +34,9 @@ compare density distribution of source vs designs with both maximin and maxpro m
 
 ## Testing
 
+[src_python/test_lookup_table.py](src_python/test_lookup_table.py)
+test lookup table and its methods
+
 [src_python/test_bsp.py](src_python/test_bsp.py)
 test bsp with a small number of points.
 
