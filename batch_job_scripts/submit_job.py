@@ -169,6 +169,7 @@ cd ../src_r/
     elif runtype in ["bsp", "filldistance"]:
         module_and_setup = """# load python
 module load python-data/3.8-22.10
+export PYTHONUSERBASE=/projappl/project_2000360/project_pip_packages_python-data_3.8-22.10
 echo "module loaded"
 
 cd ../src_python
@@ -235,21 +236,32 @@ def main():
     try:
         parameterFile = sys.argv[1]
         parameter_dict = readYAML(parameterFile)
-        validate_input_yaml(parameter_dict)
-        submit_job(parameter_dict)
-    except IndexError:
-        for runtype in ["bsp", "filldistance", "R"]:
-            for setname in ["sbnight", "sbday", "salsanight", "salsaday"]:
-                for measure in ["maximin", "maxpro"]:
 
-                    parameter_dict = {"runtype": runtype,
-                                      "setname": setname,
-                                      "measure": measure,
-                                      "account": "project_2000360",
-                                      "email": "jjahol@utu.fi"}
-                    print(parameter_dict)
-                    validate_input_yaml(parameter_dict)
-                    submit_job(parameter_dict)
+        runtype_list = parameter_dict["runtype"]
+        setname_list = parameter_dict["setname"]
+        measure_list = parameter_dict["measure"]
+        account = parameter_dict["account"]
+        email = parameter_dict["email"]
+    except IndexError:
+        runtype_list = ["bsp", "R", "filldistance"]
+        setname_list = ["sbnight", "sbday", "salsanight", "salsaday"]
+        measure_list = ["maximin", "maxpro"]
+        account = "project_2000360"
+        email = "jjahol@utu.fi"
+
+    for runtype in runtype_list:
+        for setname in setname_list:
+            for measure in measure_list:
+
+                submit_dict = {"runtype": runtype,
+                               "setname": setname,
+                               "measure": measure,
+                               "account": account,
+                               "email": email}
+                print(submit_dict)
+
+                validate_input_yaml(submit_dict)
+                submit_job(submit_dict)
 
 
 if __name__ == "__main__":

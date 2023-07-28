@@ -1,0 +1,14 @@
+runtype:
+    - R
+    - bsp
+setname:
+    - sbnight
+    - sbnight
+    - sbday
+    - salsanight
+    - salsaday
+measure:
+    - maximin
+    - maxpro
+account: project_2000360
+email: jjahol@utu.fi
