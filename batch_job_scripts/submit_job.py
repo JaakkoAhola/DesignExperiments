@@ -227,8 +227,8 @@ def submit_job(parameter_dict):
 
     with open(f"temp_submit_{runtype}_{setname}_{measure}.bash", "w") as file:
         file.write(batch_job_script)
-        subprocess.call(["sbatch", batch_job_script])
-        subprocess.call(["rm", batch_job_script])
+        subprocess.call(["sbatch", file])
+        subprocess.call(["rm", file])
 
 
 def main():
