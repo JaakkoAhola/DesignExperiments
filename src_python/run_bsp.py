@@ -98,12 +98,12 @@ def main():
             print("design_points", design_points)
             for k in range(1):
                 print("iteration:", k)
-                bsp = BinarySpacePartition(design_variables=design_variables[key],
-                                           design_points=design_points,
-                                           sourcefile=file,
-                                           outputfile=pathlib.Path(os.environ["REPO"]) /
-                                           f"data/02_raw_output/design_stats_{upfolder}" /
-                                           subfolder / "bsp" / f"bsp_{design_points}.csv")
+                bsp = BinarySpacePartition.BinarySpacePartition(design_variables=design_variables[key],
+                                                                design_points=design_points,
+                                                                sourcefile=file,
+                                                                outputfile=pathlib.Path(os.environ["REPO"]) /
+                                                                f"data/02_raw_output/design_stats_{upfolder}" /
+                                                                subfolder / "bsp" / f"bsp_{design_points}.csv")
 
                 bsp.create_bs_partitions()
                 bsp.sample_partitions_to_design()
