@@ -198,8 +198,7 @@ def get_batch_job_script(parameter_dict):
 
     argument = get_argument(parameter_dict)
 
-    batch_job_script = f"""
-#!/bin/bash
+    batch_job_script = f"""#!/bin/bash
 # SBATCH --job-name={jobname}
 # SBATCH --account={account}
 # SBATCH --time={walltime}
