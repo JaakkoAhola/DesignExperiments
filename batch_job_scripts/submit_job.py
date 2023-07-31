@@ -81,7 +81,7 @@ def get_walltime(runtype):
 
 def get_memory(runtype):
 
-    memory_dict = {"bsp": "2500M",
+    memory_dict = {"bsp": "5000M",
                    "filldistance": "850M",
                    "R": "10G"}
     return memory_dict[runtype]
