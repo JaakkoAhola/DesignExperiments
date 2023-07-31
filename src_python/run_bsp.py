@@ -140,7 +140,7 @@ def main():
 
         solutions_df.to_csv(pathlib.Path(os.environ["REPO"]) /
                             f"data/02_raw_output/design_stats_{upfolder}" /
-                            subfolder / "/bsp_stats.csv")
+                            subfolder / "bsp_stats.csv")
 
 
 if __name__ == "__main__":
