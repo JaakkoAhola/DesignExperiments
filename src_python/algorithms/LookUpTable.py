@@ -92,7 +92,7 @@ class LookUpTable:
                 sorted_series.reset_index(inplace=True, drop=True)
 
                 print(f"Save lookup table for variable {key}")
-                sorted_series.to_csv(file)
+                sorted_series.to_csv(file, index=False)
                 print(f"Lookuptable creation finished for variable {key}.")
 
     def load_look_up_tables(self):
