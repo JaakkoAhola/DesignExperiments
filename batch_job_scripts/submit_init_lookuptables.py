@@ -48,18 +48,18 @@ def get_batch_job_script(variable):
 
     logfile = f"logs/lookuptable_{var}_%j.log"
 
-    batch_job_script = f"""
-#!/bin/bash
-# SBATCH --job-name={jobname}
-# SBATCH --account={account}
-# SBATCH --time={walltime}
-# SBATCH --mem-per-cpu={memory}
-# SBATCH --partition=small
-# SBATCH --nodes=1
-# SBATCH --ntasks=1
-# SBATCH --mail-type=END
-# SBATCH --mail-user={email}
-# SBATCH --output={logfile}
+    batch_job_script = f"""#!/bin/bash
+#SBATCH --job-name={jobname}
+#SBATCH --account={account}
+#SBATCH --time={walltime}
+#SBATCH --mem-per-cpu={memory}
+#SBATCH --partition=small
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mail-type=END
+#SBATCH --mail-user={email}
+#SBATCH --output={logfile}
 
 module load python-data/3.8-22.10
 echo "module loaded"
