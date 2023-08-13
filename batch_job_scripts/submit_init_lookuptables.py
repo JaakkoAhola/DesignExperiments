@@ -15,7 +15,26 @@ import yaml
 import subprocess
 
 
+def get_var_code(variable):
+
+    dictio = {'q_inv': 'q_inv',
+              'tpot_inv': 't_inv',
+              'lwp': 'lwp',
+              'tpot_pbl': 't',
+              'pbl': 'pbl',
+              'cdnc': 'cdnc',
+              'ks': 'ks',
+              'as': 'as',
+              'cs': 'cs',
+              'rdry_AS_eff': 'reff',
+              'cos_mu': 'cos'}
+
+    return dictio[variable]
+
+
 def get_batch_job_script(variable):
+
+    var = get_var_code(variable)
 
     jobname = f"LU_{var}"
 
