@@ -49,8 +49,6 @@ class LookUpTable:
 
         self.look_up_tables = dict(zip(self.selected_variables, repeat(None)))
 
-        self.__init__wrapper()
-
     def __init__wrapper(self):
         self.create_look_up_tables()
         self.load_look_up_tables()
