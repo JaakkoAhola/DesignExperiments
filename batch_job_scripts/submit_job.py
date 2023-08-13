@@ -231,9 +231,6 @@ def submit_job(parameter_dict):
     with open(filename, "w") as file:
         file.write(batch_job_script)
 
-    subprocess.call(["sbatch", filename])
-    time.sleep(1)
-    subprocess.call(["rm", filename])
 
 
 def main():
