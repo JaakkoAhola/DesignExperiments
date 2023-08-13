@@ -97,22 +97,7 @@ subfolder <- paste(datarawoutput, "design_stats", "_", measure, "/", sep="")
 
 for (key in all_keys){
   look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
-  if (file.exists(look_up_table_filename)){
-    next
-  }
-  print("Creating look-up tables")
-  if (key == "cos_mu" | key == "rdry_AS_eff"){
-    filt_data <- source_data[ source_data$cos_mu > .Machine$double.eps, ]
-  } else{
-    filt_data <- source_data
-  }
-  look_up_table <- sort(filt_data[, key])
-  look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
-  write.table(look_up_table,
-              file=look_up_table_filename,
-              col.names = c(key),
-              row.names = FALSE,
-              sep=",")
+  assert(paste("Looktable for variable", key "exists"), file.exists(look_up_table_filename))
 }
 
 
