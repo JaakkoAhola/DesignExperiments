@@ -20,6 +20,7 @@ library("randtoolbox")
 library("lhs")
 library("DMwR")
 library("hash")
+library("testit")
 
 args = commandArgs(trailingOnly=TRUE)
 
