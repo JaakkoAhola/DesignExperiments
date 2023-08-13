@@ -55,21 +55,23 @@ srun python init_lookup_table.py {variable}
 
 def submit_job(variable):
     batch_job_script = get_batch_job_script(variable)
-
+    print()
+    print(variable)
+    print(batch_job_script)
     with open(f"temp_submit_init_lookuptable_{variable}.bash", "w") as file:
         file.write(batch_job_script)
-        subprocess.call(["sbatch", batch_job_script])
-        subprocess.call(["rm", batch_job_script])
 
 
 def main():
     load_dotenv()
-    try:
-        variable_list = sys.argv[1:]
-
-    except IndexError:
+   
+    temp_list = sys.argv[1:]
+    if len(temp_list)>0:
+        temp_list = variable_list
+    else:
         variable_list = ["q_inv", "tpot_inv", "lwp", "tpot_pbl",
                          "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]
+    print(variable_list)
     for variable in variable_list:
         submit_job(variable)
 
