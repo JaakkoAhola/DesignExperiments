@@ -97,8 +97,9 @@ subfolder <- paste(datarawoutput, "design_stats", "_", measure, "/", sep="")
 
 for (key in all_keys){
   look_up_table_filename <- paste(tools::file_path_sans_ext(filename), "_look_up_table_", key, ".csv", sep="")
-  assert(paste("Looktable for variable", key "exists"), file.exists(look_up_table_filename))
+  assert(paste("Looktable for variable", key, "exists"), file.exists(look_up_table_filename))
 }
+
 
 
 for (key in design_variables){
