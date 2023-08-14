@@ -56,7 +56,7 @@ class DistributionAnalysis(MaximinAnalysis):
             self.method_sensible_names_with_color[sensible_name] = color
 
         self.allSetColors = deepcopy(self.method_sensible_names_with_color)
-        self.allSetColors["Filtered ECHAM"] = Colorful.getDistinctColorList("grey")
+        self.allSetColors["Filtered ECHAM"] = Colorful.get_distinct_color_list_by_name("grey")
 
         self.trainingetSetsForVariables = {}
         for key in self.designVariablePool:
@@ -163,7 +163,7 @@ class DistributionAnalysis(MaximinAnalysis):
 
                 if variable == "cos_mu":
                     sourceDataVariable = sourceDataVariable[sourceDataVariable > Data.getEpsilon()]
-                sourceDataVariable.plot.density(ax=ax, color=Colorful.getDistinctColorList("grey"))
+                sourceDataVariable.plot.density(ax=ax, color=Colorful.get_distinct_color_list_by_name("grey"))
 
                 if variable in (aeroNumberVariables + [reff, "cdnc"]):
                     print(
