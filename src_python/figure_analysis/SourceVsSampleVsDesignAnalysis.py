@@ -59,7 +59,7 @@ class SourceVsSampleVsDesignAnalysis():
         self.colors = {}
         for key in self.yaml_config_file:
             self.files[key] = pathlib.Path(self.yaml_config_file[key]["file"])
-            self.colors[key] = Colorful.getDistinctColorList(self.yaml_config_file[key]["color"])
+            self.colors[key] = Colorful.get_distinct_color_list_by_name(self.yaml_config_file[key]["color"])
 
         self.dataframes = {}
 
@@ -299,8 +299,8 @@ class SourceVsSampleVsDesignAnalysis():
 
     def figure_scatter_plot_projections(self):
 
-        blue = Colorful.getDistinctColorList("blue")
-        red = Colorful.getDistinctColorList("red")
+        blue = Colorful.get_distinct_color_list_by_name("blue")
+        red = Colorful.get_distinct_color_list_by_name("red")
 
         for key in self.dataframes:
             dataframe_at_hand = self.dataframes[key]

@@ -62,7 +62,8 @@ class MaximinAnalysis:
         self.figures = {}
         self.figure_width = 12 / 2.54
 
-        color_list = Colorful.getDistinctColorList(["green", "blue", "yellow", "orange", "red"])
+        color_list = Colorful.get_distinct_color_list_by_name(
+            ["green", "blue", "yellow", "orange", "red"])
 
         self.method_with_color = dict(zip(self.design_methods_all, color_list))
 

@@ -61,7 +61,7 @@ class MaxProxAnalysis:
         self.figures = {}
         self.figure_width = 12 / 2.54
 
-        color_list = Colorful.getDistinctColorList(["green", "blue", "yellow", "orange", "red"])
+        color_list = Colorful.get_distinct_color_list_by_name(["green", "blue", "yellow", "orange", "red"])
 
         marker_list = ["3", "4", "X", "^", "v"]
 
