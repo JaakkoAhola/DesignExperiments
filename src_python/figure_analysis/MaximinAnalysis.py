@@ -83,7 +83,7 @@ class MaximinAnalysis:
 
         self.debug = False
 
-        self.look = LookUpTable()
+        self.look = LookUpTable.LookUpTable()
         self.look.load_look_up_tables()
         self.annotationValues = ["(a) SB Night",
                                  "(b) SB Day",

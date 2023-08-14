@@ -54,7 +54,7 @@ class FillDistance(MaximinAnalysis.MaximinAnalysis):
             for method in self.design_methods_to_be_executed:
                 self.fill_distance_stats[dd_set][method] = []
 
-        self.look = LookUpTable()
+        self.look = LookUpTable.LookUpTable()
         self.look.load_look_up_tables()
         self.design_variables = {"SBnight": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc"],
                                  "SBday": ["q_inv", "tpot_inv", "lwp", "tpot_pbl", "pbl", "cdnc", "cos_mu"],
