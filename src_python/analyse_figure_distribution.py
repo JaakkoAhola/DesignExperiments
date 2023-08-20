@@ -27,13 +27,13 @@ def main():
                      "data/02_raw_output/design_stats_maxpro"}
 
     for key in optim_methods:
-        fill = DistributionAnalysis.DistributionAnalysis(optim_methods[key],
+        dist = DistributionAnalysis.DistributionAnalysis(optim_methods[key],
                                                          key,
                                                          debug=False)
-        fill.read_all_designs()
-        fill.initReadFilteredSourceData()
-        fill.figure_design_variable_distribution()
-        fill.save_figures()
+        dist.read_all_designs()
+        dist.initReadFilteredSourceData()
+        dist.figure_design_variable_distribution()
+        dist.save_figures()
 
 
 if __name__ == "__main__":
