@@ -76,6 +76,7 @@ All scripts are inteded to be run in their own directory.
   in to [data/01_source](data/01_source) that was created in the previous step.
 - run `bash init_02.bash`. [init_02.bash](init_02.bash) extracts the downloaded zip file.
 - run `python init_03.py` [init_03.py](init_03.py) creates a sample set from source data for testing purposes.
+- run `bash  init_04.py` [init_04.bash](init_04.bash) creates symbolic links of manuscript designs (BSP)
 - run `python run_lookup_table.py` or submit as batch job with [batch_job_scripts/submit_init_lookuptables.bash](batch_job_scripts/submit_init_lookuptables.bash).
 - get R and BSP designs with `cd batch_job_scripts; ./submit_with_puhti.bash ../input_yaml/submit_all_designs.yaml`
 - get filldistances: `cd batch_job_scripts; ./submit_with_puhti.bash ../input_yaml/submit_all_filldistances.yaml`
