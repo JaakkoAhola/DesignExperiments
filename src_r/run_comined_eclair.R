@@ -22,6 +22,9 @@ library("DMwR")
 library("hash")
 library("testit")
 
+# set random seed
+set.seed(321)
+
 args = commandArgs(trailingOnly=TRUE)
 
 useUpscaling <- FALSE
