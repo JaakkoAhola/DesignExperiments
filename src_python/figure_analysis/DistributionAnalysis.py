@@ -98,11 +98,14 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
                 index_col=0)
 
     def read_all_designs(self):
+        print("read_all_designs")
         for trainingSet in self.design_sets:
             for method in self.design_methods_all:
                 subfolder = self.folder / trainingSet / method
                 self.stats[trainingSet][method] = {}
+                print(f"trainingSet: {trainingSet}, method: {method}, subfolder {subfolder}")
                 for file_name in list(subfolder.glob("**/*.csv")):
+                    print(file_name)
                     df = pandas.read_csv(file_name, index_col=0)
 
                     if method not in ["manuscript", "bsp"]:
@@ -110,6 +113,7 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
                     design_points = df.shape[0]
 
                     self.stats[trainingSet][method][design_points] = df
+        print("-- exiting")
 
     def figure_design_variable_distribution(self):
         nrows = 4
