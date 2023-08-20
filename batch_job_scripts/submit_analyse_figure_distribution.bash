@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mail-type=END #uncomment to enable mail
 #SBATCH --mail-user=jjahol@utu.fi
-#SBATCH --output=logs/analyse_figure_distribution.log
+#SBATCH --output=logs/analyse_figure_distribution_%j.log
 
 module load python-data/3.8-22.10
 echo "module loaded"
