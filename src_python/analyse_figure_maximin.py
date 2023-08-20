@@ -19,8 +19,7 @@ def main():
     load_dotenv()
     dd = MaximinAnalysis.MaximinAnalysis()
 
-    update_results = False
-
+    update_results = True
     if update_results:
         dd.get_manuscript_results()
         dd.get_maximin_results_with_R()
