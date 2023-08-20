@@ -77,9 +77,13 @@ All scripts are inteded to be run in their own directory.
 - run `bash init_02.bash`. [init_02.bash](init_02.bash) extracts the downloaded zip file.
 - run `python init_03.py` [init_03.py](init_03.py) creates a sample set from source data for testing purposes.
 - run `python run_lookup_table.py` or submit as batch job with [batch_job_scripts/submit_init_lookuptables.bash](batch_job_scripts/submit_init_lookuptables.bash).
-- get R and BSP designs
-- get filldistances
-- get figures
+- get R and BSP designs with `cd batch_job_scripts; ./submit_with_puhti.bash ../input_yaml/submit_all_designs.yaml`
+- get filldistances: `cd batch_job_scripts; ./submit_with_puhti.bash ../input_yaml/submit_all_filldistances.yaml`
+- get figures, first `cd src_python`
+    - maximin figures: `python analyse_figure_maximin.py`
+    - maxpro figures: `python analyse_figure_maxpro.py`
+    - filldistance figures: `python analyse_figure_filldistance.py`
+    - distribution figures `python analyse_figure_distribution.py` (recommended to submit to batch job queue with: [batch_job_scripts/submit_analyse_figure_distribution.bash](batch_job_scripts/submit_analyse_figure_distribution.bash))
 
 
 ## Not in use in PhD
