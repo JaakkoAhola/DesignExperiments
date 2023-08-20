@@ -27,7 +27,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class DistributionAnalysis(MaximinAnalysis):
+class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
     def __init__(self,
                  folder=pathlib.Path(os.environ["REPO"]) /
                  "data/02_raw_output/design_stats_maximin",
@@ -163,7 +163,8 @@ class DistributionAnalysis(MaximinAnalysis):
 
                 if variable == "cos_mu":
                     sourceDataVariable = sourceDataVariable[sourceDataVariable > Data.getEpsilon()]
-                sourceDataVariable.plot.density(ax=ax, color=Colorful.get_distinct_color_list_by_name("grey"))
+                sourceDataVariable.plot.density(ax=ax,
+                                                color=Colorful.get_distinct_color_list_by_name("grey"))
 
                 if variable in (aeroNumberVariables + [reff, "cdnc"]):
                     print(

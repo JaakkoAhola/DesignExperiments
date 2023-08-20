@@ -24,7 +24,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class FillDistanceAnalysis(MaximinAnalysis):
+class FillDistanceAnalysis(MaximinAnalysis.MaximinAnalysis):
     def __init__(self,
                  folder=pathlib.Path(os.environ["REPO"]) /
                  "data/02_raw_output/design_stats_maximin",
