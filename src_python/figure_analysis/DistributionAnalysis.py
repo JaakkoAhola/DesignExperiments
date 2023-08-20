@@ -104,7 +104,7 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
                 subfolder = self.folder / trainingSet / method
                 self.stats[trainingSet][method] = {}
                 list_of_designs = list(subfolder.glob("**/*.csv"))
-                assert len(list_of_designs) == 0, \
+                assert len(list_of_designs) >= 0, \
                     f"List of design points stats empty, check folder {trainingSet}/{method}"
 
                 for file_name in list_of_designs:

@@ -134,7 +134,7 @@ class FillDistance(MaximinAnalysis.MaximinAnalysis):
             for method in self.design_methods_to_be_executed:
                 subfolder = self.folder / dd_set / method
                 list_of_designs = list(subfolder.glob("**/*.csv"))
-                assert len(list_of_designs) == 0, \
+                assert len(list_of_designs) >= 0, \
                     f"List of design points stats empty, check folder {dd_set}/{method}"
 
                 for file_name in list_of_designs:

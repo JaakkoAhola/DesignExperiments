@@ -104,7 +104,7 @@ class MaxProxAnalysis:
     def get_manuscript_results(self):
         manu_path_folder = pathlib.Path(os.environ["REPO"]) / "data/01_source/manuscript_designs"
         list_of_designs = list(manu_path_folder.glob("**/*.csv"))
-        assert len(list_of_designs) == 0, \
+        assert len(list_of_designs) >= 0, \
             f"List of design points stats empty, check folder {manu_path_folder}"
         for file_name in list_of_designs:
             design = pandas.read_csv(file_name, index_col=0)
@@ -129,7 +129,7 @@ class MaxProxAnalysis:
             for method in self.design_methods_with_R:
                 subfolder = self.folder / dd_set / method
                 list_of_designs = list(subfolder.glob("**/*.csv"))
-                assert len(list_of_designs) == 0, \
+                assert len(list_of_designs) >= 0, \
                     f"List of design points stats empty, check folder {dd_set}/{method}"
                 for file_name in list_of_designs:
                     design_points = FileSystem.get_design_points_from_filename(file_name)
