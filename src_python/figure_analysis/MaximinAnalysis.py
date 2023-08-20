@@ -110,8 +110,11 @@ class MaximinAnalysis:
 
     def get_manuscript_results(self):
         manu_path_folder = pathlib.Path(os.environ["REPO"]) / "data/01_source/manuscript_designs"
+        list_of_designs = list(manu_path_folder.glob("**/*.csv"))
+        assert len(list_of_designs) == 0, \
+            f"List of design points stats empty, check folder {manu_path_folder}"
 
-        for file_name in list(manu_path_folder.glob("**/*.csv")):
+        for file_name in list_of_designs:
             design = pandas.read_csv(file_name, index_col=0)
             seeti = str(file_name.name).split(".")[0]
             hypercube_design = self.look.downscale_dataframe(design)
@@ -133,7 +136,10 @@ class MaximinAnalysis:
         for dd_set in self.stats:
             for method in self.design_methods_with_R:
                 subfolder = self.folder / dd_set / method
-                for file_name in list(subfolder.glob("**/*.csv")):
+                list_of_designs = list(subfolder.glob("**/*.csv"))
+                assert len(list_of_designs) == 0, \
+                    f"List of design points stats empty, check folder {dd_set}/{method}"
+                for file_name in list_of_designs:
                     design_points = FileSystem.get_design_points_from_filename(file_name)
                     maximin = Metrics.matrix_minimum_distance(pandas.read_csv(file_name).values)
                     tupp = (design_points, maximin)

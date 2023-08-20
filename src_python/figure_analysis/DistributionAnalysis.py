@@ -103,8 +103,11 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
             for method in self.design_methods_all:
                 subfolder = self.folder / trainingSet / method
                 self.stats[trainingSet][method] = {}
-                print(f"trainingSet: {trainingSet}, method: {method}, subfolder {subfolder}")
-                for file_name in list(subfolder.glob("**/*.csv")):
+                list_of_designs = list(subfolder.glob("**/*.csv"))
+                assert len(list_of_designs) == 0, \
+                    f"List of design points stats empty, check folder {trainingSet}/{method}"
+
+                for file_name in list_of_designs:
                     print(file_name)
                     df = pandas.read_csv(file_name, index_col=0)
 

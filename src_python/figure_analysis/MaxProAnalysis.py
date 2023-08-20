@@ -60,7 +60,8 @@ class MaxProxAnalysis:
         self.figures = {}
         self.figure_width = 12 / 2.54
 
-        color_list = Colorful.get_distinct_color_list_by_name(["green", "blue", "yellow", "orange", "red"])
+        color_list = Colorful.get_distinct_color_list_by_name(
+            ["green", "blue", "yellow", "orange", "red"])
 
         marker_list = ["3", "4", "X", "^", "v"]
 
@@ -102,8 +103,10 @@ class MaxProxAnalysis:
 
     def get_manuscript_results(self):
         manu_path_folder = pathlib.Path(os.environ["REPO"]) / "data/01_source/manuscript_designs"
-
-        for file_name in list(manu_path_folder.glob("**/*.csv")):
+        list_of_designs = list(manu_path_folder.glob("**/*.csv"))
+        assert len(list_of_designs) == 0, \
+            f"List of design points stats empty, check folder {manu_path_folder}"
+        for file_name in list_of_designs:
             design = pandas.read_csv(file_name, index_col=0)
             seeti = str(file_name.name).split(".")[0]
             hypercube_design = self.look.downscale_dataframe(design)
@@ -125,7 +128,10 @@ class MaxProxAnalysis:
         for dd_set in self.stats:
             for method in self.design_methods_with_R:
                 subfolder = self.folder / dd_set / method
-                for file_name in list(subfolder.glob("**/*.csv")):
+                list_of_designs = list(subfolder.glob("**/*.csv"))
+                assert len(list_of_designs) == 0, \
+                    f"List of design points stats empty, check folder {dd_set}/{method}"
+                for file_name in list_of_designs:
                     design_points = FileSystem.get_design_points_from_filename(file_name)
                     maxpro = Metrics.max_pro_measure(pandas.read_csv(file_name).values)
                     tupp = (design_points, maxpro)

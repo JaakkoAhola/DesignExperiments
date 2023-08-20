@@ -133,7 +133,11 @@ class FillDistance(MaximinAnalysis.MaximinAnalysis):
         for dd_set in self.simulation_sets_to_be_executed:
             for method in self.design_methods_to_be_executed:
                 subfolder = self.folder / dd_set / method
-                for file_name in list(subfolder.glob("**/*.csv")):
+                list_of_designs = list(subfolder.glob("**/*.csv"))
+                assert len(list_of_designs) == 0, \
+                    f"List of design points stats empty, check folder {dd_set}/{method}"
+
+                for file_name in list_of_designs:
                     design_points = int(
                         FileSystem.get_design_points_from_filename(file_name))
                     design_dataframe = pandas.read_csv(file_name, index_col=0)
