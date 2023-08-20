@@ -20,8 +20,7 @@ from library import Colorful
 from library import Figure
 from library import FileSystem
 from library import PlotTweak
-
-from algorithms import MaximinDesign
+from library import Metrics
 from algorithms import LookUpTable
 
 from dotenv import load_dotenv
@@ -108,7 +107,7 @@ class MaxProxAnalysis:
             design = pandas.read_csv(file_name, index_col=0)
             seeti = str(file_name.name).split(".")[0]
             hypercube_design = self.look.downscale_dataframe(design)
-            maxpro = MaximinDesign.max_pro_measure(hypercube_design.values)
+            maxpro = Metrics.max_pro_measure(hypercube_design.values)
 
             print(maxpro)
 
@@ -128,7 +127,7 @@ class MaxProxAnalysis:
                 subfolder = self.folder / dd_set / method
                 for file_name in list(subfolder.glob("**/*.csv")):
                     design_points = FileSystem.get_design_points_from_filename(file_name)
-                    maxpro = MaximinDesign.max_pro_measure(pandas.read_csv(file_name).values)
+                    maxpro = Metrics.max_pro_measure(pandas.read_csv(file_name).values)
                     tupp = (design_points, maxpro)
                     self.stats[dd_set][method].append(tupp)
 
