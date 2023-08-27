@@ -39,7 +39,7 @@ if (length(args)==0) {
   moodi_nro <- as.integer(args[1])
   use_max_pro <- as.logical(as.integer(args[2]))
 
-  design_points_vector <- as.integer(args[2])# c(53, 101, 199, 307, 401, 499)
+  design_points_vector <- as.integer(args[3])# c(53, 101, 199, 307, 401, 499)
   design_points_vector <- c(design_points_vector)
 
   scmc_reps <- seq(as.integer(args[4]))
