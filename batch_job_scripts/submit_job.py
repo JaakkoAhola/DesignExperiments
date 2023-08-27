@@ -246,7 +246,7 @@ def main():
         runtype_list = parameter_dict["runtype"]
         setname_list = parameter_dict["setname"]
         measure_list = parameter_dict["measure"]
-        desing_points_list = parameter_dict["designpoints"]
+        design_points_list = parameter_dict["designpoints"]
 
         reps = parameter_dict["reps"]
         account = parameter_dict["account"]
@@ -261,19 +261,19 @@ def main():
     for runtype in runtype_list:
         for setname in setname_list:
             for measure in measure_list:
-                for desing_point in desing_points_list:
+                for design_point in design_points_list:
 
                     submit_dict = {"runtype": runtype,
                                    "setname": setname,
                                    "measure": measure,
                                    "account": account,
-                                   "designpoints": desing_point,
+                                   "designpoints": design_point,
                                    "reps": reps,
                                    "email": email}
                     print(submit_dict)
 
-                validate_input_yaml(submit_dict)
-                submit_job(submit_dict)
+                    validate_input_yaml(submit_dict)
+                    submit_job(submit_dict)
 
 
 if __name__ == "__main__":
