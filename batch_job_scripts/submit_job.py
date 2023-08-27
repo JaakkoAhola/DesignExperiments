@@ -35,18 +35,18 @@ def validate_input_yaml(parameter_dict):
 def get_runtypecode(runtype):
 
     runtypecode_dict = {"R": "R",
-                        "filldistance": "FD",
-                        "bsp": "BSP"}
+                        "filldistance": "F",
+                        "bsp": "B"}
 
     return runtypecode_dict[runtype]
 
 
 def get_setnamecode(setname):
 
-    setnamecode_dict = {"sbnight": "sbn",
-                        "sbday": "sbd",
-                        "salsanight": "san",
-                        "salsaday": "sad"
+    setnamecode_dict = {"sbnight": "bn",
+                        "sbday": "bd",
+                        "salsanight": "an",
+                        "salsaday": "ad"
                         }
 
     return setnamecode_dict[setname]
@@ -54,8 +54,8 @@ def get_setnamecode(setname):
 
 def get_measurecode(measure):
 
-    measurecode_dict = {"maximin": "MA",
-                        "maxpro": "MP"}
+    measurecode_dict = {"maximin": "M",
+                        "maxpro": "P"}
 
     return measurecode_dict[measure]
 
@@ -67,7 +67,9 @@ def get_jobname(parameter_dict):
 
     measurecode = get_measurecode(parameter_dict["measure"])
 
-    jobname = f"{runtypecode}{setnamecode}{measurecode}"
+    designpoints = parameter_dict["designpoints"]
+
+    jobname = f"{runtypecode}{setnamecode}{measurecode}{designpoints}"
 
     return jobname
 
