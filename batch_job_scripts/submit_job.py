@@ -28,6 +28,8 @@ def validate_input_yaml(parameter_dict):
     assert parameter_dict["runtype"] in ["bsp", "filldistance", "R"]
     assert parameter_dict["setname"] in ["sbnight", "sbday", "salsanight", "salsaday"]
     assert parameter_dict["measure"] in ["maximin", "maxpro"]
+    assert isinstance(parameter_dict["reps"], int)
+    assert isinstance(parameter_dict["designpoints"], int)
 
 
 def get_runtypecode(runtype):
@@ -110,6 +112,8 @@ def get_argument(parameter_dict):
     runtype = parameter_dict["runtype"]
     setname = parameter_dict["setname"]
     measure = parameter_dict["measure"]
+    designpoints = parameter_dict["designpoints"]
+    reps = parameter_dict["reps"]
 
     if runtype == "R":
         setint_dict = {'test': 1,
@@ -123,8 +127,6 @@ def get_argument(parameter_dict):
         measureint_dict = {"maximin": 0, "maxpro": 1}
 
         measureint = measureint_dict[measure]
-
-        argument = f"{setint} {measureint}"
 
     elif runtype == "filldistance":
 
@@ -141,7 +143,8 @@ def get_argument(parameter_dict):
 
         measureint = measureint_dict[measure]
 
-        argument = f"{setint} {measureint}"
+    if runtype in ["bsp", "R"]:
+        argument = f"{setint} {measureint} {designpoints} {reps}"
 
     return argument
 
@@ -226,11 +229,12 @@ def submit_job(parameter_dict):
     runtype = parameter_dict["runtype"]
     setname = parameter_dict["setname"]
     measure = parameter_dict["measure"]
+    designpoints = parameter_dict["designpoints"]
+    reps = parameter_dict["reps"]
 
-    filename = f"temp_submit_{runtype}_{setname}_{measure}.bash"
+    filename = f"temp_submit_{runtype}_{setname}_{measure}_{designpoints}_{reps}.bash"
     with open(filename, "w") as file:
         file.write(batch_job_script)
-
 
 
 def main():
@@ -242,6 +246,9 @@ def main():
         runtype_list = parameter_dict["runtype"]
         setname_list = parameter_dict["setname"]
         measure_list = parameter_dict["measure"]
+        desing_points_list = parameter_dict["designpoints"]
+
+        reps = parameter_dict["reps"]
         account = parameter_dict["account"]
         email = parameter_dict["email"]
     except IndexError:
@@ -254,13 +261,16 @@ def main():
     for runtype in runtype_list:
         for setname in setname_list:
             for measure in measure_list:
+                for desing_point in desing_points_list:
 
-                submit_dict = {"runtype": runtype,
-                               "setname": setname,
-                               "measure": measure,
-                               "account": account,
-                               "email": email}
-                print(submit_dict)
+                    submit_dict = {"runtype": runtype,
+                                   "setname": setname,
+                                   "measure": measure,
+                                   "account": account,
+                                   "designpoints": desing_point,
+                                   "reps": reps,
+                                   "email": email}
+                    print(submit_dict)
 
                 validate_input_yaml(submit_dict)
                 submit_job(submit_dict)

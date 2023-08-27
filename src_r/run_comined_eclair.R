@@ -30,15 +30,29 @@ args = commandArgs(trailingOnly=TRUE)
 useUpscaling <- FALSE
 
 if (length(args)==0) {
+  # case debug:
   moodi_nro <- 1
   use_max_pro <- FALSE
+  design_points_vector <- c(11)
+  scmc_reps <- c(1)
 }else{
   moodi_nro <- as.integer(args[1])
   use_max_pro <- as.logical(as.integer(args[2]))
+
+  design_points_vector <- as.integer(args[2])# c(53, 101, 199, 307, 401, 499)
+  design_points_vector <- c(design_points_vector)
+
+  scmc_reps <- seq(as.integer(args[4]))
+
 }
+
+
 
 moodi <- switch(moodi_nro, "test", "SBnight", "SBday", "SALSAnight", "SALSAday")
 print(paste("moodi:", moodi))
+print(paste("use MaxPro", use_max_pro))
+print(paste("Design points", design_points_vector ))
+print(paste("SCMC repetitions", scmc_reps))
 
 full_collection <- paste(datahakemisto, datasource, "eclair_dataset_2001_designvariables.csv", sep="")
 sample_collection <- paste(datahakemisto, datasource, "sample20000.csv", sep="")
@@ -376,14 +390,6 @@ getPoints <- function(design_points){
     lhs_time[time_ind] <- inter_time[1]
     lhs_obj[time_ind] <- lhs.best
   }
-}
-
-if (moodi_nro > 1){
-  design_points_vector <- c(53, 101, 199, 307, 401, 499)
-  scmc_reps <- seq(1)
-} else{
-  design_points_vector <- c(11)
-  scmc_reps <- c(1)
 }
 
 comined_time <- rep(-1,length(design_points_vector))

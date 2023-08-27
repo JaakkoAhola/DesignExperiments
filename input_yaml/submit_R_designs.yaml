@@ -8,5 +8,14 @@ setname:
 measure:
     - maximin
     - maxpro
+designpoints:
+    - 53
+    - 101
+    - 199
+    - 307
+    - 401
+    - 499
+reps:
+    - 1
 account: project_2000360
 email: jjahol@utu.fi

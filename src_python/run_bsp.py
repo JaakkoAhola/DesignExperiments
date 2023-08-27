@@ -30,6 +30,10 @@ def main():
         sys.argv[2] use_max_pro integer 0: use maximin measure
                                         1: use MaxPro measure
 
+        sys.argv[3] design_points_vector
+
+        sys.argv[4] repetitions
+
 """
     load_dotenv()
 
@@ -60,7 +64,11 @@ def main():
             "data/01_source/eclair_dataset_2001_designvariables.csv"
 
         keys_list = [list(design_variables)[indeksi]]
-        design_points_vector = numpy.array([53, 101, 199, 307, 401, 499])
+
+        # numpy.array([53, 101, 199, 307, 401, 499])
+        design_points_vector = numpy.array([int(sys.argv[3])])
+
+        reps = int(sys.argv[4])
 
     look = LookUpTable.LookUpTable()
     look.load_look_up_tables()
@@ -96,7 +104,7 @@ def main():
             print(" ")
             print(" ")
             print("design_points", design_points)
-            for k in range(1):
+            for k in range(reps):
                 print("iteration:", k)
                 bsp = BinarySpacePartition.BinarySpacePartition(design_variables=design_variables[key],
                                                                 design_points=design_points,
