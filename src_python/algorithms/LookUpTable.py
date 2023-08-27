@@ -61,6 +61,30 @@ class LookUpTable:
     def get_collection_dataframe(self):
         return self.collection_dataframe
 
+    def add_suffix_to_duplicates(self, series):
+        values = series.values
+        unique_values, indices, counts = numpy.unique(values, return_counts=True, return_index=True)
+        is_duplicate = counts > 1
+
+        ordinal_numbers = numpy.zeros(len(series), dtype=int)
+        for value, count in zip(unique_values[is_duplicate], counts[is_duplicate]):
+            duplicate_indices = numpy.where(values == value)[0]
+            ordinal_numbers[duplicate_indices] = numpy.arange(1, count + 1)
+
+        mask = is_duplicate[indices.searchsorted(numpy.arange(len(series)), side='right') - 1]
+
+        result_series = [
+            f"{value}_{ordinal}" if is_dup else str(value)
+            for value, is_dup, ordinal in zip(values, mask, ordinal_numbers)
+        ]
+
+        return pandas.Series(result_series)
+
+    # Example usage:
+    # decimal_numbers = pandas.Series([1.234, 2.345, 2.345, 3.456, 3.456, 3.456, 4.567])
+    # result = add_suffix_to_duplicates(decimal_numbers)
+    # print(result)
+
     def create_look_up_tables(self):
         for key in self.selected_variables:
             print()
