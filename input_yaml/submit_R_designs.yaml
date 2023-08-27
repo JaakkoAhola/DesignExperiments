@@ -15,7 +15,6 @@ designpoints:
     - 307
     - 401
     - 499
-reps:
-    - 1
+reps: 1
 account: project_2000360
 email: jjahol@utu.fi

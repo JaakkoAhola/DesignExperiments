@@ -267,7 +267,7 @@ def main():
                                    "setname": setname,
                                    "measure": measure,
                                    "account": account,
-                                   "designpoints": int(desing_point),
+                                   "designpoints": desing_point,
                                    "reps": reps,
                                    "email": email}
                     print(submit_dict)
