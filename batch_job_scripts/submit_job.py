@@ -12,7 +12,7 @@ import time
 from datetime import datetime
 from dotenv import load_dotenv
 import yaml
-import subprocess
+import itertools
 
 
 def readYAML(path):
@@ -24,12 +24,14 @@ def readYAML(path):
     return output
 
 
-def validate_input_yaml(parameter_dict):
-    assert parameter_dict["runtype"] in ["bsp", "filldistance", "R"]
-    assert parameter_dict["setname"] in ["sbnight", "sbday", "salsanight", "salsaday"]
-    assert parameter_dict["measure"] in ["maximin", "maxpro"]
-    assert isinstance(parameter_dict["reps"], int)
-    assert isinstance(parameter_dict["designpoints"], int)
+def validate_input_yaml(submit_dict):
+    assert submit_dict["runtype"] in ["bsp", "filldistance", "R"]
+    assert submit_dict["setname"] in ["sbnight", "sbday", "salsanight", "salsaday"]
+    assert submit_dict["measure"] in ["maximin", "maxpro"]
+
+    if submit_dict["runtype"] in ["bsp", "R"]:
+        assert isinstance(submit_dict["reps"], int)
+        assert isinstance(submit_dict["designpoints"], int)
 
 
 def get_runtypecode(runtype):
@@ -60,14 +62,14 @@ def get_measurecode(measure):
     return measurecode_dict[measure]
 
 
-def get_jobname(parameter_dict):
-    runtypecode = get_runtypecode(parameter_dict["runtype"])
+def get_jobname(submit_dict):
+    runtypecode = get_runtypecode(submit_dict["runtype"])
 
-    setnamecode = get_setnamecode(parameter_dict["setname"])
+    setnamecode = get_setnamecode(submit_dict["setname"])
 
-    measurecode = get_measurecode(parameter_dict["measure"])
+    measurecode = get_measurecode(submit_dict["measure"])
 
-    designpoints = parameter_dict["designpoints"]
+    designpoints = submit_dict["designpoints"]
 
     jobname = f"{runtypecode}{setnamecode}{measurecode}{designpoints}"
 
@@ -78,7 +80,7 @@ def get_walltime(runtype):
 
     walltime_dict = {"bsp": "00:20:00",
                      "filldistance": "01:30:00",
-                     "R": "72:00:00"}
+                     "R": "12:00:00"}
 
     return walltime_dict[runtype]
 
@@ -91,13 +93,13 @@ def get_memory(runtype):
     return memory_dict[runtype]
 
 
-def get_logfile(parameter_dict):
+def get_logfile(submit_dict):
 
-    runtype = parameter_dict["runtype"]
-    setname = parameter_dict["setname"]
-    measure = parameter_dict["measure"]
-    designpoints = parameter_dict["designpoints"]
-    reps = parameter_dict["reps"]
+    runtype = submit_dict["runtype"]
+    setname = submit_dict["setname"]
+    measure = submit_dict["measure"]
+    designpoints = submit_dict["designpoints"]
+    reps = submit_dict["reps"]
 
     return f"logs/{runtype}/{runtype}_{setname}_{measure}_{designpoints}_{reps}%j.log"
 
@@ -111,13 +113,12 @@ def get_command(runtype):
     return command_dict[runtype]
 
 
-def get_argument(parameter_dict):
+def get_argument(submit_dict):
 
-    runtype = parameter_dict["runtype"]
-    setname = parameter_dict["setname"]
-    measure = parameter_dict["measure"]
-    designpoints = parameter_dict["designpoints"]
-    reps = parameter_dict["reps"]
+    runtype = submit_dict["runtype"]
+    setname = submit_dict["setname"]
+    measure = submit_dict["measure"]
+
 
     if runtype == "R":
         setint_dict = {'test': 1,
@@ -148,15 +149,17 @@ def get_argument(parameter_dict):
         measureint = measureint_dict[measure]
 
     if runtype in ["bsp", "R"]:
+	designpoints = submit_dict["designpoints"]
+        reps = submit_dict["reps"]
         argument = f"{setint} {measureint} {designpoints} {reps}"
 
     return argument
 
 
-def get_module_and_setup(parameter_dict):
+def get_module_and_setup(submit_dict):
 
-    runtype = parameter_dict["runtype"]
-    account = parameter_dict["account"]
+    runtype = submit_dict["runtype"]
+    account = submit_dict["account"]
 
     if runtype == "R":
         module_and_setup = f"""# Load r-env
@@ -185,25 +188,25 @@ cd ../src_python
     return module_and_setup
 
 
-def get_batch_job_script(parameter_dict):
+def get_batch_job_script(submit_dict):
 
-    jobname = get_jobname(parameter_dict)
+    jobname = get_jobname(submit_dict)
 
-    email = parameter_dict["email"]
+    email = submit_dict["email"]
 
-    account = parameter_dict["account"]
+    account = submit_dict["account"]
 
-    walltime = get_walltime(parameter_dict["runtype"])
+    walltime = get_walltime(submit_dict["runtype"])
 
-    memory = get_memory(parameter_dict["runtype"])
+    memory = get_memory(submit_dict["runtype"])
 
-    logfile = get_logfile(parameter_dict)
+    logfile = get_logfile(submit_dict)
 
-    module_and_setup = get_module_and_setup(parameter_dict)
+    module_and_setup = get_module_and_setup(submit_dict)
 
-    command = get_command(parameter_dict["runtype"])
+    command = get_command(submit_dict["runtype"])
 
-    argument = get_argument(parameter_dict)
+    argument = get_argument(submit_dict)
 
     batch_job_script = f"""#!/bin/bash
 #SBATCH --job-name={jobname}
@@ -225,59 +228,57 @@ def get_batch_job_script(parameter_dict):
     return batch_job_script
 
 
-def submit_job(parameter_dict):
-    batch_job_script = get_batch_job_script(parameter_dict)
+def submit_job(submit_dict):
+    batch_job_script = get_batch_job_script(submit_dict)
 
     print(batch_job_script)
 
-    runtype = parameter_dict["runtype"]
-    setname = parameter_dict["setname"]
-    measure = parameter_dict["measure"]
-    designpoints = parameter_dict["designpoints"]
-    reps = parameter_dict["reps"]
+    runtype = submit_dict["runtype"]
+    setname = submit_dict["setname"]
+    measure = submit_dict["measure"]
+    designpoints = submit_dict["designpoints"]
+    reps = submit_dict["reps"]
 
     filename = f"temp_submit_{runtype}_{setname}_{measure}_{designpoints}_{reps}.bash"
     with open(filename, "w") as file:
         file.write(batch_job_script)
 
 
+def loop_input(parameterFile):
+    parameter_dict = readYAML(parameterFile)
+
+    reps = parameter_dict["reps"]
+
+    for runtype, setname, measure in itertools.product(parameter_dict["runtype"],
+                                                       parameter_dict["setname"],
+                                                       parameter_dict["measure"]):
+        submit_dict = {"runtype": runtype,
+                       "setname": setname,
+                       "measure": measure,
+                       "account": parameter_dict["account"],
+                       "reps": reps,
+                       "email": parameter_dict["email"]}
+
+    if "designpoints" in parameter_dict:
+        for design_point in parameter_dict["designpoints"]:
+            submit_dict["designpoints"] = design_point
+
+    if "reps" in parameter_dict:
+        submit_dict["reps"] = parameter_dict["reps"]
+
+    print(submit_dict)
+    validate_input_yaml(submit_dict)
+    submit_job(submit_dict)
+
+
 def main():
     load_dotenv()
     try:
         parameterFile = sys.argv[1]
-        parameter_dict = readYAML(parameterFile)
-
-        runtype_list = parameter_dict["runtype"]
-        setname_list = parameter_dict["setname"]
-        measure_list = parameter_dict["measure"]
-        design_points_list = parameter_dict["designpoints"]
-
-        reps = parameter_dict["reps"]
-        account = parameter_dict["account"]
-        email = parameter_dict["email"]
     except IndexError:
-        runtype_list = ["bsp", "R", "filldistance"]
-        setname_list = ["sbnight", "sbday", "salsanight", "salsaday"]
-        measure_list = ["maximin", "maxpro"]
-        account = "project_2000360"
-        email = "jjahol@utu.fi"
+        print("An input yaml should be given.")
 
-    for runtype in runtype_list:
-        for setname in setname_list:
-            for measure in measure_list:
-                for design_point in design_points_list:
-
-                    submit_dict = {"runtype": runtype,
-                                   "setname": setname,
-                                   "measure": measure,
-                                   "account": account,
-                                   "designpoints": design_point,
-                                   "reps": reps,
-                                   "email": email}
-                    print(submit_dict)
-
-                    validate_input_yaml(submit_dict)
-                    submit_job(submit_dict)
+    loop_input(parameterFile)
 
 
 if __name__ == "__main__":
