@@ -268,26 +268,29 @@ def submit_job(submit_dict):
 
 def loop_input(parameterFile):
     parameter_dict = readYAML(parameterFile)
+    print(parameter_dict)
 
     for runtype, setname, measure in itertools.product(parameter_dict["runtype"],
                                                        parameter_dict["setname"],
                                                        parameter_dict["measure"]):
+
+        print("fff", runtype, setname, measure)
         submit_dict = {"runtype": runtype,
                        "setname": setname,
                        "measure": measure,
                        "account": parameter_dict["account"],
                        "email": parameter_dict["email"]}
 
-    if "designpoints" in parameter_dict:
-        for design_point in parameter_dict["designpoints"]:
-            submit_dict["designpoints"] = design_point
+        if "designpoints" in parameter_dict:
+            for design_point in parameter_dict["designpoints"]:
+                submit_dict["designpoints"] = design_point
 
-    if "reps" in parameter_dict:
-        submit_dict["reps"] = parameter_dict["reps"]
+        if "reps" in parameter_dict:
+            submit_dict["reps"] = parameter_dict["reps"]
 
-    print(submit_dict)
-    validate_input_yaml(submit_dict)
-    submit_job(submit_dict)
+        print(submit_dict)
+        validate_input_yaml(submit_dict)
+        submit_job(submit_dict)
 
 
 def main():
