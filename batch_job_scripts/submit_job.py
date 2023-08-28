@@ -119,7 +119,6 @@ def get_argument(submit_dict):
     setname = submit_dict["setname"]
     measure = submit_dict["measure"]
 
-
     if runtype == "R":
         setint_dict = {'test': 1,
                        'sbnight': 2,
@@ -149,7 +148,7 @@ def get_argument(submit_dict):
         measureint = measureint_dict[measure]
 
     if runtype in ["bsp", "R"]:
-	designpoints = submit_dict["designpoints"]
+        designpoints = submit_dict["designpoints"]
         reps = submit_dict["reps"]
         argument = f"{setint} {measureint} {designpoints} {reps}"
 
