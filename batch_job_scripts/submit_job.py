@@ -69,7 +69,10 @@ def get_jobname(submit_dict):
 
     measurecode = get_measurecode(submit_dict["measure"])
 
-    designpoints = submit_dict["designpoints"]
+    if "designpoints" in submit_dict:
+        designpoints = submit_dict["designpoints"]
+    else:
+        designpoints = ""
 
     jobname = f"{runtypecode}{setnamecode}{measurecode}{designpoints}"
 
@@ -98,10 +101,20 @@ def get_logfile(submit_dict):
     runtype = submit_dict["runtype"]
     setname = submit_dict["setname"]
     measure = submit_dict["measure"]
-    designpoints = submit_dict["designpoints"]
-    reps = submit_dict["reps"]
 
-    return f"logs/{runtype}/{runtype}_{setname}_{measure}_{designpoints}_{reps}%j.log"
+    if "designpoints" in submit_dict:
+        designpoints = submit_dict["designpoints"]
+        designpoints = f"_{designpoints}"
+    else:
+        designpoints = ""
+
+    if "reps" in submit_dict:
+        reps = submit_dict["reps"]
+        reps = f"_reps{reps}"
+    else:
+        reps = ""
+
+    return f"logs/{runtype}/{runtype}_{setname}_{measure}{designpoints}{reps}%j.log"
 
 
 def get_command(runtype):
@@ -235,10 +248,20 @@ def submit_job(submit_dict):
     runtype = submit_dict["runtype"]
     setname = submit_dict["setname"]
     measure = submit_dict["measure"]
-    designpoints = submit_dict["designpoints"]
-    reps = submit_dict["reps"]
 
-    filename = f"temp_submit_{runtype}_{setname}_{measure}_{designpoints}_{reps}.bash"
+    if "designpoints" in submit_dict:
+        designpoints = submit_dict["designpoints"]
+        designpoints = f"_{designpoints}"
+    else:
+        designpoints = ""
+
+    if "reps" in submit_dict:
+        reps = submit_dict["reps"]
+        reps = f"_{reps}"
+    else:
+        reps = ""
+
+    filename = f"temp_submit_{runtype}_{setname}_{measure}{designpoints}{reps}.bash"
     with open(filename, "w") as file:
         file.write(batch_job_script)
 
