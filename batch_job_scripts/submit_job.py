@@ -96,8 +96,10 @@ def get_logfile(parameter_dict):
     runtype = parameter_dict["runtype"]
     setname = parameter_dict["setname"]
     measure = parameter_dict["measure"]
+    designpoints = parameter_dict["designpoints"]
+    reps = parameter_dict["reps"]
 
-    return f"logs/{runtype}/{runtype}_{setname}_{measure}_%j.log"
+    return f"logs/{runtype}/{runtype}_{setname}_{measure}_{designpoints}_{reps}%j.log"
 
 
 def get_command(runtype):
