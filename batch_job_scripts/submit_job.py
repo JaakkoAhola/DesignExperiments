@@ -246,8 +246,6 @@ def submit_job(submit_dict):
 def loop_input(parameterFile):
     parameter_dict = readYAML(parameterFile)
 
-    reps = parameter_dict["reps"]
-
     for runtype, setname, measure in itertools.product(parameter_dict["runtype"],
                                                        parameter_dict["setname"],
                                                        parameter_dict["measure"]):
@@ -255,7 +253,6 @@ def loop_input(parameterFile):
                        "setname": setname,
                        "measure": measure,
                        "account": parameter_dict["account"],
-                       "reps": reps,
                        "email": parameter_dict["email"]}
 
     if "designpoints" in parameter_dict:
