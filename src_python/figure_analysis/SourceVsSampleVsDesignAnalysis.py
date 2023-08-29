@@ -143,7 +143,7 @@ class SourceVsSampleVsDesignAnalysis():
 
     def finalise_figures(self):
         for key in self.figures:
-            self.figures[key].save()
+            self.figures[key].save(fig_extension=os.environ["FIGEXTENSION"])
 
     def _figure_final_tweaks_with_all_parameters(self, figure_name):
 

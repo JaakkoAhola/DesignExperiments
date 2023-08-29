@@ -317,4 +317,4 @@ class MaxProxAnalysis:
     def save_figures(self):
 
         for fig in self.figures.values():
-            fig.save(file_extension=".pdf")
+            fig.save(file_extension=os.environ["FIGEXTENSION"])
