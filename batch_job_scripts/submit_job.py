@@ -270,11 +270,21 @@ def loop_input(parameterFile):
     parameter_dict = readYAML(parameterFile)
     print(parameter_dict)
 
-    for runtype, setname, measure in itertools.product(parameter_dict["runtype"],
-                                                       parameter_dict["setname"],
-                                                       parameter_dict["measure"]):
+    loop = [parameter_dict["runtype"],
+            parameter_dict["setname"],
+            parameter_dict["measure"]]
 
-        print("fff", runtype, setname, measure)
+    if "designpoints" in parameter_dict:
+        loop.append(parameter_dict["designpoints"])
+
+    for item in itertools.product(*loop):
+
+        if len(item) == 3:
+            runtype, setname, measure = item
+        elif len(item) == 4:
+            runtype, setname, measure, designpoints = item
+
+        print("prodotto", runtype, setname, measure)
         submit_dict = {"runtype": runtype,
                        "setname": setname,
                        "measure": measure,
@@ -282,8 +292,7 @@ def loop_input(parameterFile):
                        "email": parameter_dict["email"]}
 
         if "designpoints" in parameter_dict:
-            for design_point in parameter_dict["designpoints"]:
-                submit_dict["designpoints"] = design_point
+            submit_dict["designpoints"] = designpoints
 
         if "reps" in parameter_dict:
             submit_dict["reps"] = parameter_dict["reps"]
