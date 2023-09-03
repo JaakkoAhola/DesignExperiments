@@ -19,7 +19,7 @@ from algorithms import LookUpTable
 
 def main(variable):
     load_dotenv()
-    look = LookUpTable.LookUpTable(variable=variable, debug=True)
+    look = LookUpTable.LookUpTable(variable=variable, debug=False)
     look.create_look_up_tables()
 
 
