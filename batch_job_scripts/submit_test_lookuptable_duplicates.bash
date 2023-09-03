@@ -9,7 +9,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mail-type=END #uncomment to enable mail
 #SBATCH --mail-user=jjahol@utu.fi
-#SBATCH --output=logs/lookuptable_%j.log
+#SBATCH --output=logs/duplicates_test_lookup_table_%j.log
 
 module load python-data/3.8-22.10
 echo "module loaded"
