@@ -114,7 +114,7 @@ def get_logfile(submit_dict):
     else:
         reps = ""
 
-    return f"logs/{runtype}/{runtype}_{setname}_{measure}{designpoints}{reps}%j.log"
+    return f"logs/{runtype}/{runtype}_{setname}_{measure}{designpoints}{reps}_%j.log"
 
 
 def get_command(runtype):

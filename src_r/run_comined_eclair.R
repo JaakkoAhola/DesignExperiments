@@ -156,7 +156,7 @@ matrix_look_up_table <- function(ma){
   return (scaled_matrix)
 }
 
-if (TRUE){
+if (FALSE){
   print("test look-up table")
   vector_look_up_table(runif(length(design_variables), min = 0, max = 1))
   ma_sobol <- sobol(10, length(design_variables))
@@ -259,7 +259,7 @@ getPoints <- function(design_points){
       if (useUpscaling) {
         comined.feasible <- matrix_look_up_table(comined.feasible)  
       }
-      
+
       if (! use_max_pro){
         comined.optimised <- maximin.seq(design_points, comined.feasible, return.obj = T)
       } else{
