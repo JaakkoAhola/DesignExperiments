@@ -19,7 +19,7 @@ from algorithms import LookUpTable
 
 def main(variable):
     load_dotenv()
-    look = LookUpTable.LookUpTable(variable=variable, debug=False)
+    look = LookUpTable.LookUpTable(variable=variable, debug=True)
     look.create_look_up_tables()
 
 
@@ -31,6 +31,8 @@ if __name__ == "__main__":
         variable = sys.argv[1:]
         assert isinstance(variable, list)
     except KeyError:
+        variable = None
+    if len(variable) == 0:
         variable = None
 
     main(variable)

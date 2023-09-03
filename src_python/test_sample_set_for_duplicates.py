@@ -19,19 +19,32 @@ def main():
     load_dotenv()
     columns = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc', 'ks', 'as', 'cs',
                'rdry_AS_eff', 'cos_mu']
+    use_sample_set = True
+    check_original_look_up_tables = False
+
+    if use_sample_set:
+        prefix = "sample20000"
+    else:
+        prefix = "eclair_dataset_2001_designvariables"
+
+    if check_original_look_up_tables:
+        suffix = "_look_up_table_"
+    else:
+        suffix = "_look_up_table_non_duplicate_"
+
     for col in columns:
 
         base = pathlib.Path(os.environ["REPO"]) / \
-            f"data/02_raw_output/eclair_dataset_2001_designvariables_look_up_table_{col}.csv"
+            f"data/01_source/{prefix}{suffix}{col}.csv"
         df = pandas.read_csv(base)
         tot = len(df)
-        for ind in range(1, tot):
-            back = df.iloc[ind - 1][col]
-            forth = df.iloc[ind][col]
-            k = 0
-            if back >= forth:
-                k += 1
-        print(col, k)
+        # for ind in range(1, tot):
+        #     back = df.iloc[ind - 1][col]
+        #     forth = df.iloc[ind][col]
+        #     k = 0
+        #     if back >= forth:
+        #         k += 1
+        # # print(col, k)
 
         dup = len(df[col][df[col].duplicated()])
 

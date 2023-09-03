@@ -83,10 +83,10 @@ def submit_job(variable):
 
 def main():
     load_dotenv()
-   
+
     temp_list = sys.argv[1:]
-    if len(temp_list)>0:
-        temp_list = variable_list
+    if len(temp_list) > 0:
+        variable_list = temp_list
     else:
         variable_list = ["q_inv", "tpot_inv", "lwp", "tpot_pbl",
                          "pbl", "cdnc", "ks", "as", "cs", "rdry_AS_eff", "cos_mu"]

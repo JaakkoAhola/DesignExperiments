@@ -39,6 +39,8 @@ class LookUpTable:
 
             self.selected_variables = variable
 
+        print(f"selected variables: {self.selected_variables}")
+
         self.mainfolder = pathlib.Path(os.environ["REPO"]) / "data/01_source"
         if debug:
             self.collection_filename = self.mainfolder / "sample20000.csv"
@@ -62,6 +64,7 @@ class LookUpTable:
         return self.collection_dataframe
 
     def add_suffix_to_duplicates(self, series):
+        name = series.name
         values = series.values
         unique_values, indices, counts = numpy.unique(values, return_counts=True, return_index=True)
         is_duplicate = counts > 1
@@ -74,11 +77,11 @@ class LookUpTable:
         mask = is_duplicate[indices.searchsorted(numpy.arange(len(series)), side='right') - 1]
 
         result_series = [
-            f"{value}_{ordinal}" if is_dup else str(value)
+            f"{value}_1{ordinal}" if is_dup else str(value)
             for value, is_dup, ordinal in zip(values, mask, ordinal_numbers)
         ]
 
-        return pandas.Series(result_series)
+        return pandas.Series(result_series, name=name)
 
     # Example usage:
     # decimal_numbers = pandas.Series([1.234, 2.345, 2.345, 3.456, 3.456, 3.456, 4.567])
@@ -90,7 +93,7 @@ class LookUpTable:
             print()
             print(f"Creating lookup table for variable {key}")
             file = self.mainfolder / (self.collection_filename.stem +
-                                      "_look_up_table_" + key + ".csv")
+                                      "_look_up_table_non_duplicate_" + key + ".csv")
             if file.is_file():
                 print(f"Lookup table for variable {key} already exists")
                 next
@@ -111,10 +114,12 @@ class LookUpTable:
                 sorted_dataframe = filtered_data.sort_values(key)
                 print(f"Values sorted for {key}")
                 sorted_series = sorted_dataframe[key]
-                sorted_series.reset_index(inplace=True, drop=True)
+                sorted_series = sorted_series.reset_index(drop=True)
+
+                sorted_non_duplicate = self.add_suffix_to_duplicates(sorted_series)
 
                 print(f"Save lookup table for variable {key}")
-                sorted_series.to_csv(file, index=False)
+                sorted_non_duplicate.to_csv(file, index=False)
                 print(f"Lookuptable creation finished for variable {key}.")
 
     def load_look_up_tables(self):
