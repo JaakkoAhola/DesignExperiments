@@ -6,12 +6,10 @@ setname:
 measure:
     - maximin
 designpoints:
-    - 5
-    - 6
-    - 10
-    - 20
     - 50
     - 100
+    - 135
+    - 150
     - 200
     - 300
     - 400
