@@ -33,9 +33,11 @@ def main():
         suffix = "_look_up_table_non_duplicate_"
 
     for col in columns:
-
+    
         base = pathlib.Path(os.environ["REPO"]) / \
             f"data/01_source/{prefix}{suffix}{col}.csv"
+        print()
+        print("file", base)
         df = pandas.read_csv(base)
         tot = len(df)
         # for ind in range(1, tot):
