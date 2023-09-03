@@ -19,7 +19,7 @@ def main():
     load_dotenv()
     columns = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc', 'ks', 'as', 'cs',
                'rdry_AS_eff', 'cos_mu']
-    use_sample_set = True
+    use_sample_set = False
     check_original_look_up_tables = False
 
     if use_sample_set:
