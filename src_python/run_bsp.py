@@ -86,8 +86,6 @@ def main():
         upfolder = "maximin"
 
     for key in keys_list:
-        solutions_bsp = numpy.zeros(numpy.shape(design_points_vector))
-        timing_vector_bsp = numpy.zeros(numpy.shape(design_points_vector))
 
         if debug:
             subfolder = "test"
@@ -135,20 +133,17 @@ def main():
 
             duration_bsp = time.time() - start
 
-            solutions_bsp[ind] = best
-            timing_vector_bsp[ind] = duration_bsp
+            df_key = upfolder + "_bsp"
+            solutions_df = pandas.DataFrame(data={
+                df_key: best,
+                "duration_bsp": duration_bsp,
+            },
+                index=design_points_vector)
+            solutions_df.index.name = "design_points"
 
-        df_key = upfolder + "_bsp"
-        solutions_df = pandas.DataFrame(data={
-            df_key: solutions_bsp,
-            "duration_bsp": timing_vector_bsp,
-        },
-            index=design_points_vector)
-        solutions_df.index.name = "design_points"
-
-        solutions_df.to_csv(pathlib.Path(os.environ["REPO"]) /
-                            f"data/02_raw_output/design_stats_{upfolder}" /
-                            subfolder / "bsp_stats.csv")
+            solutions_df.to_csv(pathlib.Path(os.environ["REPO"]) /
+                                f"data/02_raw_output/design_stats_{upfolder}" /
+                                subfolder / "bsp" / f"stats_bsp_{design_points}.csv")
 
 
 if __name__ == "__main__":
