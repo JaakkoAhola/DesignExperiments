@@ -3,7 +3,9 @@ runtype:
     - bsp
 setname:
     - sbnight
+    - sbday
     - salsanight
+    - salsaday
 measure:
     - maximin
     - maxpro
