@@ -23,6 +23,7 @@ def main():
     if update_results:
         dd.get_manuscript_results()
         dd.get_maximin_results_with_R()
+        dd.save_results_with_bsp()
         dd.save_results_with_R()
 
     dd.read_all_results()

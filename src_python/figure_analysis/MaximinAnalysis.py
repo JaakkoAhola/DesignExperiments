@@ -160,6 +160,27 @@ class MaximinAnalysis:
                 stats_file = self.folder / dd_set / (method + "_stats.csv")
                 self.stats[dd_set][method].to_csv(stats_file)
 
+    def save_results_with_bsp(self):
+        for dd_set in self.design_sets:
+            subfolder = self.folder / dd_set / "bsp"
+            list_of_designs = list(subfolder.glob("**/stats_bsp_*.csv"))
+            # Create an empty DataFrame to store the merged data
+            merged_df = pandas.DataFrame(columns=['design_points', 'maximin_bsp', 'duration_bsp'])
+
+            print(list_of_designs)
+            # Use glob to get a list
+
+            # Loop through the CSV files and append their data to the merged DataFrame
+            for file_name in list_of_designs:
+                df = pandas.read_csv(file_name)
+                merged_df = pandas.concat([merged_df, df], ignore_index=True)
+
+            # Save the merged DataFrame to a new CSV file
+            merged_df = merged_df.sort_values(by='design_points')
+            merged_df.to_csv(self.folder / dd_set / 'bsp_stats.csv', index=False)
+
+            print("Merged data saved to 'merged_stats.csv'")
+
     def read_all_results(self):
 
         for dd_set in self.design_sets:
