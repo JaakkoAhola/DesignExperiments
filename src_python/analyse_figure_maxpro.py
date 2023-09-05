@@ -25,6 +25,7 @@ def main():
         dd.get_manuscript_results()
         dd.get_maxpro_results_with_R()
         dd.save_results_with_R()
+        dd.save_results_with_bsp()
 
     dd.read_all_results()
     dd.get_maxpro_column_names()
