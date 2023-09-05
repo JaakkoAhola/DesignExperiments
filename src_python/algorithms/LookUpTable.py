@@ -39,8 +39,6 @@ class LookUpTable:
 
             self.selected_variables = variable
 
-        print(f"selected variables: {self.selected_variables}")
-
         self.mainfolder = pathlib.Path(os.environ["REPO"]) / "data/01_source"
         if debug:
             self.collection_filename = self.mainfolder / "sample20000.csv"
@@ -82,11 +80,6 @@ class LookUpTable:
         ]
 
         return pandas.Series(result_series, name=name)
-
-    # Example usage:
-    # decimal_numbers = pandas.Series([1.234, 2.345, 2.345, 3.456, 3.456, 3.456, 4.567])
-    # result = add_suffix_to_duplicates(decimal_numbers)
-    # print(result)
 
     def create_look_up_tables(self):
         for key in self.selected_variables:

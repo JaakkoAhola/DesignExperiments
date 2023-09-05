@@ -141,9 +141,11 @@ class MaxProxAnalysis:
             for method in self.design_methods_with_R:
                 list_of_tuples = self.stats[dd_set][method]
 
-                self.stats[dd_set][method] = pandas.DataFrame.from_records(list_of_tuples,
-                                                                           columns=['design_points',
-                                                                                    'maxpro_' + method])
+                self.stats[dd_set][method] = pandas.DataFrame\
+                    .from_records(list_of_tuples,
+                                  columns=['design_points',
+                                           'maxpro_' + method])
+
                 self.stats[dd_set][method].set_index("design_points", inplace=True)
 
     def save_results_with_R(self):
@@ -151,6 +153,24 @@ class MaxProxAnalysis:
             for method in self.design_methods_with_R:
                 stats_file = self.folder / dd_set / (method + "_stats.csv")
                 self.stats[dd_set][method].to_csv(stats_file)
+
+    def save_results_with_bsp(self):
+        for dd_set in self.design_sets:
+            subfolder = self.folder / dd_set / "bsp"
+            list_of_designs = list(subfolder.glob("**/stats_bsp_*.csv"))
+            # Create an empty DataFrame to store the merged data
+            merged_df = pandas.DataFrame(columns=['design_points', 'maxpro_bsp', 'duration_bsp'])
+
+            # Use glob to get a list
+
+            # Loop through the CSV files and append their data to the merged DataFrame
+            for file_name in list_of_designs:
+                df = pandas.read_csv(file_name)
+                merged_df = pandas.concat([merged_df, df], ignore_index=True)
+
+            # Save the merged DataFrame to a new CSV file
+            merged_df = merged_df.sort_values(by='design_points')
+            merged_df.to_csv(self.folder / dd_set / 'bsp_stats.csv', index=False)
 
     def read_all_results(self):
 

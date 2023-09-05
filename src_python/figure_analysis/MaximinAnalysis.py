@@ -167,7 +167,6 @@ class MaximinAnalysis:
             # Create an empty DataFrame to store the merged data
             merged_df = pandas.DataFrame(columns=['design_points', 'maximin_bsp', 'duration_bsp'])
 
-            print(list_of_designs)
             # Use glob to get a list
 
             # Loop through the CSV files and append their data to the merged DataFrame
@@ -178,8 +177,6 @@ class MaximinAnalysis:
             # Save the merged DataFrame to a new CSV file
             merged_df = merged_df.sort_values(by='design_points')
             merged_df.to_csv(self.folder / dd_set / 'bsp_stats.csv', index=False)
-
-            print("Merged data saved to 'merged_stats.csv'")
 
     def read_all_results(self):
 
