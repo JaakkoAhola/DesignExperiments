@@ -9,6 +9,7 @@ Created on %(date)s
 import os
 from copy import deepcopy
 import pathlib
+import re
 import pandas
 import numpy
 from scipy.stats import qmc
@@ -129,18 +130,21 @@ class FillDistance(MaximinAnalysis.MaximinAnalysis):
         return fill_distance
 
     def get_fill_distance_for_all(self):
-
+        skip_pattern = r'stats_bsp_\d+\.csv'
         for dd_set in self.simulation_sets_to_be_executed:
             for method in self.design_methods_to_be_executed:
                 subfolder = self.folder / dd_set / method
                 list_of_designs = list(subfolder.glob("**/*.csv"))
+
                 assert len(list_of_designs) >= 0, \
                     f"List of design points stats empty, check folder {dd_set}/{method}"
 
                 for file_name in list_of_designs:
-                    design_points = int(
-                        FileSystem.get_design_points_from_filename(file_name))
+                    if re.match(skip_pattern, file_name.name):
+                        continue
+
                     design_dataframe = pandas.read_csv(file_name, index_col=0)
+                    design_points = len(design_dataframe)
 
                     if method in ["bsp", "manuscript"]:
                         hypercube_design_dataframe = self.look.downscale_dataframe(
