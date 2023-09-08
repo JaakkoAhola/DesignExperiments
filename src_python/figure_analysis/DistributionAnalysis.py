@@ -112,14 +112,15 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
                 for file_name in list_of_designs:
                     if re.match(skip_pattern, file_name.name):
                         continue
-                    print(file_name)
                     df = pandas.read_csv(file_name, index_col=0)
 
                     if method not in ["manuscript", "bsp"]:
                         df = self.look.upscale_dataframe(df)
-                    design_points = df.shape[0]
-
+                    design_points = len(df)
+                    print(trainingSet, method, design_points, file_name)
                     self.stats[trainingSet][method][design_points] = df
+
+                    print(self.stats[trainingSet][method])
         print("-- exiting")
 
     def figure_design_variable_distribution(self):
@@ -184,7 +185,8 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
             for method in self.design_methods_all:
                 if method == "manuscript" and variable == "pbl":
                     variable = "pblh"
-                # print("design maximi", trainingSet, method, max(self.stats[trainingSet][method].keys()))
+                print("design maximi", trainingSet, method,
+                      self.stats[trainingSet][method].keys())
                 design_points = max(self.stats[trainingSet][method].keys())
 
                 try:
