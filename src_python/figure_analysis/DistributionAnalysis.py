@@ -8,6 +8,7 @@ Created on 19.1.2022
 """
 
 import os
+import re
 import pandas
 import pathlib
 from math import ceil
@@ -99,6 +100,7 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
 
     def read_all_designs(self):
         print("read_all_designs")
+        skip_pattern = r'stats_bsp_\d+\.csv'
         for trainingSet in self.design_sets:
             for method in self.design_methods_all:
                 subfolder = self.folder / trainingSet / method
@@ -108,6 +110,8 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
                     f"List of design points stats empty, check folder {trainingSet}/{method}"
 
                 for file_name in list_of_designs:
+                    if re.match(skip_pattern, file_name.name):
+                        continue
                     print(file_name)
                     df = pandas.read_csv(file_name, index_col=0)
 
