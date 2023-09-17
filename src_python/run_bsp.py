@@ -103,7 +103,7 @@ def main():
             print(" ")
             print("design_points", design_points)
             for k in range(reps):
-                print("iteration:", k)
+                print("iteration:", k, end=" ")
                 bsp = BinarySpacePartition.BinarySpacePartition(design_variables=design_variables[key],
                                                                 design_points=design_points,
                                                                 sourcefile=file,
@@ -121,6 +121,7 @@ def main():
                     solution = Metrics.matrix_minimum_distance(bsp_matrix)
 
                     if solution > best:
+                        print("solution improved")
                         best = solution
                         bsp.write_design()
 
@@ -128,6 +129,7 @@ def main():
                     solution = Metrics.max_pro_measure(bsp_matrix)
 
                     if solution < best:
+                        print("solution improved")
                         best = solution
                         bsp.write_design()
 

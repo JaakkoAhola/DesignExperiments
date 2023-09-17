@@ -26,7 +26,8 @@ class BinarySpacePartition:
                  design_points=500,
                  sourcefile=pathlib.Path(os.environ["REPO"]) / "data/01_source/sample20000.csv",
                  outputfile=pathlib.Path(os.environ["REPO"]) /
-                 "data/02_raw_output/bsp_test_sb_night_500.csv"
+                 "data/02_raw_output/bsp_test_sb_night_500.csv",
+                 logging=False
                  ):
 
         self.design_variables = design_variables
@@ -45,6 +46,8 @@ class BinarySpacePartition:
         self.partitions = []
 
         self.design = None
+
+        self.logging = logging
 
         random.seed(321)
 
@@ -69,14 +72,16 @@ class BinarySpacePartition:
 
         make_partition = True
         print("Creating partitions")
-        print("\t", end="")
+        if self.logging:
+            print("\t", end="")
         while make_partition:
             shuffled_dimensions = self.shuffleList(self.design_variables)
             for _, dimension in enumerate(shuffled_dimensions):
                 part_ind = 0
                 iterate_partitions = True
                 while iterate_partitions:
-                    print(f"{len(self.partitions)}", end=" ")
+                    if self.logging:
+                        print(f"{len(self.partitions)}", end=" ")
                     if len(self.partitions) < self.design_points:
                         partition = self.partitions[part_ind]
 
@@ -102,14 +107,18 @@ class BinarySpacePartition:
     def sample_partitions_to_design(self):
         design_helper_list = [None] * self.design_points
         print("Sampling partitions")
-        print("\t", end="")
+        if self.logging:
+            print("\t", end="")
         for part_ind, partition in enumerate(self.partitions):
             constraintPass = False
-            print(f"{part_ind}", end=" ")
+            if self.logging:
+                print(f"{part_ind}", end=" ")
             random_seed_increment = 0
-            print("(", end=" ")
+            if self.logging:
+                print("(", end=" ")
             while not constraintPass:
-                print(f"{random_seed_increment}", end=" ")
+                if self.logging:
+                    print(f"{random_seed_increment}", end=" ")
                 row = partition.sample(random_state=part_ind + random_seed_increment)
                 q_pbl = Meteo.solve_rw_lwp(101780,
                                            row.iloc[0]["tpot_pbl"],
@@ -117,13 +126,16 @@ class BinarySpacePartition:
                                            row.iloc[0]["pbl"] * 100.) * 1e3
                 constraintPass = (q_pbl - row.iloc[0]["q_inv"] > 1)
                 random_seed_increment += 1
-            print(")", end=" ")
+            if self.logging:
+                print(")", end=" ")
 
             design_helper_list[part_ind] = row
 
         self.design = pandas.concat(design_helper_list)
-        print(" ")
-        print(" ")
+        if self.logging:
+            print(" ")
+        if self.logging:
+            print(" ")
         return self.design
 
     def get_design(self):
