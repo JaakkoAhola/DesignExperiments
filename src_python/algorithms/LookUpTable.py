@@ -86,7 +86,7 @@ class LookUpTable:
             print()
             print(f"Creating lookup table for variable {key}")
             file = self.mainfolder / (self.collection_filename.stem +
-                                      "_look_up_table_non_duplicate_" + key + ".csv")
+                                      "_look_up_table_" + key + ".csv")
             if file.is_file():
                 print(f"Lookup table for variable {key} already exists")
                 next
