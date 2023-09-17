@@ -267,14 +267,8 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
             ax = fig.getAxes(ind)
             trainingSet = self.trainingetSetsForVariables[variable]
 
-            annotation_method_manu = "manuscript"
-            annotation_method_other = "scmc"
-            variableSpecs = f"""Design set: {self.design_sensible_names[trainingSet]}
-{PlotTweak.getLatexLabel(f'min={minisDesigns[ind]:.2f}')}
+            variableSpecs = f"""{PlotTweak.getLatexLabel(f'min={minisDesigns[ind]:.2f}')}
 {PlotTweak.getLatexLabel(f'max={maxisDesigns[ind]:.2f}')}
-Design points
-  - {self.get_sensible_name(annotation_method_manu)}: {max(self.stats[trainingSet][annotation_method_manu].keys())}
-  - Other designs: {max(self.stats[trainingSet][annotation_method_other].keys())}
 """
 
             ax.annotate(variableSpecs,
