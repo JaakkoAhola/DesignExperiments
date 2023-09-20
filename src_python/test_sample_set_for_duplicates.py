@@ -9,48 +9,99 @@
 
 import os
 import pathlib
+import sys
 import time
 from datetime import datetime
 from dotenv import load_dotenv
 import pandas
+import numpy
+from library import Data
+
+
+def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon()):
+    # Check if the array is empty or has only one element
+    # if len(arr) < 2:
+    #     return True
+    if isinstance(arr, pandas.core.frame.DataFrame):
+        arr = arr.values.reshape(1, -1)
+    elif isinstance(arr, pandas.core.series.Series):
+        arr = arr.values
+    else:
+        pass
+
+    arr = arr.ravel()
+
+    # Calculate the absolute differences between all pairs of elements
+    differences = numpy.abs(numpy.subtract.outer(arr, arr))
+
+    # Set the diagonal elements to infinity to avoid comparing elements to themselves
+    differences[numpy.triu_indices(len(arr), 0)] = numpy.inf
+    indices = numpy.argwhere(differences < epsilon)
+    duplicate_indices = numpy.unique(indices.flatten())
+
+    # Check if all differences are less than epsilon
+    return numpy.all(differences < epsilon), duplicate_indices
 
 
 def main():
     load_dotenv()
     columns = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc', 'ks', 'as', 'cs',
                'rdry_AS_eff', 'cos_mu']
-    use_sample_set = False
-    check_original_look_up_tables = False
+    columns = ['q_inv']
+
+    mountfolder = pathlib.Path(
+        "/home/jamesaloha/mounttauskansiot/puhtiwork/optimal_design/DesignExperiments")
+    mounted = (mountfolder / ".env").is_file()
+
+    if mounted:
+        rootfolder = "/home/jamesaloha/mounttauskansiot/puhtiwork/optimal_design/DesignExperiments"
+    else:
+        rootfolder = os.environ["REPO"]
+
+    if len(sys.argv) >= 3:
+        use_sample_set = sys.argv[1].lower() == "true"
+        check_original_look_up_tables = sys.argv[2].lower() == "true"
+    else:
+        use_sample_set = True
+        check_original_look_up_tables = False
 
     if use_sample_set:
-        prefix = "sample20000"
+        setname = "sample20000"
     else:
-        prefix = "eclair_dataset_2001_designvariables"
+        setname = "eclair_dataset_2001_designvariables"
 
     if check_original_look_up_tables:
-        suffix = "_look_up_table_"
+        subdir = "archive_lookuptable/"
     else:
-        suffix = "_look_up_table_non_duplicate_"
+        subdir = ""
 
+    # data_type = "float64"
+    pref = "_look_up_table_"
     for col in columns:
-    
-        base = pathlib.Path(os.environ["REPO"]) / \
-            f"data/01_source/{prefix}{suffix}{col}.csv"
+
+        base = pathlib.Path(rootfolder) / \
+            f"data/01_source/{subdir}{setname}{pref}{col}.csv"
+
+        assert base.is_file(), f"File {base} missing, check your folders"
         print()
         print("file", base)
         df = pandas.read_csv(base)
-        tot = len(df)
-        # for ind in range(1, tot):
-        #     back = df.iloc[ind - 1][col]
-        #     forth = df.iloc[ind][col]
-        #     k = 0
-        #     if back >= forth:
-        #         k += 1
-        # # print(col, k)
+        total_number_of_samples = len(df)
 
-        dup = len(df[col][df[col].duplicated()])
+        is_unique, duplicate_indices = is_array_unique_show_duplicates(df)
 
-        print(f"{col} {dup} {dup/tot*100:.2f}")
+        if (not use_sample_set) and (not check_original_look_up_tables) and (not mounted):
+            df.iloc[duplicate_indices].to_csv(pathlib.Path(os.environ["REPO"]) /
+                                              f"data/01_source/duplicates/{setname}{col}_duplicates.csv")
+        # print(col, k)
+        # df[col][df[col].duplicated()].to_csv(pathlib.Path(os.environ["REPO"]) /
+        #                                      f"data/{data_type}_{col}_dup.csv", index_col=False)
+        # dup = len(df[col][df[col].duplicated()])
+        number_of_duplicates = len(duplicate_indices)
+
+        print(f"{col}: Unique {is_unique}. \
+Number of duplicates {number_of_duplicates}. \
+Percentage of duplicates{number_of_duplicates/total_number_of_samples*100:.2f}")
 
 
 if __name__ == "__main__":
