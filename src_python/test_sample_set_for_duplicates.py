@@ -18,10 +18,7 @@ import numpy
 from library import Data
 
 
-def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon()):
-    # Check if the array is empty or has only one element
-    # if len(arr) < 2:
-    #     return True
+def reshape_list(arr):
     if isinstance(arr, pandas.core.frame.DataFrame):
         arr = arr.values.reshape(1, -1)
     elif isinstance(arr, pandas.core.series.Series):
@@ -31,23 +28,41 @@ def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon()):
 
     arr = arr.ravel()
 
+    return arr
+
+
+def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon()):
+    arr = reshape_list(arr)
+
     # Calculate the absolute differences between all pairs of elements
     differences = numpy.abs(numpy.subtract.outer(arr, arr))
 
     # Set the diagonal elements to infinity to avoid comparing elements to themselves
     differences[numpy.triu_indices(len(arr), 0)] = numpy.inf
-    indices = numpy.argwhere(differences < epsilon)
+    smaller_than_epsilon = differences < epsilon
+    indices = numpy.argwhere(smaller_than_epsilon)
     duplicate_indices = numpy.unique(indices.flatten())
 
     # Check if all differences are less than epsilon
-    return numpy.all(differences < epsilon), duplicate_indices
+    return numpy.all(smaller_than_epsilon), duplicate_indices
+
+
+def simple_diff(arr, epsilon=Data.getEpsilon()):
+    arr = reshape_list(arr)
+    forward_values = arr[1:]
+    backward_values = arr[:-1]
+    differences = numpy.abs(forward_values - backward_values)
+    smaller_than_epsilon = differences < epsilon
+    indices = numpy.argwhere(smaller_than_epsilon)
+    duplicate_indices = numpy.unique(numpy.concatenate((indices, indices + 1)))
+
+    return numpy.all(smaller_than_epsilon), duplicate_indices
 
 
 def main():
     load_dotenv()
     columns = ['q_inv', 'tpot_inv', 'lwp', 'tpot_pbl', 'pbl', 'cdnc', 'ks', 'as', 'cs',
                'rdry_AS_eff', 'cos_mu']
-    columns = ['q_inv']
 
     mountfolder = pathlib.Path(
         "/home/jamesaloha/mounttauskansiot/puhtiwork/optimal_design/DesignExperiments")
@@ -88,7 +103,7 @@ def main():
         df = pandas.read_csv(base)
         total_number_of_samples = len(df)
 
-        is_unique, duplicate_indices = is_array_unique_show_duplicates(df)
+        is_unique, duplicate_indices = simple_diff(df)
 
         if (not use_sample_set) and (not check_original_look_up_tables) and (not mounted):
             df.iloc[duplicate_indices].to_csv(pathlib.Path(os.environ["REPO"]) /
@@ -101,7 +116,7 @@ def main():
 
         print(f"{col}: Unique {is_unique}. \
 Number of duplicates {number_of_duplicates}. \
-Percentage of duplicates{number_of_duplicates/total_number_of_samples*100:.2f}")
+Percentage of duplicates {number_of_duplicates/total_number_of_samples*100:.2f}")
 
 
 if __name__ == "__main__":
