@@ -92,31 +92,37 @@ def main():
 
     # data_type = "float64"
     pref = "_look_up_table_"
-    for col in columns:
-
-        base = pathlib.Path(rootfolder) / \
-            f"data/01_source/{subdir}{setname}{pref}{col}.csv"
-
-        assert base.is_file(), f"File {base} missing, check your folders"
+    print()
+    for epsilon in [1e-3, 1e-6, 1e-8, 1e-12, Data.getEpsilon()]:
         print()
-        print("file", base)
-        df = pandas.read_csv(base)
-        total_number_of_samples = len(df)
+        print()
+        print(epsilon)
+        for col in columns:
 
-        is_unique, duplicate_indices = simple_diff(df)
+            base = pathlib.Path(rootfolder) / \
+                f"data/01_source/{subdir}{setname}{pref}{col}.csv"
 
-        if (not use_sample_set) and (not check_original_look_up_tables) and (not mounted):
-            df.iloc[duplicate_indices].to_csv(pathlib.Path(os.environ["REPO"]) /
-                                              f"data/01_source/duplicates/{setname}{col}_duplicates.csv")
-        # print(col, k)
-        # df[col][df[col].duplicated()].to_csv(pathlib.Path(os.environ["REPO"]) /
-        #                                      f"data/{data_type}_{col}_dup.csv", index_col=False)
-        # dup = len(df[col][df[col].duplicated()])
-        number_of_duplicates = len(duplicate_indices)
+            assert base.is_file(), f"File {base} missing, check your folders"
 
-        print(f"{col}: Unique {is_unique}. \
+            print("file", base)
+            df = pandas.read_csv(base)
+            total_number_of_samples = len(df)
+
+            is_unique, duplicate_indices = simple_diff(df, epsilon)
+
+            if (not use_sample_set) and (not check_original_look_up_tables) and (not mounted):
+                df.iloc[duplicate_indices].to_csv(pathlib.Path(os.environ["REPO"]) /
+                                                  f"data/01_source/duplicates/{setname}{col}_duplicates.csv")
+            # print(col, k)
+            # df[col][df[col].duplicated()].to_csv(pathlib.Path(os.environ["REPO"]) /
+            #                                      f"data/{data_type}_{col}_dup.csv", index_col=False)
+            # dup = len(df[col][df[col].duplicated()])
+            number_of_duplicates = len(duplicate_indices)
+
+            print(f"{col}: {epsilon:e} Unique {is_unique}. \
 Number of duplicates {number_of_duplicates}. \
 Percentage of duplicates {number_of_duplicates/total_number_of_samples*100:.2f}")
+            print()
 
 
 if __name__ == "__main__":
