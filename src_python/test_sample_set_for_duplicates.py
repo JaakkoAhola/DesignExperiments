@@ -31,7 +31,9 @@ def reshape_list(arr):
     return arr
 
 
-def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon()):
+def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon(), dtype=None):
+    if dtype is not None:
+        epsilon = numpy.finfo(dtype).eps
     arr = reshape_list(arr)
 
     # Calculate the absolute differences between all pairs of elements
@@ -90,39 +92,35 @@ def main():
     else:
         subdir = ""
 
-    # data_type = "float64"
+    dtype = numpy.float128
     pref = "_look_up_table_"
     print()
-    for epsilon in [1e-3, 1e-6, 1e-8, 1e-12, Data.getEpsilon()]:
-        print()
-        print()
-        print(epsilon)
-        for col in columns:
+    for col in columns:
 
-            base = pathlib.Path(rootfolder) / \
-                f"data/01_source/{subdir}{setname}{pref}{col}.csv"
+        base = pathlib.Path(rootfolder) / \
+            f"data/01_source/{subdir}{setname}{pref}{col}.csv"
 
-            assert base.is_file(), f"File {base} missing, check your folders"
+        assert base.is_file(), f"File {base} missing, check your folders"
 
-            print("file", base)
-            df = pandas.read_csv(base)
-            total_number_of_samples = len(df)
+        print("file", base)
+        df = pandas.read_csv(base, dtype=dtype)
+        total_number_of_samples = len(df)
 
-            is_unique, duplicate_indices = simple_diff(df, epsilon)
+        is_unique, duplicate_indices = simple_diff(df, dtype=dtype)
 
-            if (not use_sample_set) and (not check_original_look_up_tables) and (not mounted):
-                df.iloc[duplicate_indices].to_csv(pathlib.Path(os.environ["REPO"]) /
-                                                  f"data/01_source/duplicates/{setname}{col}_duplicates.csv")
-            # print(col, k)
-            # df[col][df[col].duplicated()].to_csv(pathlib.Path(os.environ["REPO"]) /
-            #                                      f"data/{data_type}_{col}_dup.csv", index_col=False)
-            # dup = len(df[col][df[col].duplicated()])
-            number_of_duplicates = len(duplicate_indices)
+        if (not use_sample_set) and (not check_original_look_up_tables) and (not mounted):
+            df.iloc[duplicate_indices].to_csv(pathlib.Path(os.environ["REPO"]) /
+                                              f"data/01_source/duplicates/{setname}{col}_duplicates.csv")
+        # print(col, k)
+        # df[col][df[col].duplicated()].to_csv(pathlib.Path(os.environ["REPO"]) /
+        #                                      f"data/{data_type}_{col}_dup.csv", index_col=False)
+        # dup = len(df[col][df[col].duplicated()])
+        number_of_duplicates = len(duplicate_indices)
 
-            print(f"{col}: {epsilon:e} Unique {is_unique}. \
+        print(f"{col}: Unique {is_unique}. \
 Number of duplicates {number_of_duplicates}. \
 Percentage of duplicates {number_of_duplicates/total_number_of_samples*100:.2f}")
-            print()
+        print()
 
 
 if __name__ == "__main__":
