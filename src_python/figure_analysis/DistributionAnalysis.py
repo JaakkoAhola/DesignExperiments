@@ -136,7 +136,7 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
                                            left=0.05, right=0.99)
 
         fig = self.figures[name]
-
+        default = [0.02, 0.02]
         rightUp = [0.57, 0.70]
         leftUp = [0.25, 0.73]
         leftDown = [0.1, 0]
@@ -144,9 +144,9 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
         middleDown = [0.33, 0.05]
         default = [0.5, 0.5]
         specsPositions = [[0.3, 0.05], [0.2, 0.05], [0.3, 0.5],
-                          [0.3, 0.5], [0.3, 0.4], [0.3, 0.5],
+                          [0.3, 0.5], [0.3, 0.05], [0.3, 0.5],
                           [0.3, 0.5], [0.3, 0.5], [0.3, 0.5],
-                          [0.2, 0.05], middleDown
+                          middleDown, middleDown
                           ]
 
         aeroNumberVariables = ["ks", "as", "cs"]
@@ -272,7 +272,7 @@ class DistributionAnalysis(MaximinAnalysis.MaximinAnalysis):
 """
 
             ax.annotate(variableSpecs,
-                        xy=[0.02, 0.02],
+                        xy=specsPositions[ind],
                         size=4,
                         bbox=dict(pad=0.6, fc="w", ec="w", alpha=0.9), xycoords="axes fraction")
 
