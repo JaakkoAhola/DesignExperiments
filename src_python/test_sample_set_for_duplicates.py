@@ -31,9 +31,8 @@ def reshape_list(arr):
     return arr
 
 
-def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon(), dtype=None):
-    if dtype is not None:
-        epsilon = numpy.finfo(dtype).eps
+def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon()):
+
     arr = reshape_list(arr)
 
     # Calculate the absolute differences between all pairs of elements
@@ -49,7 +48,10 @@ def is_array_unique_show_duplicates(arr, epsilon=Data.getEpsilon(), dtype=None):
     return numpy.all(smaller_than_epsilon), duplicate_indices
 
 
-def simple_diff(arr, epsilon=Data.getEpsilon()):
+def simple_diff(arr, epsilon=Data.getEpsilon(), dtype=None):
+    if dtype is not None:
+        epsilon = numpy.finfo(dtype).eps
+
     arr = reshape_list(arr)
     forward_values = arr[1:]
     backward_values = arr[:-1]
